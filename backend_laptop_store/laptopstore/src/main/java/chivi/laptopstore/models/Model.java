@@ -10,15 +10,15 @@ import java.time.LocalDateTime;
 @Data
 public abstract class Model {
     @Id
-    private String id;
+    protected String id;
     @CreatedDate
-    private LocalDateTime createdDate;
+    protected LocalDateTime createdDate;
     @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    protected LocalDateTime lastModifiedDate;
 
     public Model() {
-        this.createdDate = LocalDateTime.now();
-        this.lastModifiedDate = LocalDateTime.now();
+//        this.createdDate = LocalDateTime.now();
+//        this.lastModifiedDate = LocalDateTime.now();
     }
 
     public void setLastModifiedDateNow() {

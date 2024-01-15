@@ -1,5 +1,6 @@
 package chivi.laptopstore.controllers;
 
+import chivi.laptopstore.common.Values;
 import chivi.laptopstore.communication.request.ProductRequest;
 import chivi.laptopstore.models.ProductModel;
 import chivi.laptopstore.services.ProductService;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/v1")
+@RequestMapping(Values.API_V1)
 @AllArgsConstructor
 public class ProductController {
     private final ProductService productService;

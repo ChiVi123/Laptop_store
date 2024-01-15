@@ -1,2 +1,6 @@
+# database
 database_laptop_store
-docker-compose-db-old.yml
+
+# docker
+*.old.yml
+*.local.yml

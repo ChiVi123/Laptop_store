@@ -1,4 +1,4 @@
-package chivi.laptopstore.communication.request;
+package chivi.laptopstore.models.requests;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -10,4 +10,7 @@ public class ProductRequest {
     @NotBlank(message = "Name not blank")
     private String name;
     private BigDecimal price;
+    private String description;
+    private Long categoryId;
+    private Long brandId;
 }

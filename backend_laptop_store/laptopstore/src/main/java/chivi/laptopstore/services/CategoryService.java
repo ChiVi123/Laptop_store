@@ -1,12 +1,13 @@
 package chivi.laptopstore.services;
 
-import chivi.laptopstore.communication.request.CategoryRequest;
-import chivi.laptopstore.models.entities.CategoryModel;
+import chivi.laptopstore.models.entities.CategoryEntity;
+import chivi.laptopstore.models.requests.CategoryRequest;
+import chivi.laptopstore.models.responses.ResponseModel;
 import chivi.laptopstore.repositories.entities.ICategoryRepository;
+import chivi.laptopstore.utils.CustomString;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -14,27 +15,35 @@ import java.util.Optional;
 public class CategoryService {
     private final ICategoryRepository categoryRepository;
 
-    public List<CategoryModel> findAllCategory() {
-        return categoryRepository.findAll();
+    public ResponseModel findAllCategory() {
+        return new ResponseModel(true, "Success", categoryRepository.findAll());
     }
 
-    public CategoryModel createCategory(CategoryRequest categoryRequest) {
-        return categoryRepository.save(CategoryModel
-                .builder()
-                .name(categoryRequest.getName())
-                .url(categoryRequest.getUrl())
-                .build());
+    public ResponseModel createCategory(CategoryRequest categoryRequest) {
+        String url = categoryRequest.getUrl() == null ? CustomString.toSlug(categoryRequest.getName()) : categoryRequest.getUrl();
+        CategoryEntity categoryEntity = new CategoryEntity(categoryRequest.getName(), url);
+        return new ResponseModel(true, "Create success", categoryRepository.save(categoryEntity));
     }
 
-    public CategoryModel editCategory(Long categoryID, CategoryRequest categoryRequest) {
-        Optional<CategoryModel> optional = categoryRepository.findById(categoryID);
+    public ResponseModel editCategory(Long categoryID, CategoryRequest categoryRequest) {
+        Optional<CategoryEntity> optional = categoryRepository.findById(categoryID);
 
         if (optional.isEmpty()) {
-            return CategoryModel.builder().build();
+            return new ResponseModel(false, "Can't find category", new CategoryEntity());
         }
 
         optional.get().setName(categoryRequest.getName());
         optional.get().setUrl(categoryRequest.getUrl());
-        return categoryRepository.save(optional.get());
+        return new ResponseModel(true, "Edit success", categoryRepository.save(optional.get()));
+    }
+
+    public ResponseModel deleteCategory(Long categoryId) {
+        Optional<CategoryEntity> optionalCategory = categoryRepository.findById(categoryId);
+        if (optionalCategory.isEmpty()) {
+            return new ResponseModel(false, "Can't found category", "");
+        }
+
+        categoryRepository.delete(optionalCategory.get());
+        return new ResponseModel(true, "Delete success", "");
     }
 }

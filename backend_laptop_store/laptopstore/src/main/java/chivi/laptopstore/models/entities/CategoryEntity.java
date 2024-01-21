@@ -1,10 +1,9 @@
 package chivi.laptopstore.models.entities;
 
+import chivi.laptopstore.common.ColumnName;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -15,30 +14,28 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "category")
 @NoArgsConstructor
-@Getter
-@Setter
-public class CategoryModel {
+@Data
+public class CategoryEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "category_id")
     private Long id;
 
-    @Column(name = "category_name", unique = true)
+    @Column(name = "category_name", unique = true, nullable = false)
     private String name;
 
-    @Column(name = "category_url", unique = true)
+    @Column(name = "category_url", unique = true, nullable = false)
     private String url;
 
     @CreatedDate
-    @Column(name = "created_date")
+    @Column(name = ColumnName.CREATED_AT)
     private LocalDateTime createdDate;
 
     @LastModifiedDate
-    @Column(name = "last_modified_date")
+    @Column(name = ColumnName.UPDATED_AT)
     private LocalDateTime lastModifiedDate;
 
-    @Builder
-    public CategoryModel(String name, String url) {
+    public CategoryEntity(String name, String url) {
         this.name = name;
         this.url = url;
     }

@@ -1,37 +1,41 @@
 package chivi.laptopstore.controllers;
 
-import chivi.laptopstore.common.Values;
-import chivi.laptopstore.communication.request.CategoryRequest;
-import chivi.laptopstore.models.entities.CategoryModel;
+import chivi.laptopstore.common.RequestMaps;
+import chivi.laptopstore.models.requests.CategoryRequest;
+import chivi.laptopstore.models.responses.ResponseModel;
 import chivi.laptopstore.services.CategoryService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping(Values.API_V1)
+@RequestMapping(RequestMaps.API_V1)
 @AllArgsConstructor
 public class CategoryController {
     private final CategoryService categoryService;
 
-    @GetMapping("categories")
+    @GetMapping(RequestMaps.CATEGORY_PATHNAME_PUBLIC + "find-all")
     @ResponseStatus(HttpStatus.OK)
-    public List<CategoryModel> findAllCategory() {
+    public ResponseModel findAllCategory() {
         return categoryService.findAllCategory();
     }
 
-    @PostMapping("categories/create")
-    @ResponseStatus(HttpStatus.OK)
-    public CategoryModel createCategory(@Valid @RequestBody CategoryRequest categoryRequest) {
+    @PostMapping(RequestMaps.CATEGORY_PATHNAME_PUBLIC + "create")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseModel createCategory(@Valid @RequestBody CategoryRequest categoryRequest) {
         return categoryService.createCategory(categoryRequest);
     }
 
-    @PutMapping("categories/edit/{categoryID}")
+    @PutMapping(RequestMaps.CATEGORY_PATHNAME_PUBLIC + "edit/{categoryId}")
     @ResponseStatus(HttpStatus.OK)
-    public CategoryModel editCategory(@PathVariable("categoryID") Long categoryID, @Valid @RequestBody CategoryRequest categoryRequest) {
-        return categoryService.editCategory(categoryID, categoryRequest);
+    public ResponseModel editCategory(@PathVariable("categoryId") Long categoryId, @Valid @RequestBody CategoryRequest categoryRequest) {
+        return categoryService.editCategory(categoryId, categoryRequest);
+    }
+
+    @DeleteMapping(RequestMaps.CATEGORY_PATHNAME_PUBLIC + "delete/{categoryId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseModel deleteCategory(@PathVariable Long categoryId) {
+        return categoryService.deleteCategory(categoryId);
     }
 }

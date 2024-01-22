@@ -36,8 +36,8 @@ public class ProductEntity {
 
     private BigDecimal discount;
 
-    @Column(name = "discount_rate", columnDefinition = "tinyint")
-    private byte discountRate;
+    @Column(name = "discount_rate")
+    private float discountRate;
 
     @Column(columnDefinition = "longtext")
     private String description;
@@ -48,7 +48,7 @@ public class ProductEntity {
     @Column(name = "quantity_sold", columnDefinition = "integer default 0")
     private int quantitySold;
 
-    @Column(name = "rating_average", columnDefinition = "real default 0")
+    @Column(name = "rating_average", columnDefinition = "float default 0")
     private float ratingAverage;
 
     @Column(name = "review_count", columnDefinition = "integer default 0")
@@ -58,7 +58,7 @@ public class ProductEntity {
     @JoinColumn(name = "category_id")
     private CategoryEntity category;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "brand_id")
     private BrandEntity brand;
 
@@ -71,11 +71,12 @@ public class ProductEntity {
     private LocalDateTime lastModifiedDate;
 
     @Builder
-    public ProductEntity(String name, String slug, BigDecimal price, String description, CategoryEntity category) {
+    public ProductEntity(String name, String slug, BigDecimal price, String description, CategoryEntity category, BrandEntity brand) {
         this.name = name;
         this.slug = slug;
         this.price = price;
         this.description = description;
         this.category = category;
+        this.brand = brand;
     }
 }

@@ -74,14 +74,19 @@ public class InitialDataLoader implements CommandLineRunner {
 
     private void initialProduct() {
         if (!productRepository.findAll().isEmpty()) {
-            log.info("Brands have already");
+            log.info("Products have already");
             return;
         }
 
         List<CategoryEntity> categoryEntities = categoryRepository.findAll();
-
         if (categoryEntities.isEmpty()) {
             log.info("Categories empty");
+            return;
+        }
+
+        List<BrandEntity> brandEntities = brandRepository.findAll();
+        if (brandEntities.isEmpty()) {
+            log.info("Brands empty");
             return;
         }
 
@@ -93,6 +98,7 @@ public class InitialDataLoader implements CommandLineRunner {
                 .price(new BigDecimal(100000))
                 .description("dang cap nhat")
                 .category(categoryEntities.get(0))
+                .brand(brandEntities.get(4))
                 .build();
         ProductEntity product2 = ProductEntity
                 .builder()
@@ -100,6 +106,7 @@ public class InitialDataLoader implements CommandLineRunner {
                 .slug("product-2")
                 .price(new BigDecimal(120000))
                 .description("dang cap nhat")
+                .brand(brandEntities.get(0))
                 .build();
         ProductEntity product3 = ProductEntity
                 .builder()
@@ -108,6 +115,7 @@ public class InitialDataLoader implements CommandLineRunner {
                 .price(new BigDecimal(80000))
                 .description("dang cap nhat")
                 .category(categoryEntities.get(4))
+                .brand(brandEntities.get(1))
                 .build();
         ProductEntity product4 = ProductEntity
                 .builder()
@@ -116,6 +124,7 @@ public class InitialDataLoader implements CommandLineRunner {
                 .price(new BigDecimal(30000))
                 .description("dang cap nhat")
                 .category(categoryEntities.get(2))
+                .brand(brandEntities.get(3))
                 .build();
         ProductEntity product5 = ProductEntity
                 .builder()
@@ -124,6 +133,7 @@ public class InitialDataLoader implements CommandLineRunner {
                 .price(new BigDecimal(30000))
                 .description("dang cap nhat")
                 .category(categoryEntities.get(2))
+                .brand(brandEntities.get(0))
                 .build();
         ProductEntity product6 = ProductEntity
                 .builder()
@@ -131,6 +141,7 @@ public class InitialDataLoader implements CommandLineRunner {
                 .slug("product-6")
                 .price(new BigDecimal(70000))
                 .description("dang cap nhat")
+                .brand(brandEntities.get(2))
                 .build();
 
         productEntities.add(product1);

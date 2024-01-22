@@ -1,6 +1,7 @@
 package chivi.laptopstore.controllers;
 
 import chivi.laptopstore.common.RequestMaps;
+import chivi.laptopstore.models.requests.DiscountRequest;
 import chivi.laptopstore.models.requests.ProductRequest;
 import chivi.laptopstore.models.responses.ResponseModel;
 import chivi.laptopstore.services.ProductService;
@@ -43,9 +44,27 @@ public class ProductController {
         return productService.createProduct(productRequest);
     }
 
+    @PutMapping(RequestMaps.PRODUCT_PATHNAME_PUBLIC + "edit/{productId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseModel updateProduct(@PathVariable Long productId, @Valid @RequestBody ProductRequest productRequest) {
+        return productService.updateProduct(productId, productRequest);
+    }
+
+    @PutMapping(RequestMaps.PRODUCT_PATHNAME_PUBLIC + "discount/{productId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseModel updateDiscountProduct(@PathVariable Long productId, @Valid @RequestBody DiscountRequest discountRequest) {
+        return productService.updateDiscountProduct(productId, discountRequest);
+    }
+
     @DeleteMapping(RequestMaps.PRODUCT_PATHNAME_PUBLIC + "delete/{productId}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseModel deleteProduct(@PathVariable Long productId) {
         return productService.deleteProduct(productId);
+    }
+
+    @DeleteMapping(RequestMaps.PRODUCT_PATHNAME_PUBLIC + "delete-all")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseModel deleteAllProduct() {
+        return productService.deleteAllProduct();
     }
 }

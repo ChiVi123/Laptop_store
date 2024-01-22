@@ -27,9 +27,21 @@ public class BrandController {
         return brandService.createBrand(baseInfoRequest);
     }
 
+    @PutMapping(RequestMaps.BRAND_PATHNAME_PUBLIC + "edit/{brandId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseModel editCategory(@PathVariable Long brandId, @Valid @RequestBody BaseInfoRequest baseInfoRequest) {
+        return brandService.editBrand(brandId, baseInfoRequest);
+    }
+
     @DeleteMapping(RequestMaps.BRAND_PATHNAME_PUBLIC + "delete/{brandId}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseModel deleteCategory(@PathVariable Long brandId) {
         return brandService.deleteBrand(brandId);
+    }
+
+    @DeleteMapping(RequestMaps.BRAND_PATHNAME_PUBLIC + "delete-all")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseModel deleteAllCategory() {
+        return brandService.deleteAllBrand();
     }
 }

@@ -1,7 +1,7 @@
 package chivi.laptopstore.controllers;
 
 import chivi.laptopstore.common.RequestMaps;
-import chivi.laptopstore.models.requests.CategoryRequest;
+import chivi.laptopstore.models.requests.BaseInfoRequest;
 import chivi.laptopstore.models.responses.ResponseModel;
 import chivi.laptopstore.services.CategoryService;
 import jakarta.validation.Valid;
@@ -23,19 +23,25 @@ public class CategoryController {
 
     @PostMapping(RequestMaps.CATEGORY_PATHNAME_PUBLIC + "create")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseModel createCategory(@Valid @RequestBody CategoryRequest categoryRequest) {
-        return categoryService.createCategory(categoryRequest);
+    public ResponseModel createCategory(@Valid @RequestBody BaseInfoRequest baseInfoRequest) {
+        return categoryService.createCategory(baseInfoRequest);
     }
 
     @PutMapping(RequestMaps.CATEGORY_PATHNAME_PUBLIC + "edit/{categoryId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseModel editCategory(@PathVariable("categoryId") Long categoryId, @Valid @RequestBody CategoryRequest categoryRequest) {
-        return categoryService.editCategory(categoryId, categoryRequest);
+    public ResponseModel editCategory(@PathVariable Long categoryId, @Valid @RequestBody BaseInfoRequest baseInfoRequest) {
+        return categoryService.editCategory(categoryId, baseInfoRequest);
     }
 
     @DeleteMapping(RequestMaps.CATEGORY_PATHNAME_PUBLIC + "delete/{categoryId}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseModel deleteCategory(@PathVariable Long categoryId) {
         return categoryService.deleteCategory(categoryId);
+    }
+
+    @DeleteMapping(RequestMaps.CATEGORY_PATHNAME_PUBLIC + "delete-all")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseModel deleteAllCategory() {
+        return categoryService.deleteAllCategory();
     }
 }

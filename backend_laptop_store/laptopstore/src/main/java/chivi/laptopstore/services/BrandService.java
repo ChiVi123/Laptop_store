@@ -24,6 +24,18 @@ public class BrandService {
         return new ResponseModel(true, "Success", brandRepository.save(new BrandEntity(baseInfoRequest.getName(), slug)));
     }
 
+    public ResponseModel editBrand(Long brandId, BaseInfoRequest baseInfoRequest) {
+        Optional<BrandEntity> optional = brandRepository.findById(brandId);
+
+        if (optional.isEmpty()) {
+            return new ResponseModel(false, "Can't find brand", new BrandEntity());
+        }
+
+        optional.get().setName(baseInfoRequest.getName());
+        optional.get().setSlug(CustomString.toSlug(baseInfoRequest.getName()));
+        return new ResponseModel(true, "Edit success", brandRepository.save(optional.get()));
+    }
+
     public ResponseModel deleteBrand(Long brandId) {
         Optional<BrandEntity> optionalBrand = brandRepository.findById(brandId);
         if (optionalBrand.isEmpty()) {
@@ -32,5 +44,10 @@ public class BrandService {
 
         brandRepository.delete(optionalBrand.get());
         return new ResponseModel(true, "Delete brand success", "");
+    }
+
+    public ResponseModel deleteAllBrand() {
+        brandRepository.deleteAll();
+        return new ResponseModel(true, "Delete all brand success", "");
     }
 }

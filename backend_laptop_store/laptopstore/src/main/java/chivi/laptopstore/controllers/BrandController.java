@@ -21,25 +21,25 @@ public class BrandController {
         return brandService.findAllBrand();
     }
 
-    @PostMapping(RequestMaps.BRAND_PATHNAME_PUBLIC + "create")
+    @PostMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "create")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseModel createBrand(@Valid @RequestBody BaseInfoRequest baseInfoRequest) {
         return brandService.createBrand(baseInfoRequest);
     }
 
-    @PutMapping(RequestMaps.BRAND_PATHNAME_PUBLIC + "edit/{brandId}")
+    @PutMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "edit/{brandId}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseModel editCategory(@PathVariable Long brandId, @Valid @RequestBody BaseInfoRequest baseInfoRequest) {
         return brandService.editBrand(brandId, baseInfoRequest);
     }
 
-    @DeleteMapping(RequestMaps.BRAND_PATHNAME_PUBLIC + "delete/{brandId}")
+    @DeleteMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "delete/{brandId}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseModel deleteCategory(@PathVariable Long brandId) {
         return brandService.deleteBrand(brandId);
     }
 
-    @DeleteMapping(RequestMaps.BRAND_PATHNAME_PUBLIC + "delete-all")
+    @DeleteMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "delete-all")
     @ResponseStatus(HttpStatus.OK)
     public ResponseModel deleteAllCategory() {
         return brandService.deleteAllBrand();

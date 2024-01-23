@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class ProductController {
     private final ProductService productService;
 
-    @GetMapping(RequestMaps.PRODUCT_PATHNAME_PUBLIC + "find-all")
+    @GetMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "find-all")
     @ResponseStatus(HttpStatus.OK)
     public ResponseModel findAllProduct() {
         return productService.findAllProduct();
@@ -32,37 +32,37 @@ public class ProductController {
     @GetMapping(RequestMaps.PRODUCT_PATHNAME_PUBLIC + "sort-latest")
     @ResponseStatus(HttpStatus.OK)
     public ResponseModel findAllLatest(
-            @RequestParam(name = "pageNumber", defaultValue = "1") int pageNumber,
-            @RequestParam(name = "pageSize", defaultValue = "6") int pageSize
+            @RequestParam(name = "page_number", defaultValue = "1") int pageNumber,
+            @RequestParam(name = "page_size", defaultValue = "6") int pageSize
     ) {
         return productService.findAllProductLatest(PageRequest.of(pageNumber - 1, pageSize));
     }
 
-    @PostMapping(RequestMaps.PRODUCT_PATHNAME_PUBLIC + "create")
+    @PostMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "create")
     @ResponseStatus(HttpStatus.OK)
     public ResponseModel createProduct(@Valid @RequestBody ProductRequest productRequest) {
         return productService.createProduct(productRequest);
     }
 
-    @PutMapping(RequestMaps.PRODUCT_PATHNAME_PUBLIC + "edit/{productId}")
+    @PutMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "edit/{productId}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseModel updateProduct(@PathVariable Long productId, @Valid @RequestBody ProductRequest productRequest) {
         return productService.updateProduct(productId, productRequest);
     }
 
-    @PutMapping(RequestMaps.PRODUCT_PATHNAME_PUBLIC + "discount/{productId}")
+    @PutMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "discount/{productId}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseModel updateDiscountProduct(@PathVariable Long productId, @Valid @RequestBody DiscountRequest discountRequest) {
         return productService.updateDiscountProduct(productId, discountRequest);
     }
 
-    @DeleteMapping(RequestMaps.PRODUCT_PATHNAME_PUBLIC + "delete/{productId}")
+    @DeleteMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "delete/{productId}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseModel deleteProduct(@PathVariable Long productId) {
         return productService.deleteProduct(productId);
     }
 
-    @DeleteMapping(RequestMaps.PRODUCT_PATHNAME_PUBLIC + "delete-all")
+    @DeleteMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "delete-all")
     @ResponseStatus(HttpStatus.OK)
     public ResponseModel deleteAllProduct() {
         return productService.deleteAllProduct();

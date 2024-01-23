@@ -21,25 +21,25 @@ public class CategoryController {
         return categoryService.findAllCategory();
     }
 
-    @PostMapping(RequestMaps.CATEGORY_PATHNAME_PUBLIC + "create")
+    @PostMapping(RequestMaps.CATEGORY_PATHNAME_ADMIN + "create")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseModel createCategory(@Valid @RequestBody BaseInfoRequest baseInfoRequest) {
         return categoryService.createCategory(baseInfoRequest);
     }
 
-    @PutMapping(RequestMaps.CATEGORY_PATHNAME_PUBLIC + "edit/{categoryId}")
+    @PutMapping(RequestMaps.CATEGORY_PATHNAME_ADMIN + "edit/{categoryId}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseModel editCategory(@PathVariable Long categoryId, @Valid @RequestBody BaseInfoRequest baseInfoRequest) {
         return categoryService.editCategory(categoryId, baseInfoRequest);
     }
 
-    @DeleteMapping(RequestMaps.CATEGORY_PATHNAME_PUBLIC + "delete/{categoryId}")
+    @DeleteMapping(RequestMaps.CATEGORY_PATHNAME_ADMIN + "delete/{categoryId}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseModel deleteCategory(@PathVariable Long categoryId) {
         return categoryService.deleteCategory(categoryId);
     }
 
-    @DeleteMapping(RequestMaps.CATEGORY_PATHNAME_PUBLIC + "delete-all")
+    @DeleteMapping(RequestMaps.CATEGORY_PATHNAME_ADMIN + "delete-all")
     @ResponseStatus(HttpStatus.OK)
     public ResponseModel deleteAllCategory() {
         return categoryService.deleteAllCategory();

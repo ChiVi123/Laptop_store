@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 public class CustomString {
     public static String toSlug(String value) {
+        // https://stackoverflow.com/questions/1657193/java-code-library-for-generating-slugs-for-use-in-pretty-urls
         Pattern nonLatin = Pattern.compile("[^\\w-]");
         Pattern whiteSpace = Pattern.compile("\\s");
         String noWhiteSpace = whiteSpace.matcher(value).replaceAll("-");

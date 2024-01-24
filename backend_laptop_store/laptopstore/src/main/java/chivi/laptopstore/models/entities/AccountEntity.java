@@ -26,7 +26,7 @@ public class AccountEntity {
     @Column(unique = true)
     private String username;
 
-    @Column(name = "full_name", unique = true, nullable = false)
+    @Column(name = "full_name", nullable = false)
     private String fullName;
 
     @Column(unique = true)

@@ -1,53 +1,63 @@
 package chivi.laptopstore.services;
 
+import chivi.laptopstore.common.ResponseMessage;
 import chivi.laptopstore.models.entities.BrandEntity;
+import chivi.laptopstore.models.exceptions.ConflictException;
+import chivi.laptopstore.models.exceptions.NotFoundException;
 import chivi.laptopstore.models.requests.BaseInfoRequest;
-import chivi.laptopstore.models.responses.ResponseModel;
+import chivi.laptopstore.models.responses.SuccessResponse;
 import chivi.laptopstore.repositories.entities.IBrandRepository;
 import chivi.laptopstore.utils.CustomString;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 public class BrandService {
     private final IBrandRepository brandRepository;
 
-    public ResponseModel findAllBrand() {
-        return new ResponseModel(true, "Success", brandRepository.findAll());
+    public SuccessResponse findAllBrand() {
+        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, brandRepository.findAll());
     }
 
-    public ResponseModel createBrand(BaseInfoRequest baseInfoRequest) {
+    public SuccessResponse createBrand(BaseInfoRequest baseInfoRequest) {
+        this.handleConflictBrandByName(baseInfoRequest.getName());
+
         String slug = CustomString.toSlug(baseInfoRequest.getName());
-        return new ResponseModel(true, "Success", brandRepository.save(new BrandEntity(baseInfoRequest.getName(), slug)));
+        BrandEntity brand = new BrandEntity(baseInfoRequest.getName(), slug);
+        return new SuccessResponse(ResponseMessage.CREATE_SUCCESS, brandRepository.save(brand));
     }
 
-    public ResponseModel editBrand(Long brandId, BaseInfoRequest baseInfoRequest) {
-        Optional<BrandEntity> optional = brandRepository.findById(brandId);
+    public SuccessResponse editBrand(Long brandId, BaseInfoRequest baseInfoRequest) {
+        BrandEntity brand = this.handleFindBrandById(brandId);
 
-        if (optional.isEmpty()) {
-            return new ResponseModel(false, "Can't find brand", new BrandEntity());
+        if (!brand.getName().equals(baseInfoRequest.getName())) {
+            this.handleConflictBrandByName(baseInfoRequest.getName());
+            brand.setName(baseInfoRequest.getName());
+            brand.setSlug(CustomString.toSlug(baseInfoRequest.getName()));
         }
 
-        optional.get().setName(baseInfoRequest.getName());
-        optional.get().setSlug(CustomString.toSlug(baseInfoRequest.getName()));
-        return new ResponseModel(true, "Edit success", brandRepository.save(optional.get()));
+        return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, brandRepository.save(brand));
     }
 
-    public ResponseModel deleteBrand(Long brandId) {
-        Optional<BrandEntity> optionalBrand = brandRepository.findById(brandId);
-        if (optionalBrand.isEmpty()) {
-            return new ResponseModel(false, "Can't found brand", "");
-        }
-
-        brandRepository.delete(optionalBrand.get());
-        return new ResponseModel(true, "Delete brand success", "");
+    public SuccessResponse deleteBrand(Long brandId) {
+        BrandEntity brand = this.handleFindBrandById(brandId);
+        brandRepository.delete(brand);
+        return new SuccessResponse(ResponseMessage.DELETE_SUCCESS);
     }
 
-    public ResponseModel deleteAllBrand() {
+    public SuccessResponse deleteAllBrand() {
         brandRepository.deleteAll();
-        return new ResponseModel(true, "Delete all brand success", "");
+        return new SuccessResponse(ResponseMessage.DELETE_ALL_SUCCESS);
+    }
+
+    private BrandEntity handleFindBrandById(Long id) {
+        return brandRepository.findById(id).orElseThrow(() -> new NotFoundException("brand", id));
+    }
+
+    private void handleConflictBrandByName(String name) {
+        if (brandRepository.existsByName(name)) {
+            throw new ConflictException("Brand", name);
+        }
     }
 }

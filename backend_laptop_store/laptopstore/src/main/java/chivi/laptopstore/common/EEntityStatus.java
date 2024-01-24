@@ -1,6 +1,6 @@
 package chivi.laptopstore.common;
 
-public enum EntityStatus {
+public enum EEntityStatus {
     DRAFT,
     ENABLED,
     DISABLED

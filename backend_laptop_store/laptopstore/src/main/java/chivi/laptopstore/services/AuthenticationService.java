@@ -2,15 +2,14 @@ package chivi.laptopstore.services;
 
 import chivi.laptopstore.common.EAccountRole;
 import chivi.laptopstore.models.entities.AccountEntity;
-import chivi.laptopstore.models.exceptions.BaseException;
+import chivi.laptopstore.models.exceptions.ConflictException;
 import chivi.laptopstore.models.requests.LoginRequest;
 import chivi.laptopstore.models.requests.RegisterRequest;
-import chivi.laptopstore.models.responses.ResponseModel;
+import chivi.laptopstore.models.responses.SuccessResponse;
 import chivi.laptopstore.repositories.entities.IAccountRepository;
 import chivi.laptopstore.security.account.AccountDetails;
 import chivi.laptopstore.security.jwt.JwtUtils;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,19 +26,19 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
 
-    public ResponseModel registerAdmin(RegisterRequest registerRequest) {
-        AccountEntity accountEntity = this.handleSetDataAccount(registerRequest);
-        accountEntity.setEnumRole(EAccountRole.ADMIN);
-        return new ResponseModel(true, "Register success", accountRepository.save(accountEntity));
+    public SuccessResponse registerAdmin(RegisterRequest registerRequest) {
+        AccountEntity account = this.handleSetDataAccount(registerRequest);
+        account.setEnumRole(EAccountRole.ADMIN);
+        return new SuccessResponse("Register success", accountRepository.save(account));
     }
 
-    public ResponseModel registerCustomer(RegisterRequest registerRequest) {
-        AccountEntity accountEntity = this.handleSetDataAccount(registerRequest);
-        accountEntity.setEnumRole(EAccountRole.CUSTOMER);
-        return new ResponseModel(true, "Register success", accountRepository.save(accountEntity));
+    public SuccessResponse registerCustomer(RegisterRequest registerRequest) {
+        AccountEntity account = this.handleSetDataAccount(registerRequest);
+        account.setEnumRole(EAccountRole.CUSTOMER);
+        return new SuccessResponse("Register success", accountRepository.save(account));
     }
 
-    public ResponseModel login(LoginRequest loginRequest) {
+    public SuccessResponse login(LoginRequest loginRequest) {
         String token;
 
         try {
@@ -56,13 +55,11 @@ public class AuthenticationService {
             throw new BadCredentialsException(badCredentialsException.getMessage());
         }
 
-        return new ResponseModel(true, "Login success", token);
+        return new SuccessResponse("Login success", token);
     }
 
     private AccountEntity handleSetDataAccount(RegisterRequest registerRequest) {
-        if (accountRepository.existsByEmail(registerRequest.getEmail())) {
-            throw new BaseException(HttpStatus.CONFLICT.value(), "Email exists");
-        }
+        this.handleConflictAccountByEmail(registerRequest.getEmail());
 
         String encode = passwordEncoder.encode(registerRequest.getPassword());
         AccountEntity account = new AccountEntity();
@@ -71,5 +68,11 @@ public class AuthenticationService {
         account.setEmail(registerRequest.getEmail());
         account.setPassword(encode);
         return account;
+    }
+
+    private void handleConflictAccountByEmail(String email) {
+        if (accountRepository.existsByEmail(email)) {
+            throw new ConflictException("Email", email);
+        }
     }
 }

@@ -1,5 +1,7 @@
 package chivi.laptopstore.models.requests;
 
+import chivi.laptopstore.common.ValidationMessage;
+import chivi.laptopstore.common.ValidationValues;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -8,19 +10,17 @@ import lombok.Data;
 
 @Data
 public class RegisterRequest {
-    @NotNull(message = "not null")
-    @NotBlank(message = "not blank")
-    @Email(message = "invalid")
+    @NotNull(message = ValidationMessage.NOT_NULL)
+    @NotBlank(message = ValidationMessage.NOT_BLANK)
+    @Email(message = ValidationMessage.INVALID)
     private String email;
 
-    @NotNull(message = "not null")
-    @NotBlank(message = "not blank")
-    @Size(min = 8, message = "is equal or greater than 8")
-    @Size(max = 20, message = "is equal or less than 20")
+    @NotNull(message = ValidationMessage.NOT_NULL)
+    @NotBlank(message = ValidationMessage.NOT_BLANK)
+    @Size(min = ValidationValues.STRING_MIN_LENGTH, max = ValidationValues.FULL_NAME_MAX_LENGTH)
     private String fullName;
 
-    @NotNull(message = "not null")
-    @Size(min = 8, message = "is equal or greater than 8")
-    @Size(max = 32, message = "is equal or less than 32")
+    @NotNull(message = ValidationMessage.NOT_NULL)
+    @Size(min = ValidationValues.STRING_MIN_LENGTH, max = ValidationValues.PASSWORD_MAX_LENGTH)
     private String password;
 }

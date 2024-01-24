@@ -2,7 +2,7 @@ package chivi.laptopstore.controllers;
 
 import chivi.laptopstore.common.RequestMaps;
 import chivi.laptopstore.models.requests.BaseInfoRequest;
-import chivi.laptopstore.models.responses.ResponseModel;
+import chivi.laptopstore.models.responses.SuccessResponse;
 import chivi.laptopstore.services.CategoryService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -17,31 +17,31 @@ public class CategoryController {
 
     @GetMapping(RequestMaps.CATEGORY_PATHNAME_PUBLIC + "find-all")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseModel findAllCategory() {
+    public SuccessResponse findAllCategory() {
         return categoryService.findAllCategory();
     }
 
     @PostMapping(RequestMaps.CATEGORY_PATHNAME_ADMIN + "create")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseModel createCategory(@Valid @RequestBody BaseInfoRequest baseInfoRequest) {
+    public SuccessResponse createCategory(@Valid @RequestBody BaseInfoRequest baseInfoRequest) {
         return categoryService.createCategory(baseInfoRequest);
     }
 
     @PutMapping(RequestMaps.CATEGORY_PATHNAME_ADMIN + "edit/{categoryId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseModel editCategory(@PathVariable Long categoryId, @Valid @RequestBody BaseInfoRequest baseInfoRequest) {
+    public SuccessResponse editCategory(@PathVariable Long categoryId, @Valid @RequestBody BaseInfoRequest baseInfoRequest) {
         return categoryService.editCategory(categoryId, baseInfoRequest);
     }
 
     @DeleteMapping(RequestMaps.CATEGORY_PATHNAME_ADMIN + "delete/{categoryId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseModel deleteCategory(@PathVariable Long categoryId) {
+    public SuccessResponse deleteCategory(@PathVariable Long categoryId) {
         return categoryService.deleteCategory(categoryId);
     }
 
     @DeleteMapping(RequestMaps.CATEGORY_PATHNAME_ADMIN + "delete-all")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseModel deleteAllCategory() {
+    public SuccessResponse deleteAllCategory() {
         return categoryService.deleteAllCategory();
     }
 }

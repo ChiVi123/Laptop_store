@@ -2,7 +2,7 @@ package chivi.laptopstore.controllers;
 
 import chivi.laptopstore.common.RequestMaps;
 import chivi.laptopstore.models.requests.BaseInfoRequest;
-import chivi.laptopstore.models.responses.ResponseModel;
+import chivi.laptopstore.models.responses.SuccessResponse;
 import chivi.laptopstore.services.BrandService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -17,31 +17,31 @@ public class BrandController {
 
     @GetMapping(RequestMaps.BRAND_PATHNAME_PUBLIC + "find-all")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseModel findAllBrand() {
+    public SuccessResponse findAllBrand() {
         return brandService.findAllBrand();
     }
 
     @PostMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "create")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseModel createBrand(@Valid @RequestBody BaseInfoRequest baseInfoRequest) {
+    public SuccessResponse createBrand(@Valid @RequestBody BaseInfoRequest baseInfoRequest) {
         return brandService.createBrand(baseInfoRequest);
     }
 
     @PutMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "edit/{brandId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseModel editCategory(@PathVariable Long brandId, @Valid @RequestBody BaseInfoRequest baseInfoRequest) {
+    public SuccessResponse editCategory(@PathVariable Long brandId, @Valid @RequestBody BaseInfoRequest baseInfoRequest) {
         return brandService.editBrand(brandId, baseInfoRequest);
     }
 
     @DeleteMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "delete/{brandId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseModel deleteCategory(@PathVariable Long brandId) {
+    public SuccessResponse deleteCategory(@PathVariable Long brandId) {
         return brandService.deleteBrand(brandId);
     }
 
     @DeleteMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "delete-all")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseModel deleteAllCategory() {
+    public SuccessResponse deleteAllCategory() {
         return brandService.deleteAllBrand();
     }
 }

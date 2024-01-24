@@ -1,4 +1,9 @@
 {
+    "[markdown]": {
+        "editor.wordWrap": "wordWrapColumn",
+        "editor.wordWrapColumn": 160,
+        "editor.rulers": [160, 180, 200]
+    },
     "[typescriptreact]": {
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "esbenp.prettier-vscode",

@@ -3,7 +3,7 @@ package chivi.laptopstore.controllers;
 import chivi.laptopstore.common.RequestMaps;
 import chivi.laptopstore.models.requests.DiscountRequest;
 import chivi.laptopstore.models.requests.ProductRequest;
-import chivi.laptopstore.models.responses.ResponseModel;
+import chivi.laptopstore.models.responses.SuccessResponse;
 import chivi.laptopstore.services.ProductService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -19,19 +19,19 @@ public class ProductController {
 
     @GetMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "find-all")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseModel findAllProduct() {
+    public SuccessResponse findAllProduct() {
         return productService.findAllProduct();
     }
 
     @GetMapping(RequestMaps.PRODUCT_PATHNAME_PUBLIC + "{slug}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseModel findBySlug(@PathVariable String slug) {
+    public SuccessResponse findBySlug(@PathVariable String slug) {
         return productService.findBySlug(slug);
     }
 
     @GetMapping(RequestMaps.PRODUCT_PATHNAME_PUBLIC + "sort-latest")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseModel findAllLatest(
+    public SuccessResponse findAllLatest(
             @RequestParam(name = "page_number", defaultValue = "1") int pageNumber,
             @RequestParam(name = "page_size", defaultValue = "6") int pageSize
     ) {
@@ -40,31 +40,31 @@ public class ProductController {
 
     @PostMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "create")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseModel createProduct(@Valid @RequestBody ProductRequest productRequest) {
+    public SuccessResponse createProduct(@Valid @RequestBody ProductRequest productRequest) {
         return productService.createProduct(productRequest);
     }
 
     @PutMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "edit/{productId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseModel updateProduct(@PathVariable Long productId, @Valid @RequestBody ProductRequest productRequest) {
+    public SuccessResponse updateProduct(@PathVariable Long productId, @Valid @RequestBody ProductRequest productRequest) {
         return productService.updateProduct(productId, productRequest);
     }
 
-    @PutMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "discount/{productId}")
+    @PatchMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "discount/{productId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseModel updateDiscountProduct(@PathVariable Long productId, @Valid @RequestBody DiscountRequest discountRequest) {
+    public SuccessResponse updateDiscountProduct(@PathVariable Long productId, @Valid @RequestBody DiscountRequest discountRequest) {
         return productService.updateDiscountProduct(productId, discountRequest);
     }
 
     @DeleteMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "delete/{productId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseModel deleteProduct(@PathVariable Long productId) {
+    public SuccessResponse deleteProduct(@PathVariable Long productId) {
         return productService.deleteProduct(productId);
     }
 
     @DeleteMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "delete-all")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseModel deleteAllProduct() {
+    public SuccessResponse deleteAllProduct() {
         return productService.deleteAllProduct();
     }
 }

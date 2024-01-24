@@ -1,59 +1,71 @@
 package chivi.laptopstore.services;
 
+import chivi.laptopstore.common.ResponseMessage;
 import chivi.laptopstore.models.entities.CategoryEntity;
+import chivi.laptopstore.models.exceptions.ConflictException;
+import chivi.laptopstore.models.exceptions.NotFoundException;
 import chivi.laptopstore.models.requests.BaseInfoRequest;
-import chivi.laptopstore.models.responses.ResponseModel;
+import chivi.laptopstore.models.responses.SuccessResponse;
 import chivi.laptopstore.repositories.entities.ICategoryRepository;
 import chivi.laptopstore.utils.CustomString;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 public class CategoryService {
     private final ICategoryRepository categoryRepository;
 
-    public ResponseModel findAllCategory() {
-        return new ResponseModel(true, "Success", categoryRepository.findAll());
+    public SuccessResponse findAllCategory() {
+        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, categoryRepository.findAll());
     }
 
-    public ResponseModel createCategory(BaseInfoRequest baseInfoRequest) {
+    public SuccessResponse createCategory(BaseInfoRequest baseInfoRequest) {
+        this.handleConflictCategoryByName(baseInfoRequest.getName());
+
         String url = handleCategoryUrl(baseInfoRequest);
-        CategoryEntity categoryEntity = new CategoryEntity(baseInfoRequest.getName(), url);
-        return new ResponseModel(true, "Create success", categoryRepository.save(categoryEntity));
+        CategoryEntity category = new CategoryEntity(baseInfoRequest.getName(), url);
+        return new SuccessResponse(ResponseMessage.CREATE_SUCCESS, categoryRepository.save(category));
     }
 
-    public ResponseModel editCategory(Long categoryID, BaseInfoRequest baseInfoRequest) {
-        Optional<CategoryEntity> optional = categoryRepository.findById(categoryID);
+    public SuccessResponse editCategory(Long categoryId, BaseInfoRequest baseInfoRequest) {
+        CategoryEntity category = this.handleFindCategoryById(categoryId);
 
-        if (optional.isEmpty()) {
-            return new ResponseModel(false, "Can't find category", new CategoryEntity());
+        if (!category.getName().equals(baseInfoRequest.getName())) {
+            this.handleConflictCategoryByName(baseInfoRequest.getName());
+            String url = handleCategoryUrl(baseInfoRequest);
+            category.setName(baseInfoRequest.getName());
+            category.setUrl(url);
         }
 
         String url = handleCategoryUrl(baseInfoRequest);
-        optional.get().setName(baseInfoRequest.getName());
-        optional.get().setUrl(url);
-        return new ResponseModel(true, "Edit success", categoryRepository.save(optional.get()));
+        category.setName(baseInfoRequest.getName());
+        category.setUrl(url);
+        return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, categoryRepository.save(category));
     }
 
-    public ResponseModel deleteCategory(Long categoryId) {
-        Optional<CategoryEntity> optionalCategory = categoryRepository.findById(categoryId);
-        if (optionalCategory.isEmpty()) {
-            return new ResponseModel(false, "Can't found category", "");
-        }
-
-        categoryRepository.delete(optionalCategory.get());
-        return new ResponseModel(true, "Delete success", "");
+    public SuccessResponse deleteCategory(Long categoryId) {
+        CategoryEntity category = this.handleFindCategoryById(categoryId);
+        categoryRepository.delete(category);
+        return new SuccessResponse(ResponseMessage.DELETE_SUCCESS);
     }
 
-    public ResponseModel deleteAllCategory() {
+    public SuccessResponse deleteAllCategory() {
         categoryRepository.deleteAll();
-        return new ResponseModel(true, "Delete all category success", "");
+        return new SuccessResponse(ResponseMessage.DELETE_ALL_SUCCESS);
     }
 
     private String handleCategoryUrl(BaseInfoRequest baseInfoRequest) {
         return baseInfoRequest.getUrl() == null ? CustomString.toSlug(baseInfoRequest.getName()) : baseInfoRequest.getUrl();
+    }
+
+    private CategoryEntity handleFindCategoryById(Long id) {
+        return categoryRepository.findById(id).orElseThrow(() -> new NotFoundException("category", id));
+    }
+
+    private void handleConflictCategoryByName(String name) {
+        if (categoryRepository.existsByName(name)) {
+            throw new ConflictException("Category", name);
+        }
     }
 }

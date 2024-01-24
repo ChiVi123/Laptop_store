@@ -1,5 +1,7 @@
 package chivi.laptopstore.models.requests;
 
+import chivi.laptopstore.common.ValidationMessage;
+import chivi.laptopstore.common.ValidationValues;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -8,7 +10,7 @@ import java.math.BigDecimal;
 
 @Data
 public class DiscountRequest {
-    @NotNull(message = "not null")
-    @DecimalMin(value = "0.0", inclusive = false)
+    @NotNull(message = ValidationMessage.NOT_NULL)
+    @DecimalMin(value = ValidationValues.DECIMAL_MIN, inclusive = false)
     private BigDecimal discount;
 }

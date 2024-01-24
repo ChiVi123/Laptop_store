@@ -4,7 +4,7 @@
 
 Root path `/api/v1`
 
-Success response structure:
+### Success response structure:
 
 ```json
 {
@@ -14,22 +14,34 @@ Success response structure:
 }
 ```
 
-Error response structure, success always false if send error response
+### Error response structure, success always false if send error response
+
+**Standard**
 
 ```json
 {
     "code": 404,
     "success": false,
-    "errors": [
-        {
-            "message": "",
-            "timestamp": ""
-        }
-    ]
+    "errors": {
+        "message": ""
+    }
 }
 ```
 
-3 type route
+**Validation**
+
+```json
+{
+    "code": 404,
+    "success": false,
+    "errors": {
+        "email": "invalid",
+        "phone": "invalid"
+    }
+}
+```
+
+## Three type route
 
 -   public `don't need token`
 -   private `need token` (account has role `customer | admin`)
@@ -203,17 +215,11 @@ Request (5.2)
 -   [io.jsonwebtoken](https://github.com/jwtk/jjwt)
 -   [Implement method SecurityFilterChain filterChain(HttpSecurity http)](https://www.bezkoder.com/spring-boot-security-jwt/#Configure_Spring_Security)
 
-## To do
-
--   [x] unique: java String must define varchar(size)
-
--   [ ] menu multi level
-
 ## Fix
 
 **1. Spring Data MongoDB - Could not safely identify store assignment for repository candidate interface**
 
-[In file Application.java](https://www.baeldung.com/spring-multiple-data-modules#3-using-package-based-scoping)
+[Specify package repository](https://www.baeldung.com/spring-multiple-data-modules#3-using-package-based-scoping)
 
 **2. open-in-view**
 
@@ -226,6 +232,8 @@ Request (5.2)
 [Some algorithm have `secret key` or `private and public` key](https://github.com/jwtk/jjwt?tab=readme-ov-file#signed-jwts)
 
 **4. Response unauthorized**
+
+Send response by project format
 
 ## Process
 

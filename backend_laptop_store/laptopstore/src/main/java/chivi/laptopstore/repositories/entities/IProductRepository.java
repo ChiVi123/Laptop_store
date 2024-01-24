@@ -13,4 +13,6 @@ public interface IProductRepository extends JpaRepository<ProductEntity, Long> {
     Page<ProductEntity> findAllByOrderByCreatedDateDesc(Pageable pageable);
 
     Optional<ProductEntity> findBySlug(String slug);
+
+    boolean existsByName(String name);
 }

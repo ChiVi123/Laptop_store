@@ -143,6 +143,41 @@ public class InitialDataLoader implements CommandLineRunner {
                 .description("dang cap nhat")
                 .brand(brandEntities.get(2))
                 .build();
+        ProductEntity product7 = ProductEntity
+                .builder()
+                .name("Product 7")
+                .slug("product-7")
+                .price(new BigDecimal(80000))
+                .description("dang cap nhat")
+                .category(categoryEntities.get(1))
+                .brand(brandEntities.get(1))
+                .build();
+        ProductEntity product8 = ProductEntity
+                .builder()
+                .name("Product 8")
+                .slug("product-8")
+                .price(new BigDecimal(95000))
+                .description("dang cap nhat")
+                .category(categoryEntities.get(3))
+                .brand(brandEntities.get(4))
+                .build();
+        ProductEntity product9 = ProductEntity
+                .builder()
+                .name("Product 9")
+                .slug("product-9")
+                .price(new BigDecimal(63000))
+                .description("dang cap nhat")
+                .category(categoryEntities.get(1))
+                .brand(brandEntities.get(3))
+                .build();
+        ProductEntity product10 = ProductEntity
+                .builder()
+                .name("Product 10")
+                .slug("product-10")
+                .price(new BigDecimal(28000))
+                .description("dang cap nhat")
+                .brand(brandEntities.get(0))
+                .build();
 
         productEntities.add(product1);
         productEntities.add(product2);
@@ -150,6 +185,10 @@ public class InitialDataLoader implements CommandLineRunner {
         productEntities.add(product4);
         productEntities.add(product5);
         productEntities.add(product6);
+        productEntities.add(product7);
+        productEntities.add(product8);
+        productEntities.add(product9);
+        productEntities.add(product10);
 
         log.info("Insert products: {} item", productRepository.saveAll(productEntities).size());
     }

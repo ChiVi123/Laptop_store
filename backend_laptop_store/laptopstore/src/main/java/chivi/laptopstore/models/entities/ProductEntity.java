@@ -42,16 +42,16 @@ public class ProductEntity {
     @Column(columnDefinition = "longtext")
     private String description;
 
-    @Column(name = "quantity_stock", columnDefinition = "integer default 0")
+    @Column(name = "quantity_stock", columnDefinition = "int default 0")
     private int quantityStock;
 
-    @Column(name = "quantity_sold", columnDefinition = "integer default 0")
+    @Column(name = "quantity_sold", columnDefinition = "int default 0")
     private int quantitySold;
 
     @Column(name = "rating_average", columnDefinition = "float default 0")
     private float ratingAverage;
 
-    @Column(name = "review_count", columnDefinition = "integer default 0")
+    @Column(name = "review_count", columnDefinition = "int default 0")
     private int reviewCount;
 
     @ManyToOne

@@ -1,0 +1,26 @@
+{
+    "Create component": {
+        "scope": "typescriptreact",
+        "prefix": "fcc",
+        "body": ["function $1() {", "	return <div></div>", "};", "", "export default $1;"],
+        "description": "Create component"
+    },
+    "Create component layout": {
+        "scope": "typescriptreact",
+        "prefix": "fccl",
+        "body": [
+            "function $1Layout({ children }: $2Type) {",
+            "	return (<div>{children}</div>)",
+            "};",
+            "",
+            "export default $1Layout;"
+        ],
+        "description": "Create component layout"
+    },
+    "Use state": {
+        "scope": "typescriptreact",
+        "prefix": "ust",
+        "body": ["const [$1, set$1] = useState$4<$2>($3);"],
+        "description": "Use state"
+    }
+}

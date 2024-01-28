@@ -50,15 +50,11 @@ export const StyleField = styled(Box)(() => ({
     display: 'flex',
     alignItems: 'center',
 }));
-export const StyleLabel = styled('label')(() => ({
-    color: 'text.secondary',
+export const StyleLabel = styled('label')(({ theme: { palette } }) => ({
+    color: palette.text.secondary,
     fontSize: '0.875rem',
     fontWeight: 400,
     lineHeight: 1.2,
-}));
-export const StyleInput = styled(TextField)(() => ({
-    width: 380,
-    marginLeft: 'auto',
 }));
 export const StyleInputSend = styled(TextField)(() => ({
     flex: 1,

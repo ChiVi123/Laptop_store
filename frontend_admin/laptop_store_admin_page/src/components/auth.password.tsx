@@ -1,19 +1,34 @@
 'use client';
 
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput } from '@mui/material';
-import { MouseEvent, useState } from 'react';
+import {
+    FormControl,
+    FormHelperText,
+    IconButton,
+    InputAdornment,
+    InputLabel,
+    OutlinedInput,
+} from '@mui/material';
+import { ChangeEventHandler, MouseEvent, useState } from 'react';
 
-function PasswordField() {
+interface IProps {
+    error: boolean;
+    helperText: string | undefined;
+    value: unknown;
+    onChange: ChangeEventHandler<HTMLInputElement>;
+}
+
+function PasswordField({ error, helperText, value, onChange }: IProps) {
     const [showed, setShowed] = useState<boolean>(false);
+
     function handleClick(event: MouseEvent) {
         event.preventDefault();
         setShowed((prev) => !prev);
     }
 
     return (
-        <FormControl variant='outlined' size='small' fullWidth>
-            <InputLabel htmlFor='auth-password' size='small'>
+        <FormControl variant='outlined' size='small' fullWidth error={error}>
+            <InputLabel htmlFor='auth-password' size='small' error={error}>
                 Mật khẩu
             </InputLabel>
             <OutlinedInput
@@ -29,7 +44,11 @@ function PasswordField() {
                         </IconButton>
                     </InputAdornment>
                 }
+                value={value}
+                error={error}
+                onChange={onChange}
             />
+            <FormHelperText>{helperText}</FormHelperText>
         </FormControl>
     );
 }

@@ -1,7 +1,11 @@
+'use client';
+
 import { Google as Google_icon } from '@mui/icons-material';
 import { Box, TextField, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import Image from 'next/image';
+import { Controller, useForm } from 'react-hook-form';
+import { loginDefaultValues } from '~/common/values';
 import PasswordField from '~/components/auth.password';
 import {
     StyleButtonLoginWithGoogle,
@@ -9,8 +13,21 @@ import {
     StyleLine,
     StyleLink,
 } from '~/components/auth.styles';
+import { loginResolver } from '~/resolvers';
+import { TLoginFormData } from '~/types/form.data';
+import { logger } from '~/utils';
 
 function LoginPage() {
+    const {
+        control,
+        formState: { errors },
+        handleSubmit,
+    } = useForm<TLoginFormData>({ resolver: loginResolver, defaultValues: loginDefaultValues });
+
+    function handleOnSubmit(data: TLoginFormData) {
+        logger(handleOnSubmit.name, data);
+    }
+
     return (
         <StyleContainer elevation={3} sx={{ width: 420 }}>
             <Box sx={{ display: 'flex', columnGap: 2 }}>
@@ -31,17 +48,40 @@ function LoginPage() {
                     '& .MuiFormControl-root': { my: 1 },
                     '& .MuiInputBase-input': { p: 1 },
                 }}
+                onSubmit={handleSubmit(handleOnSubmit)}
             >
-                <TextField
-                    id='email'
+                <Controller
                     name='email'
-                    label='Email'
-                    type='email'
-                    size='small'
-                    autoComplete='off'
-                    fullWidth
+                    control={control}
+                    render={({ field: { onChange, value } }) => (
+                        <TextField
+                            id='email'
+                            name='email'
+                            label='Email'
+                            type='email'
+                            size='small'
+                            autoComplete='off'
+                            fullWidth
+                            error={Boolean(errors.email?.message)}
+                            helperText={errors.email?.message}
+                            value={value}
+                            onChange={onChange}
+                        />
+                    )}
                 />
-                <PasswordField />
+
+                <Controller
+                    name='password'
+                    control={control}
+                    render={({ field: { onChange, value } }) => (
+                        <PasswordField
+                            error={Boolean(errors.password?.message)}
+                            helperText={errors.password?.message}
+                            value={value}
+                            onChange={onChange}
+                        />
+                    )}
+                />
 
                 <Box sx={{ mb: 4 }}>
                     <Typography variant='body2' component='span'>
@@ -50,7 +90,7 @@ function LoginPage() {
                     <StyleLink href='/auth/forgot-password'>đây</StyleLink>
                 </Box>
 
-                <Button variant='contained' fullWidth>
+                <Button type='submit' variant='contained' fullWidth>
                     Đăng nhập
                 </Button>
             </Box>

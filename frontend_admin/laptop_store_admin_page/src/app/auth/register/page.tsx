@@ -1,18 +1,24 @@
-import { Box, Button, Typography } from '@mui/material';
+'use client';
+
+import { Box, Button, FormHelperText, TextField, Typography } from '@mui/material';
 import React, { Fragment, HTMLInputTypeAttribute } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { registerDefaultValues } from '~/common/values';
 import {
     StyleButtonSend,
     StyleContainer,
     StyleField,
-    StyleInput,
     StyleInputSend,
     StyleLabel,
     StyleLink,
 } from '~/components/auth.styles';
+import { registerResolver } from '~/resolvers';
+import { TRegisterFormData } from '~/types/form.data';
+import { logger } from '~/utils';
 
 interface Field {
     id: string;
-    name: string;
+    name: keyof TRegisterFormData;
     label: string;
     type: HTMLInputTypeAttribute;
     placeholder: string;
@@ -57,36 +63,73 @@ const fields: Field[] = [
 ];
 
 function RegisterPage() {
+    const {
+        control,
+        formState: { errors },
+        handleSubmit,
+    } = useForm<TRegisterFormData>({
+        resolver: registerResolver,
+        defaultValues: registerDefaultValues,
+    });
+
+    function handleOnSubmit(data: TRegisterFormData) {
+        logger(handleOnSubmit.name, data);
+    }
+
     function renderField(field: Field): React.ReactNode {
         return (
             <StyleField>
                 <StyleLabel htmlFor={field.id}>{field.label}</StyleLabel>
-                {field.type !== 'email' ? (
-                    <StyleInput
-                        id={field.id}
-                        name={field.name}
-                        label=''
-                        type={field.type}
-                        placeholder={field.placeholder}
-                        size='small'
-                        autoComplete='off'
-                    />
-                ) : (
-                    <Box display='flex' width={380} ml='auto'>
-                        <StyleInputSend
-                            id={field.id}
+                <Box ml='auto'>
+                    {field.type !== 'email' ? (
+                        <Controller
                             name={field.name}
-                            label=''
-                            type={field.type}
-                            placeholder={field.placeholder}
-                            size='small'
-                            autoComplete='off'
+                            control={control}
+                            render={({ field: { onChange, value } }) => (
+                                <TextField
+                                    id={field.id}
+                                    name={field.name}
+                                    label=''
+                                    type={field.type}
+                                    placeholder={field.placeholder}
+                                    size='small'
+                                    autoComplete='off'
+                                    error={Boolean(errors[field.name]?.message)}
+                                    value={value}
+                                    onChange={onChange}
+                                    sx={{ width: 380 }}
+                                />
+                            )}
                         />
-                        <StyleButtonSend variant='contained' size='small'>
-                            Gửi mã xác thực
-                        </StyleButtonSend>
-                    </Box>
-                )}
+                    ) : (
+                        <Box display='flex' width={380} ml='auto'>
+                            <Controller
+                                control={control}
+                                name={field.name}
+                                render={({ field: { onChange, value } }) => (
+                                    <StyleInputSend
+                                        id={field.id}
+                                        name={field.name}
+                                        label=''
+                                        type={field.type}
+                                        placeholder={field.placeholder}
+                                        size='small'
+                                        autoComplete='off'
+                                        error={Boolean(errors[field.name]?.message)}
+                                        value={value}
+                                        onChange={onChange}
+                                    />
+                                )}
+                            />
+                            <StyleButtonSend variant='contained' size='small'>
+                                Gửi mã xác thực
+                            </StyleButtonSend>
+                        </Box>
+                    )}
+                    <FormHelperText error={Boolean(errors[field.name]?.message)} sx={{ pl: 1 }}>
+                        {errors[field.name]?.message}
+                    </FormHelperText>
+                </Box>
             </StyleField>
         );
     }
@@ -103,12 +146,13 @@ function RegisterPage() {
                 gap={2}
                 mb={2}
                 sx={{ '& .MuiInputBase-input': { p: 1 } }}
+                onSubmit={handleSubmit(handleOnSubmit)}
             >
                 {fields.map((item) => (
                     <Fragment key={item.id}>{renderField(item)}</Fragment>
                 ))}
 
-                <Button variant='contained' sx={{ width: 380, ml: 'auto' }}>
+                <Button type='submit' variant='contained' sx={{ width: 380, ml: 'auto' }}>
                     Đăng ký
                 </Button>
             </Box>

@@ -235,6 +235,12 @@ Request (5.2)
 
 Send response by project format
 
+**5. Send project's email to other email**
+
+Username and Password not accepted (project's email)
+
+[2 step verification and then app password](https://www.youtube.com/watch?v=moBfKA1fE0g)
+
 ## Process
 
 -   [x] fix 1
@@ -244,3 +250,5 @@ Send response by project format
 -   [x] fix 3
 
 -   [x] fix 4
+
+-   [x] fix 5

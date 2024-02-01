@@ -34,6 +34,7 @@ public class SecurityConfig {
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final String[] ALLOWED_LIST_URL = {
             "/api/v1/auth/**",
+            "/api/v1/dev/**",
             //Paypal
             "/api/v1/checkout/*/success",
             "/api/v1/checkout/*/cancel"

@@ -1,5 +1,3 @@
-interface IOnlyChildren {
+export interface IOnlyChildren {
     children: React.ReactNode;
 }
-
-export type { IOnlyChildren };

@@ -1,6 +1,6 @@
 package chivi.laptopstore.models.entities;
 
-import chivi.laptopstore.common.ColumnName;
+import chivi.laptopstore.common.EntityNames;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,20 +15,20 @@ import java.time.LocalDateTime;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "product")
+@Table(name = EntityNames.TABLE_PRODUCT)
 @NoArgsConstructor
 @Getter
 @Setter
 public class ProductEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "product_id")
+    @Column(name = EntityNames.COLUMN_PRODUCT_ID)
     private Long id;
 
-    @Column(name = "product_name", unique = true, nullable = false)
+    @Column(name = EntityNames.COLUMN_PRODUCT_NAME, unique = true, nullable = false)
     private String name;
 
-    @Column(name = "product_slug", unique = true, nullable = false)
+    @Column(name = EntityNames.COLUMN_PRODUCT_SLUG, unique = true, nullable = false)
     private String slug;
 
     @Column(nullable = false)
@@ -36,42 +36,42 @@ public class ProductEntity {
 
     private BigDecimal discount;
 
-    @Column(name = "discount_rate")
+    @Column(name = EntityNames.COLUMN_DISCOUNT_RATE)
     private float discountRate;
 
     @Column(columnDefinition = "longtext")
     private String description;
 
-    @Column(name = "quantity_stock", columnDefinition = "int default 0")
+    @Column(name = EntityNames.COLUMN_QUANTITY_STOCK, columnDefinition = "int default 0")
     private int quantityStock;
 
-    @Column(name = "quantity_sold", columnDefinition = "int default 0")
+    @Column(name = EntityNames.COLUMN_QUANTITY_SOLD, columnDefinition = "int default 0")
     private int quantitySold;
 
-    @Column(name = "rating_average", columnDefinition = "float default 0")
+    @Column(name = EntityNames.COLUMN_RATING_AVERAGE, columnDefinition = "float default 0")
     private float ratingAverage;
 
-    @Column(name = "review_count", columnDefinition = "int default 0")
+    @Column(name = EntityNames.COLUMN_REVIEW_COUNT, columnDefinition = "int default 0")
     private int reviewCount;
 
     @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = EntityNames.COLUMN_CATEGORY_ID)
     private CategoryEntity category;
 
     @ManyToOne
-    @JoinColumn(name = "brand_id")
+    @JoinColumn(name = EntityNames.COLUMN_BRAND_ID)
     private BrandEntity brand;
 
     @CreatedDate
-    @Column(name = ColumnName.CREATED_AT)
+    @Column(name = EntityNames.CREATED_AT)
     private LocalDateTime createdDate;
 
     @LastModifiedDate
-    @Column(name = ColumnName.UPDATED_AT)
+    @Column(name = EntityNames.UPDATED_AT)
     private LocalDateTime lastModifiedDate;
 
     @Builder
-    public ProductEntity(String name, String slug, BigDecimal price, String description, CategoryEntity category, BrandEntity brand) {
+    private ProductEntity(String name, String slug, BigDecimal price, String description, CategoryEntity category, BrandEntity brand) {
         this.name = name;
         this.slug = slug;
         this.price = price;

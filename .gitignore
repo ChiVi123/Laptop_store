@@ -4,3 +4,6 @@ database_laptop_store
 # docker
 *.old.yml
 *.local.yml
+
+# templates mail content
+email_templates

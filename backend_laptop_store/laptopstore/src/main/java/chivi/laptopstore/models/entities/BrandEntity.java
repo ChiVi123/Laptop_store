@@ -1,6 +1,6 @@
 package chivi.laptopstore.models.entities;
 
-import chivi.laptopstore.common.ColumnName;
+import chivi.laptopstore.common.EntityNames;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,27 +12,27 @@ import java.time.LocalDateTime;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "brand")
+@Table(name = EntityNames.TABLE_BRAND)
 @NoArgsConstructor
 @Data
 public class BrandEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "brand_id")
+    @Column(name = EntityNames.COLUMN_BRAND_ID)
     private Long id;
 
-    @Column(name = "brand_name", unique = true, nullable = false)
+    @Column(name = EntityNames.COLUMN_BRAND_NAME, unique = true, nullable = false)
     private String name;
 
-    @Column(name = "brand_slug", unique = true, nullable = false)
+    @Column(name = EntityNames.COLUMN_BRAND_SLUG, unique = true, nullable = false)
     private String slug;
 
     @CreatedDate
-    @Column(name = ColumnName.CREATED_AT)
+    @Column(name = EntityNames.CREATED_AT)
     private LocalDateTime createdDate;
 
     @LastModifiedDate
-    @Column(name = ColumnName.UPDATED_AT)
+    @Column(name = EntityNames.UPDATED_AT)
     private LocalDateTime lastModifiedDate;
 
     public BrandEntity(String name, String slug) {

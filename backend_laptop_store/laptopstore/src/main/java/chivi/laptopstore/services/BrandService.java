@@ -3,7 +3,7 @@ package chivi.laptopstore.services;
 import chivi.laptopstore.common.ResponseMessage;
 import chivi.laptopstore.models.entities.BrandEntity;
 import chivi.laptopstore.models.exceptions.ConflictException;
-import chivi.laptopstore.models.exceptions.NotFoundException;
+import chivi.laptopstore.models.exceptions.CustomNotFoundException;
 import chivi.laptopstore.models.requests.BaseInfoRequest;
 import chivi.laptopstore.models.responses.SuccessResponse;
 import chivi.laptopstore.repositories.entities.IBrandRepository;
@@ -20,44 +20,30 @@ public class BrandService {
         return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, brandRepository.findAll());
     }
 
-    public SuccessResponse createBrand(BaseInfoRequest baseInfoRequest) {
-        this.handleConflictBrandByName(baseInfoRequest.getName());
-
-        String slug = CustomString.toSlug(baseInfoRequest.getName());
-        BrandEntity brand = new BrandEntity(baseInfoRequest.getName(), slug);
-        return new SuccessResponse(ResponseMessage.CREATE_SUCCESS, brandRepository.save(brand));
+    public BrandEntity getById(Long id) {
+        return brandRepository.findById(id).orElseThrow(() -> new CustomNotFoundException("brand", id));
     }
 
-    public SuccessResponse editBrand(Long brandId, BaseInfoRequest baseInfoRequest) {
-        BrandEntity brand = this.handleFindBrandById(brandId);
-
-        if (!brand.getName().equals(baseInfoRequest.getName())) {
-            this.handleConflictBrandByName(baseInfoRequest.getName());
-            brand.setName(baseInfoRequest.getName());
-            brand.setSlug(CustomString.toSlug(baseInfoRequest.getName()));
-        }
-
-        return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, brandRepository.save(brand));
-    }
-
-    public SuccessResponse deleteBrand(Long brandId) {
-        BrandEntity brand = this.handleFindBrandById(brandId);
-        brandRepository.delete(brand);
-        return new SuccessResponse(ResponseMessage.DELETE_SUCCESS);
-    }
-
-    public SuccessResponse deleteAllBrand() {
-        brandRepository.deleteAll();
-        return new SuccessResponse(ResponseMessage.DELETE_ALL_SUCCESS);
-    }
-
-    private BrandEntity handleFindBrandById(Long id) {
-        return brandRepository.findById(id).orElseThrow(() -> new NotFoundException("brand", id));
-    }
-
-    private void handleConflictBrandByName(String name) {
+    public void checkConflictByName(String name) {
         if (brandRepository.existsByName(name)) {
             throw new ConflictException("Brand", name);
         }
+    }
+
+    public BrandEntity createBrand(BaseInfoRequest baseInfoRequest) {
+        String slug = CustomString.toSlug(baseInfoRequest.getName());
+        return brandRepository.save(new BrandEntity(baseInfoRequest.getName(), slug));
+    }
+
+    public BrandEntity editBrand(BrandEntity brand, BaseInfoRequest baseInfoRequest) {
+
+        brand.setName(baseInfoRequest.getName());
+        brand.setSlug(CustomString.toSlug(baseInfoRequest.getName()));
+        return brandRepository.save(brand);
+    }
+
+    public void deleteBrand(Long brandId) {
+        BrandEntity brand = this.getById(brandId);
+        brandRepository.delete(brand);
     }
 }

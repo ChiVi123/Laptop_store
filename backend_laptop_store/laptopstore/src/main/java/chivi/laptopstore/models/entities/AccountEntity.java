@@ -1,9 +1,11 @@
 package chivi.laptopstore.models.entities;
 
-import chivi.laptopstore.common.ColumnName;
 import chivi.laptopstore.common.EAccountRole;
+import chivi.laptopstore.common.EAccountStatus;
+import chivi.laptopstore.common.EntityNames;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -14,19 +16,19 @@ import java.time.LocalDateTime;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "account")
+@Table(name = EntityNames.TABLE_ACCOUNT)
 @NoArgsConstructor
 @Data
 public class AccountEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "account_id")
+    @Column(name = EntityNames.COLUMN_ACCOUNT_ID)
     private Long id;
 
     @Column(unique = true)
     private String username;
 
-    @Column(name = "full_name", nullable = false)
+    @Column(name = EntityNames.COLUMN_ACCOUNT_FULL_NAME, nullable = false)
     private String fullName;
 
     @Column(unique = true)
@@ -39,24 +41,31 @@ public class AccountEntity {
     @Column(columnDefinition = "varchar(14)")
     private String phone;
 
-    @Column(name = "review_count", columnDefinition = "int default 0")
+    @Column(name = EntityNames.COLUMN_REVIEW_COUNT, columnDefinition = "int default 0")
     private int reviewCount;
 
-    @Column(name = "like_count", columnDefinition = "int default 0")
+    @Column(name = EntityNames.COLUMN_LIKE_COUNT, columnDefinition = "int default 0")
     private int likeCount;
 
-    @Column(name = "enum_role")
-    private EAccountRole enumRole;
+    @Column(name = EntityNames.COLUMN_ACCOUNT_ROLE)
+    private EAccountRole role;
+
+    private EAccountStatus status;
 
     @CreatedDate
-    @Column(name = ColumnName.CREATED_AT)
+    @Column(name = EntityNames.CREATED_AT)
     private LocalDateTime createdDate;
 
     @LastModifiedDate
-    @Column(name = ColumnName.UPDATED_AT)
+    @Column(name = EntityNames.UPDATED_AT)
     private LocalDateTime lastModifiedDate;
 
-    public AccountEntity(String email) {
+    @Builder
+    public AccountEntity(String fullName, String email, String password, EAccountRole role, EAccountStatus status) {
+        this.fullName = fullName;
         this.email = email;
+        this.password = password;
+        this.role = role;
+        this.status = status;
     }
 }

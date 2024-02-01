@@ -1,6 +1,6 @@
 package chivi.laptopstore.models.entities;
 
-import chivi.laptopstore.common.ColumnName;
+import chivi.laptopstore.common.EntityNames;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,27 +12,27 @@ import java.time.LocalDateTime;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "category")
+@Table(name = EntityNames.TABLE_CATEGORY)
 @NoArgsConstructor
 @Data
 public class CategoryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "category_id")
+    @Column(name = EntityNames.COLUMN_CATEGORY_ID)
     private Long id;
 
-    @Column(name = "category_name", unique = true, nullable = false)
+    @Column(name = EntityNames.COLUMN_CATEGORY_NAME, unique = true, nullable = false)
     private String name;
 
-    @Column(name = "category_url", unique = true, nullable = false)
+    @Column(name = EntityNames.COLUMN_CATEGORY_URL, unique = true, nullable = false)
     private String url;
 
     @CreatedDate
-    @Column(name = ColumnName.CREATED_AT)
+    @Column(name = EntityNames.CREATED_AT)
     private LocalDateTime createdDate;
 
     @LastModifiedDate
-    @Column(name = ColumnName.UPDATED_AT)
+    @Column(name = EntityNames.UPDATED_AT)
     private LocalDateTime lastModifiedDate;
 
     public CategoryEntity(String name, String url) {

@@ -1,6 +1,6 @@
 'use client';
 import * as yup from 'yup';
-import { EInvalid } from '~/common/invalid';
+import { EInvalid } from '~/common/enums';
 
 function yupString() {
     return yup.string().trim();

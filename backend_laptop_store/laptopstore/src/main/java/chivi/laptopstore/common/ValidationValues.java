@@ -1,6 +1,7 @@
 package chivi.laptopstore.common;
 
 public class ValidationValues {
+    public static final int FULL_NAME_MIN_LENGTH = 4;
     public static final int FULL_NAME_MAX_LENGTH = 20;
     public static final int STRING_MIN_LENGTH = 8;
     public static final int STRING_MAX_LENGTH = 255;

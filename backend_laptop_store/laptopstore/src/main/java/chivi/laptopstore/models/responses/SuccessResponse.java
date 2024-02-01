@@ -6,15 +6,15 @@ import lombok.Data;
 public class SuccessResponse {
     private final boolean success = true;
     private String message;
-    private Object result;
+    private Object data;
 
-    public SuccessResponse(String message, Object result) {
+    public SuccessResponse(String message, Object data) {
         this.message = message;
-        this.result = result;
+        this.data = data;
     }
 
     public SuccessResponse(String message) {
         this.message = message;
-        this.result = "";
+        this.data = "";
     }
 }

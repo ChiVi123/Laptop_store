@@ -1,6 +1,8 @@
 package chivi.laptopstore.controllers;
 
 import chivi.laptopstore.common.RequestMaps;
+import chivi.laptopstore.common.ResponseMessage;
+import chivi.laptopstore.models.entities.CategoryEntity;
 import chivi.laptopstore.models.requests.BaseInfoRequest;
 import chivi.laptopstore.models.responses.SuccessResponse;
 import chivi.laptopstore.services.CategoryService;
@@ -24,24 +26,24 @@ public class CategoryController {
     @PostMapping(RequestMaps.CATEGORY_PATHNAME_ADMIN + "create")
     @ResponseStatus(HttpStatus.CREATED)
     public SuccessResponse createCategory(@Valid @RequestBody BaseInfoRequest baseInfoRequest) {
-        return categoryService.createCategory(baseInfoRequest);
+        categoryService.checkConflictByName(baseInfoRequest.getName());
+        return new SuccessResponse(ResponseMessage.CREATE_SUCCESS, categoryService.createCategory(baseInfoRequest));
     }
 
     @PutMapping(RequestMaps.CATEGORY_PATHNAME_ADMIN + "edit/{categoryId}")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse editCategory(@PathVariable Long categoryId, @Valid @RequestBody BaseInfoRequest baseInfoRequest) {
-        return categoryService.editCategory(categoryId, baseInfoRequest);
+        CategoryEntity category = categoryService.getById(categoryId);
+        if (!category.getName().equals(baseInfoRequest.getName())) {
+            categoryService.checkConflictByName(baseInfoRequest.getName());
+        }
+        return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, categoryService.editCategory(category, baseInfoRequest));
     }
 
     @DeleteMapping(RequestMaps.CATEGORY_PATHNAME_ADMIN + "delete/{categoryId}")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse deleteCategory(@PathVariable Long categoryId) {
-        return categoryService.deleteCategory(categoryId);
-    }
-
-    @DeleteMapping(RequestMaps.CATEGORY_PATHNAME_ADMIN + "delete-all")
-    @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse deleteAllCategory() {
-        return categoryService.deleteAllCategory();
+        categoryService.deleteCategory(categoryId);
+        return new SuccessResponse(ResponseMessage.DELETE_SUCCESS);
     }
 }

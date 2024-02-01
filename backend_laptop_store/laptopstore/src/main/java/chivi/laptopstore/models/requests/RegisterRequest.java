@@ -17,7 +17,7 @@ public class RegisterRequest {
 
     @NotNull(message = ValidationMessage.NOT_NULL)
     @NotBlank(message = ValidationMessage.NOT_BLANK)
-    @Size(min = ValidationValues.STRING_MIN_LENGTH, max = ValidationValues.FULL_NAME_MAX_LENGTH)
+    @Size(min = ValidationValues.FULL_NAME_MIN_LENGTH, max = ValidationValues.FULL_NAME_MAX_LENGTH)
     private String fullName;
 
     @NotNull(message = ValidationMessage.NOT_NULL)

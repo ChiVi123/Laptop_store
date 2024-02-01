@@ -1,6 +1,8 @@
 package chivi.laptopstore.controllers;
 
 import chivi.laptopstore.common.RequestMaps;
+import chivi.laptopstore.common.ResponseMessage;
+import chivi.laptopstore.models.entities.BrandEntity;
 import chivi.laptopstore.models.requests.BaseInfoRequest;
 import chivi.laptopstore.models.responses.SuccessResponse;
 import chivi.laptopstore.services.BrandService;
@@ -24,24 +26,25 @@ public class BrandController {
     @PostMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "create")
     @ResponseStatus(HttpStatus.CREATED)
     public SuccessResponse createBrand(@Valid @RequestBody BaseInfoRequest baseInfoRequest) {
-        return brandService.createBrand(baseInfoRequest);
+        brandService.checkConflictByName(baseInfoRequest.getName());
+        BrandEntity brand = brandService.createBrand(baseInfoRequest);
+        return new SuccessResponse(ResponseMessage.CREATE_SUCCESS, brand);
     }
 
     @PutMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "edit/{brandId}")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse editCategory(@PathVariable Long brandId, @Valid @RequestBody BaseInfoRequest baseInfoRequest) {
-        return brandService.editBrand(brandId, baseInfoRequest);
+        BrandEntity brand = brandService.getById(brandId);
+        if (!brand.getName().equals(baseInfoRequest.getName())) {
+            brandService.checkConflictByName(baseInfoRequest.getName());
+        }
+        return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, brandService.editBrand(brand, baseInfoRequest));
     }
 
     @DeleteMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "delete/{brandId}")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse deleteCategory(@PathVariable Long brandId) {
-        return brandService.deleteBrand(brandId);
-    }
-
-    @DeleteMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "delete-all")
-    @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse deleteAllCategory() {
-        return brandService.deleteAllBrand();
+    public SuccessResponse deleteBrand(@PathVariable Long brandId) {
+        brandService.deleteBrand(brandId);
+        return new SuccessResponse(ResponseMessage.DELETE_SUCCESS);
     }
 }

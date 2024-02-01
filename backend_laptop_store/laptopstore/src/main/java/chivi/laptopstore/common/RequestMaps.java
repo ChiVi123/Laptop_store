@@ -2,6 +2,7 @@ package chivi.laptopstore.common;
 
 public class RequestMaps {
     public static final String API_V1 = "api/v1";
+    public static final String API_V1_DEV = "api/v1/dev";
 
     // PRODUCT
     public static final String PRODUCT_PATHNAME_ADMIN = "admin/products/";

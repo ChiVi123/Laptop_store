@@ -3,7 +3,7 @@ package chivi.laptopstore.services;
 import chivi.laptopstore.common.ResponseMessage;
 import chivi.laptopstore.models.entities.CategoryEntity;
 import chivi.laptopstore.models.exceptions.ConflictException;
-import chivi.laptopstore.models.exceptions.NotFoundException;
+import chivi.laptopstore.models.exceptions.CustomNotFoundException;
 import chivi.laptopstore.models.requests.BaseInfoRequest;
 import chivi.laptopstore.models.responses.SuccessResponse;
 import chivi.laptopstore.repositories.entities.ICategoryRepository;
@@ -20,52 +20,35 @@ public class CategoryService {
         return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, categoryRepository.findAll());
     }
 
-    public SuccessResponse createCategory(BaseInfoRequest baseInfoRequest) {
-        this.handleConflictCategoryByName(baseInfoRequest.getName());
-
-        String url = handleCategoryUrl(baseInfoRequest);
-        CategoryEntity category = new CategoryEntity(baseInfoRequest.getName(), url);
-        return new SuccessResponse(ResponseMessage.CREATE_SUCCESS, categoryRepository.save(category));
+    public CategoryEntity getById(Long id) {
+        return categoryRepository.findById(id).orElseThrow(() -> new CustomNotFoundException("category", id));
     }
 
-    public SuccessResponse editCategory(Long categoryId, BaseInfoRequest baseInfoRequest) {
-        CategoryEntity category = this.handleFindCategoryById(categoryId);
-
-        if (!category.getName().equals(baseInfoRequest.getName())) {
-            this.handleConflictCategoryByName(baseInfoRequest.getName());
-            String url = handleCategoryUrl(baseInfoRequest);
-            category.setName(baseInfoRequest.getName());
-            category.setUrl(url);
+    public void checkConflictByName(String name) {
+        if (categoryRepository.existsByName(name)) {
+            throw new ConflictException("Category", name);
         }
+    }
 
+    public CategoryEntity createCategory(BaseInfoRequest baseInfoRequest) {
+        String url = this.handleCategoryUrl(baseInfoRequest);
+        CategoryEntity category = new CategoryEntity(baseInfoRequest.getName(), url);
+        return categoryRepository.save(category);
+    }
+
+    public CategoryEntity editCategory(CategoryEntity category, BaseInfoRequest baseInfoRequest) {
         String url = handleCategoryUrl(baseInfoRequest);
         category.setName(baseInfoRequest.getName());
         category.setUrl(url);
-        return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, categoryRepository.save(category));
+        return categoryRepository.save(category);
     }
 
-    public SuccessResponse deleteCategory(Long categoryId) {
-        CategoryEntity category = this.handleFindCategoryById(categoryId);
+    public void deleteCategory(Long categoryId) {
+        CategoryEntity category = this.getById(categoryId);
         categoryRepository.delete(category);
-        return new SuccessResponse(ResponseMessage.DELETE_SUCCESS);
-    }
-
-    public SuccessResponse deleteAllCategory() {
-        categoryRepository.deleteAll();
-        return new SuccessResponse(ResponseMessage.DELETE_ALL_SUCCESS);
     }
 
     private String handleCategoryUrl(BaseInfoRequest baseInfoRequest) {
         return baseInfoRequest.getUrl() == null ? CustomString.toSlug(baseInfoRequest.getName()) : baseInfoRequest.getUrl();
-    }
-
-    private CategoryEntity handleFindCategoryById(Long id) {
-        return categoryRepository.findById(id).orElseThrow(() -> new NotFoundException("category", id));
-    }
-
-    private void handleConflictCategoryByName(String name) {
-        if (categoryRepository.existsByName(name)) {
-            throw new ConflictException("Category", name);
-        }
     }
 }

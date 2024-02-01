@@ -1,8 +1,9 @@
 'use client';
 
 import { Box, Button, FormHelperText, TextField, Typography } from '@mui/material';
-import React, { Fragment, HTMLInputTypeAttribute } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import React, { Fragment, HTMLInputTypeAttribute, useState } from 'react';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { registerAction } from '~/actions/authActions';
 import { registerDefaultValues } from '~/common/values';
 import {
     StyleButtonSend,
@@ -14,7 +15,6 @@ import {
 } from '~/components/auth.styles';
 import { registerResolver } from '~/resolvers';
 import { TRegisterFormData } from '~/types/form.data';
-import { logger } from '~/utils';
 
 interface Field {
     id: string;
@@ -71,10 +71,16 @@ function RegisterPage() {
         resolver: registerResolver,
         defaultValues: registerDefaultValues,
     });
+    const [disabled, setDisabled] = useState<boolean>(false);
 
-    function handleOnSubmit(data: TRegisterFormData) {
-        logger(handleOnSubmit.name, data);
-    }
+    const handleOnSubmit: SubmitHandler<TRegisterFormData> = async (data) => {
+        setDisabled(true);
+        const result = await registerAction(data);
+
+        if (!result?.success) {
+            setDisabled(false);
+        }
+    };
 
     function renderField(field: Field): React.ReactNode {
         return (
@@ -152,7 +158,12 @@ function RegisterPage() {
                     <Fragment key={item.id}>{renderField(item)}</Fragment>
                 ))}
 
-                <Button type='submit' variant='contained' sx={{ width: 380, ml: 'auto' }}>
+                <Button
+                    type='submit'
+                    variant='contained'
+                    disabled={disabled}
+                    sx={{ width: 380, ml: 'auto' }}
+                >
                     Đăng ký
                 </Button>
             </Box>

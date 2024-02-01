@@ -4,7 +4,11 @@ import { Google as Google_icon } from '@mui/icons-material';
 import { Box, TextField, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import Image from 'next/image';
-import { Controller, useForm } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { loginAction } from '~/actions/authActions';
+import { EKeys } from '~/common/enums';
 import { loginDefaultValues } from '~/common/values';
 import PasswordField from '~/components/auth.password';
 import {
@@ -15,7 +19,6 @@ import {
 } from '~/components/auth.styles';
 import { loginResolver } from '~/resolvers';
 import { TLoginFormData } from '~/types/form.data';
-import { logger } from '~/utils';
 
 function LoginPage() {
     const {
@@ -23,10 +26,21 @@ function LoginPage() {
         formState: { errors },
         handleSubmit,
     } = useForm<TLoginFormData>({ resolver: loginResolver, defaultValues: loginDefaultValues });
+    const [disabled, setDisabled] = useState<boolean>(false);
+    const router = useRouter();
 
-    function handleOnSubmit(data: TLoginFormData) {
-        logger(handleOnSubmit.name, data);
-    }
+    const handleOnSubmit: SubmitHandler<TLoginFormData> = async (data) => {
+        setDisabled(true);
+        const result = await loginAction(data);
+
+        if (!result?.success) {
+            setDisabled(false);
+            return;
+        }
+
+        localStorage.setItem(EKeys.TOKEN, result?.data || '');
+        router.push('/manage/product/list');
+    };
 
     return (
         <StyleContainer elevation={3} sx={{ width: 420 }}>
@@ -90,7 +104,7 @@ function LoginPage() {
                     <StyleLink href='/auth/forgot-password'>đây</StyleLink>
                 </Box>
 
-                <Button type='submit' variant='contained' fullWidth>
+                <Button type='submit' variant='contained' fullWidth disabled={disabled}>
                     Đăng nhập
                 </Button>
             </Box>

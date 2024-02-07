@@ -34,13 +34,15 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationE
     public void onApplicationEvent(OnRegistrationEvent event) {
         log.info("Start send mail: {}", Thread.currentThread().getName());
 
+        String appURL = event.getAppURL();
         AccountEntity account = event.getAccount();
         String toMail = account.getEmail();
         String token = UUID.randomUUID().toString();
 
         authenticationService.saveVerificationToken(account, token);
 
-        String buttonElement = this.createButtonLink(token);
+        String url = this.createConfirmUrl(appURL, token);
+        String buttonElement = this.createButtonLink(url);
         Map<String, Object> model = this.createTemplateModel(toMail, buttonElement);
         String subject = "Mã xác minh tài khoản Laptop Website";
         String fileName = "verify-account.ftl";
@@ -66,9 +68,8 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationE
         );
     }
 
-    private String createButtonLink(String token) {
+    private String createButtonLink(String url) {
         ElementHTML elementHTML = new ElementHTML();
-        String url = this.createConfirmUrl(token);
         Map<String, Object> props = Map.of(
                 "href", url,
                 "class", "button"
@@ -76,7 +77,7 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationE
         return elementHTML.createElement("a", props, List.of("Xác thực email"));
     }
 
-    private String createConfirmUrl(String token) {
-        return String.format("%1$s/registration-confirm?token=%2$s", host, token);
+    private String createConfirmUrl(String appURL, String token) {
+        return String.format("%1$s/%2$s?token=%3$s", host, appURL, token);
     }
 }

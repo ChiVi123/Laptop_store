@@ -1,4 +1,5 @@
 'use client';
+
 import * as yup from 'yup';
 import { EInvalid } from '~/common/enums';
 
@@ -13,10 +14,9 @@ export const loginSchema = yup.object({ email, password });
 export const registerSchema = yup.object({
     fullName: yupString().required(EInvalid.FULL_NAME_REQUIRED),
     email,
-    otp: yupString(),
     password,
     passwordConfirm: yupString()
         .required(EInvalid.PASSWORD_CONFIRM_REQUIRED)
         .oneOf([yup.ref('password')], EInvalid.PASSWORD_CONFIRM_MATCH),
 });
-export const forgotPasswordSchema = yup.object({ email });
+export const sendMailSchema = yup.object({ email });

@@ -49,7 +49,7 @@ export function formatLocalDate(
 
 export const fetaos = (function () {
     interface IPathRequestInit extends RequestInit {
-        dynamic?: unknown[];
+        pathVariables?: unknown[];
         params?: Record<string, unknown>;
     }
     interface IDataRequestInit extends IPathRequestInit {
@@ -59,8 +59,8 @@ export const fetaos = (function () {
 
     let _baseURL: string;
 
-    function dynamicToString(dynamic: unknown[] | undefined) {
-        const string = dynamic ? dynamic.join('/') : '';
+    function pathVariablesToString(pathVariables: unknown[] | undefined) {
+        const string = pathVariables ? pathVariables.join('/') : '';
         return string ? '/'.concat(string) : string;
     }
     function joinParam(param: [unknown, unknown]): string {
@@ -72,22 +72,32 @@ export const fetaos = (function () {
     }
 
     function createURL(path: string, options: IPathRequestInit): string {
-        const newOptions = Object.assign({ dynamic: [], params: {} }, options);
-        const dynamicPath = dynamicToString(newOptions.dynamic);
+        const newOptions = Object.assign({ pathVariables: [], params: {} }, options);
+        const pathVariablesPath = pathVariablesToString(newOptions.pathVariables);
         const paramsPath = paramsToString(newOptions.params);
-        return ''.concat(_baseURL, path, dynamicPath, paramsPath);
+        return ''.concat(_baseURL, path, pathVariablesPath, paramsPath);
     }
 
-    async function get(path: string, options: IPathRequestInit = {}) {
+    async function get<GSuccessResponse, GErrorResponse>(
+        path: string,
+        options: IPathRequestInit = {},
+    ) {
         const url = createURL(path, options);
         try {
             const response = await fetch(url, options);
-            return await response.json();
+            if (response.ok) {
+                return (await response.json()) as Promise<GSuccessResponse>;
+            }
+
+            return (await response.json()) as Promise<GErrorResponse>;
         } catch (reason) {
             throw reason;
         }
     }
-    async function post(path: string, options: IDataRequestInit = {}) {
+    async function post<GSuccessResponse, GErrorResponse>(
+        path: string,
+        options: IDataRequestInit = {},
+    ) {
         const url = createURL(path, options);
         options.method = 'POST';
 
@@ -98,12 +108,19 @@ export const fetaos = (function () {
 
         try {
             const response = await fetch(url, options);
-            return await response.json();
+            if (response.ok) {
+                return (await response.json()) as Promise<GSuccessResponse>;
+            }
+
+            return (await response.json()) as Promise<GErrorResponse>;
         } catch (reason) {
             throw reason;
         }
     }
-    async function put(path: string, options: IDataRequestInit = {}) {
+    async function put<GSuccessResponse, GErrorResponse>(
+        path: string,
+        options: IDataRequestInit = {},
+    ) {
         const url = createURL(path, options);
         options.method = 'PUT';
 
@@ -114,12 +131,19 @@ export const fetaos = (function () {
 
         try {
             const response = await fetch(url, options);
-            return response.json();
+            if (response.ok) {
+                return (await response.json()) as Promise<GSuccessResponse>;
+            }
+
+            return (await response.json()) as Promise<GErrorResponse>;
         } catch (reason) {
             throw reason;
         }
     }
-    async function patch(path: string, options: IDataRequestInit = {}) {
+    async function patch<GSuccessResponse, GErrorResponse>(
+        path: string,
+        options: IDataRequestInit = {},
+    ) {
         const url = createURL(path, options);
         options.method = 'PATCH';
 
@@ -130,26 +154,37 @@ export const fetaos = (function () {
 
         try {
             const response = await fetch(url, options);
-            return response.json();
+            if (response.ok) {
+                return (await response.json()) as Promise<GSuccessResponse>;
+            }
+
+            return (await response.json()) as Promise<GErrorResponse>;
         } catch (reason) {
             throw reason;
         }
     }
-    async function _delete(path: string, options: IDataRequestInit = {}) {
+    async function _delete<GSuccessResponse, GErrorResponse>(
+        path: string,
+        options: IDataRequestInit = {},
+    ) {
         const url = createURL(path, options);
         options.method = 'DELETE';
 
         try {
             const response = await fetch(url, options);
-            return response.json();
+            if (response.ok) {
+                return (await response.json()) as Promise<GSuccessResponse>;
+            }
+
+            return (await response.json()) as Promise<GErrorResponse>;
         } catch (reason) {
             throw reason;
         }
     }
 
-    function fetaos(baseURL: string | undefined) {
+    function create(baseURL: string | undefined) {
         _baseURL = baseURL || '';
         return { get, post, put, patch, _delete };
     }
-    return fetaos;
+    return create;
 })();

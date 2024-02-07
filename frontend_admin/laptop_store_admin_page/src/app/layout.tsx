@@ -1,7 +1,7 @@
 import CssBaseline from '@mui/material/CssBaseline';
 import type { Metadata } from 'next';
 import { ThemeMUIProvider } from '~/providers';
-import type { IOnlyChildren } from '~/types/props';
+import { IOnlyChildren } from '~/types/props';
 
 export const metadata: Metadata = {
     title: 'Management | Laptop store',
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: IOnlyChildren) {
     return (
         <html lang='vi'>
-            <body>
+            <body suppressHydrationWarning={true}>
                 <ThemeMUIProvider>
                     <CssBaseline />
                     {children}

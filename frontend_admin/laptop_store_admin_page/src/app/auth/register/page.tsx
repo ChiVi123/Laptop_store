@@ -1,24 +1,19 @@
 'use client';
 
 import { Box, Button, FormHelperText, TextField, Typography } from '@mui/material';
+import { useRouter } from 'next/navigation';
 import React, { Fragment, HTMLInputTypeAttribute, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { registerAction } from '~/actions/authActions';
+import { EPath } from '~/common/enums';
 import { registerDefaultValues } from '~/common/values';
-import {
-    StyleButtonSend,
-    StyleContainer,
-    StyleField,
-    StyleInputSend,
-    StyleLabel,
-    StyleLink,
-} from '~/components/auth.styles';
+import { StyleContainer, StyleField, StyleLabel, StyleLink } from '~/components/auth.styles';
 import { registerResolver } from '~/resolvers';
-import { TRegisterFormData } from '~/types/form.data';
+import { registerFormData } from '~/types/form.data';
 
 interface Field {
     id: string;
-    name: keyof TRegisterFormData;
+    name: keyof registerFormData;
     label: string;
     type: HTMLInputTypeAttribute;
     placeholder: string;
@@ -38,13 +33,6 @@ const fields: Field[] = [
         label: 'Email',
         type: 'email',
         placeholder: 'Nhập Email...',
-    },
-    {
-        id: 'otp',
-        name: 'otp',
-        label: 'Mã xác thực',
-        type: 'text',
-        placeholder: 'Nhập mã xác thực gửi tới email trên',
     },
     {
         id: 'password',
@@ -67,19 +55,22 @@ function RegisterPage() {
         control,
         formState: { errors },
         handleSubmit,
-    } = useForm<TRegisterFormData>({
+    } = useForm<registerFormData>({
         resolver: registerResolver,
         defaultValues: registerDefaultValues,
     });
+    const router = useRouter();
     const [disabled, setDisabled] = useState<boolean>(false);
 
-    const handleOnSubmit: SubmitHandler<TRegisterFormData> = async (data) => {
+    const handleOnSubmit: SubmitHandler<registerFormData> = async (data) => {
         setDisabled(true);
         const result = await registerAction(data);
 
-        if (!result?.success) {
-            setDisabled(false);
+        if (result?.success) {
+            router.push(EPath.AUTH_NOTIFY_SEND_MAIL.concat('?variant=verify'));
         }
+
+        setDisabled(false);
     };
 
     function renderField(field: Field): React.ReactNode {
@@ -87,51 +78,25 @@ function RegisterPage() {
             <StyleField>
                 <StyleLabel htmlFor={field.id}>{field.label}</StyleLabel>
                 <Box ml='auto'>
-                    {field.type !== 'email' ? (
-                        <Controller
-                            name={field.name}
-                            control={control}
-                            render={({ field: { onChange, value } }) => (
-                                <TextField
-                                    id={field.id}
-                                    name={field.name}
-                                    label=''
-                                    type={field.type}
-                                    placeholder={field.placeholder}
-                                    size='small'
-                                    autoComplete='off'
-                                    error={Boolean(errors[field.name]?.message)}
-                                    value={value}
-                                    onChange={onChange}
-                                    sx={{ width: 380 }}
-                                />
-                            )}
-                        />
-                    ) : (
-                        <Box display='flex' width={380} ml='auto'>
-                            <Controller
-                                control={control}
+                    <Controller
+                        name={field.name}
+                        control={control}
+                        render={({ field: { onChange, value } }) => (
+                            <TextField
+                                id={field.id}
                                 name={field.name}
-                                render={({ field: { onChange, value } }) => (
-                                    <StyleInputSend
-                                        id={field.id}
-                                        name={field.name}
-                                        label=''
-                                        type={field.type}
-                                        placeholder={field.placeholder}
-                                        size='small'
-                                        autoComplete='off'
-                                        error={Boolean(errors[field.name]?.message)}
-                                        value={value}
-                                        onChange={onChange}
-                                    />
-                                )}
+                                label=''
+                                type={field.type}
+                                placeholder={field.placeholder}
+                                size='small'
+                                autoComplete='off'
+                                error={Boolean(errors[field.name]?.message)}
+                                value={value}
+                                onChange={onChange}
+                                sx={{ width: 380 }}
                             />
-                            <StyleButtonSend variant='contained' size='small'>
-                                Gửi mã xác thực
-                            </StyleButtonSend>
-                        </Box>
-                    )}
+                        )}
+                    />
                     <FormHelperText error={Boolean(errors[field.name]?.message)} sx={{ pl: 1 }}>
                         {errors[field.name]?.message}
                     </FormHelperText>
@@ -172,7 +137,7 @@ function RegisterPage() {
                 <Typography variant='body2' component='span'>
                     Đã có tài khoản?{' '}
                 </Typography>
-                <StyleLink href='/auth/login'>Trở về trang đăng nhập</StyleLink>
+                <StyleLink href={EPath.AUTH_LOGIN}>Trở về trang đăng nhập</StyleLink>
             </Box>
         </StyleContainer>
     );

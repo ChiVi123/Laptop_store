@@ -9,9 +9,11 @@ import org.springframework.context.ApplicationEvent;
 @Setter
 public class OnRegistrationEvent extends ApplicationEvent {
     private AccountEntity account;
+    private String appURL;
 
-    public OnRegistrationEvent(AccountEntity account) {
+    public OnRegistrationEvent(AccountEntity account, String appURL) {
         super(account);
         this.account = account;
+        this.appURL = appURL;
     }
 }

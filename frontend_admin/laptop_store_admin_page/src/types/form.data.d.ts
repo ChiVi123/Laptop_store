@@ -1,6 +1,6 @@
 import { InferType } from 'yup';
-import { forgotPasswordSchema, loginSchema, registerSchema } from '~/schemas';
+import { sendMailSchema, loginSchema, registerSchema } from '~/schemas';
 
-export type TLoginFormData = InferType<typeof loginSchema>;
-export type TRegisterFormData = InferType<typeof registerSchema>;
-export type TForgotPasswordFormData = InferType<typeof forgotPasswordSchema>;
+export type loginFormData = InferType<typeof loginSchema>;
+export type registerFormData = InferType<typeof registerSchema>;
+export type sendMailFormData = InferType<typeof sendMailSchema>;

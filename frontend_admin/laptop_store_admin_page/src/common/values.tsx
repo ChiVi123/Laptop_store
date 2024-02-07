@@ -1,13 +1,12 @@
-import { TLoginFormData, TRegisterFormData } from '~/types/form.data';
+import { loginFormData, registerFormData } from '~/types/form.data';
 
-export const loginDefaultValues: TLoginFormData = {
-    email: 'nhcv@gmail.com',
+export const loginDefaultValues: loginFormData = {
+    email: process.env.REACT_INPUT_EMAIL || '',
     password: '123456789',
 };
-export const registerDefaultValues: TRegisterFormData = {
-    fullName: '',
-    email: '',
-    otp: '',
-    password: '',
-    passwordConfirm: '',
+export const registerDefaultValues: registerFormData = {
+    fullName: 'Chi Vi',
+    email: process.env.REACT_INPUT_EMAIL || '',
+    password: '123456789',
+    passwordConfirm: '123456789',
 };

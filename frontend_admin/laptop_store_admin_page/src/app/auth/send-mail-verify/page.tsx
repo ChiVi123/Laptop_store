@@ -4,13 +4,13 @@ import { Box, Button, TextField, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { sendEmailResetPasswordAction } from '~/actions/authActions';
+import { sendEmailVerifyAction } from '~/actions/authActions';
 import { EPath } from '~/common/enums';
 import { StyleContainer, StyleLink } from '~/components/auth.styles';
 import { sendMailResolver } from '~/resolvers';
 import { sendMailFormData } from '~/types/form.data';
 
-function ForgotPasswordPage() {
+function SendEmailVerifyPage() {
     const {
         control,
         formState: { errors },
@@ -25,11 +25,9 @@ function ForgotPasswordPage() {
     const handleOnSubmit: SubmitHandler<sendMailFormData> = async (data) => {
         setDisabled(true);
 
-        const result = await sendEmailResetPasswordAction(data.email);
-        console.log({ result });
-
+        const result = await sendEmailVerifyAction(data.email);
         if (result?.success) {
-            router.push(EPath.AUTH_NOTIFY_SEND_MAIL.concat('?variant=reset-password'));
+            router.push(EPath.AUTH_NOTIFY_SEND_MAIL.concat('?variant=verify'));
             return;
         }
 
@@ -38,9 +36,9 @@ function ForgotPasswordPage() {
 
     return (
         <StyleContainer elevation={3} sx={{ width: 380 }}>
-            <Typography variant='h1'>Quên mật khẩu</Typography>
+            <Typography variant='h1'>Gửi mã xác nhận</Typography>
             <Typography mt={1} sx={{ fontSize: '0.75rem', fontWeight: 400, lineHeight: 1.2 }}>
-                Vui lòng cung cấp email đăng nhập để lấy lại mật khẩu
+                Vui lòng cung cấp email đăng nhập
             </Typography>
 
             <Box
@@ -77,7 +75,7 @@ function ForgotPasswordPage() {
                     fullWidth
                     sx={{ mt: 1 }}
                 >
-                    Đặt lại mật khẩu
+                    Gửi
                 </Button>
             </Box>
             <Box display='flex' justifyContent='center' mt={2}>
@@ -87,4 +85,4 @@ function ForgotPasswordPage() {
     );
 }
 
-export default ForgotPasswordPage;
+export default SendEmailVerifyPage;

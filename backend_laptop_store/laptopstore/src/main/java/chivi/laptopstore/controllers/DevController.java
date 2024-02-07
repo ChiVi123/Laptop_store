@@ -2,8 +2,10 @@ package chivi.laptopstore.controllers;
 
 import chivi.laptopstore.common.RequestMaps;
 import chivi.laptopstore.common.ResponseMessage;
+import chivi.laptopstore.models.entities.AccountEntity;
 import chivi.laptopstore.models.entities.VerificationTokenEntity;
 import chivi.laptopstore.models.responses.SuccessResponse;
+import chivi.laptopstore.services.AccountService;
 import chivi.laptopstore.services.DevService;
 import freemarker.template.TemplateException;
 import jakarta.mail.MessagingException;
@@ -21,6 +23,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class DevController {
     private final DevService devService;
+    private final AccountService accountService;
 
     @GetMapping("send-email")
     @ResponseStatus(HttpStatus.OK)
@@ -39,6 +42,13 @@ public class DevController {
         verificationToken.setNewExpired();
 
         return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, devService.saveVerificationToken(verificationToken));
+    }
+
+    @PutMapping("account-reset-status/{email}")
+    @ResponseStatus(HttpStatus.OK)
+    public SuccessResponse resetStatusAccount(@PathVariable String email) {
+        AccountEntity account = accountService.getByEmail(email);
+        return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, devService.resetAccount(account));
     }
 
     @DeleteMapping("delete-all-brand")

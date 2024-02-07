@@ -7,9 +7,13 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class EmailRequest {
+public class SendEmailRequest {
     @NotNull(message = ValidationMessage.NOT_NULL)
     @NotBlank(message = ValidationMessage.NOT_BLANK)
     @Email(message = ValidationMessage.INVALID)
     private String email;
+
+    @NotNull(message = ValidationMessage.NOT_NULL)
+    @NotBlank(message = ValidationMessage.NOT_BLANK)
+    private String appURL;
 }

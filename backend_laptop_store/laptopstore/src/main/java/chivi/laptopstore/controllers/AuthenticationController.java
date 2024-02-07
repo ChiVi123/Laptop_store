@@ -8,9 +8,9 @@ import chivi.laptopstore.events.OnResetPasswordEvent;
 import chivi.laptopstore.models.entities.AccountEntity;
 import chivi.laptopstore.models.entities.VerificationTokenEntity;
 import chivi.laptopstore.models.exceptions.BaseException;
-import chivi.laptopstore.models.requests.EmailRequest;
 import chivi.laptopstore.models.requests.LoginRequest;
 import chivi.laptopstore.models.requests.RegisterRequest;
+import chivi.laptopstore.models.requests.SendEmailRequest;
 import chivi.laptopstore.models.responses.SuccessResponse;
 import chivi.laptopstore.security.jwt.JwtUtils;
 import chivi.laptopstore.services.AccountService;
@@ -64,11 +64,11 @@ public class AuthenticationController {
 
     @PostMapping(RequestMaps.AUTH_PATHNAME + "register-admin")
     @ResponseStatus(HttpStatus.CREATED)
-    public SuccessResponse registerAdmin(@Valid @RequestBody RegisterRequest registerRequest) {
+    public SuccessResponse registerAdmin(@RequestParam("app_url") String appURL, @Valid @RequestBody RegisterRequest registerRequest) {
         authenticationService.checkConflictAccountByEmail(registerRequest.getEmail());
 
         AccountEntity account = authenticationService.createAccount(registerRequest, EAccountRole.ADMIN);
-        OnRegistrationEvent event = new OnRegistrationEvent(account);
+        OnRegistrationEvent event = new OnRegistrationEvent(account, appURL);
 
         applicationEventPublisher.publishEvent(event);
         return new SuccessResponse("Register success", account);
@@ -76,30 +76,31 @@ public class AuthenticationController {
 
     @PostMapping(RequestMaps.AUTH_PATHNAME + "register-customer")
     @ResponseStatus(HttpStatus.CREATED)
-    public SuccessResponse registerCustomer(@Valid @RequestBody RegisterRequest registerRequest) {
+    public SuccessResponse registerCustomer(@RequestParam("app_url") String appURL, @Valid @RequestBody RegisterRequest registerRequest) {
         authenticationService.checkConflictAccountByEmail(registerRequest.getEmail());
 
         AccountEntity account = authenticationService.createAccount(registerRequest, EAccountRole.CUSTOMER);
-        OnRegistrationEvent event = new OnRegistrationEvent(account);
+        OnRegistrationEvent event = new OnRegistrationEvent(account, appURL);
 
         applicationEventPublisher.publishEvent(event);
         return new SuccessResponse("Register success", account);
     }
 
-    @PutMapping(RequestMaps.AUTH_PATHNAME + "resend-verification-token")
+    @PutMapping(RequestMaps.AUTH_PATHNAME + "send-verification-token")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse reSendVerificationToken(@Valid @RequestBody EmailRequest emailRequest) {
-        String email = emailRequest.getEmail();
+    public SuccessResponse sendVerificationToken(@Valid @RequestBody SendEmailRequest sendEmailRequest) {
+        String email = sendEmailRequest.getEmail();
+        String appURL = sendEmailRequest.getAppURL();
         AccountEntity account = accountService.getByEmail(email);
-        OnRegistrationEvent event = new OnRegistrationEvent(account);
+        OnRegistrationEvent event = new OnRegistrationEvent(account, appURL);
         applicationEventPublisher.publishEvent(event);
         return new SuccessResponse("Resend verification token successfully");
     }
 
     @PutMapping(RequestMaps.AUTH_PATHNAME + "reset-password")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse resetPassword(@Valid @RequestBody EmailRequest emailRequest) {
-        String email = emailRequest.getEmail();
+    public SuccessResponse resetPassword(@Valid @RequestBody SendEmailRequest sendEmailRequest) {
+        String email = sendEmailRequest.getEmail();
         OnResetPasswordEvent event = new OnResetPasswordEvent(email);
         applicationEventPublisher.publishEvent(event);
         return new SuccessResponse("Reset password successfully");

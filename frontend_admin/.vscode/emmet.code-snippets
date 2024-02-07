@@ -1,13 +1,13 @@
 {
     "Create component": {
         "scope": "typescriptreact",
-        "prefix": "fcc",
+        "prefix": "ffc",
         "body": ["function $1() {", "	return <div></div>", "};", "", "export default $1;"],
         "description": "Create component"
     },
     "Create component layout": {
         "scope": "typescriptreact",
-        "prefix": "fccl",
+        "prefix": "ffcl",
         "body": [
             "function $1Layout({ children }: $2Type) {",
             "	return (<div>{children}</div>)",

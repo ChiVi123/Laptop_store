@@ -11,5 +11,10 @@
             "source.organizeImports": "explicit"
         }
     },
+    "[typescript]": {
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        }
+    },
     "cSpell.words": ["fetaos", "fontsource", "hookform", "roboto"]
 }

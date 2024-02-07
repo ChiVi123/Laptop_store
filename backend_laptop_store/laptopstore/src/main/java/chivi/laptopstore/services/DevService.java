@@ -1,5 +1,6 @@
 package chivi.laptopstore.services;
 
+import chivi.laptopstore.common.EAccountStatus;
 import chivi.laptopstore.models.entities.AccountEntity;
 import chivi.laptopstore.models.entities.VerificationTokenEntity;
 import chivi.laptopstore.models.exceptions.CustomNotFoundException;
@@ -56,6 +57,11 @@ public class DevService {
         javaMailSender.send(mimeMessage);
 
         log.info("End send mail: {}", Thread.currentThread().getName());
+    }
+
+    public AccountEntity resetAccount(AccountEntity account) {
+        account.setStatus(EAccountStatus.NOT_VERIFIED);
+        return accountRepository.save(account);
     }
 
     public VerificationTokenEntity findVerificationTokenByEmail(String email) {

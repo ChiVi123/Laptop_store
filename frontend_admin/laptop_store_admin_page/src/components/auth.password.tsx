@@ -1,14 +1,7 @@
 'use client';
 
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import {
-    FormControl,
-    FormHelperText,
-    IconButton,
-    InputAdornment,
-    InputLabel,
-    OutlinedInput,
-} from '@mui/material';
+import { FormControl, FormHelperText, IconButton, InputAdornment, InputLabel, OutlinedInput } from '@mui/material';
 import { ChangeEventHandler, MouseEvent, useState } from 'react';
 
 interface IProps {
@@ -39,7 +32,7 @@ function PasswordField({ error, helperText, value, onChange }: IProps) {
                 label='Mật khẩu'
                 endAdornment={
                     <InputAdornment position='end'>
-                        <IconButton edge='end' onClick={handleClick}>
+                        <IconButton aria-label='toggle password visibility' edge='end' onClick={handleClick}>
                             {showed ? <VisibilityOff /> : <Visibility />}
                         </IconButton>
                     </InputAdornment>

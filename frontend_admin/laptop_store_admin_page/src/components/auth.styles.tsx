@@ -7,7 +7,9 @@ export const StyleWrap = styled(Box)(() => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    height: '100vh',
+    minHeight: '100vh',
+    paddingTop: 20,
+    paddingBottom: 20,
     background: 'linear-gradient(180deg, #A1AEE7 0%, #F0F2F5 100%)',
 }));
 export const StyleLink = styled(NextLink)(({ theme: { palette } }) => ({

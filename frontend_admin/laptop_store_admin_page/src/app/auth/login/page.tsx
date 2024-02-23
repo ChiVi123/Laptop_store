@@ -11,12 +11,7 @@ import { loginAction } from '~/actions/authActions';
 import { EPath } from '~/common/enums';
 import { loginDefaultValues } from '~/common/values';
 import PasswordField from '~/components/auth.password';
-import {
-    StyleButtonLoginWithGoogle,
-    StyleContainer,
-    StyleLine,
-    StyleLink,
-} from '~/components/auth.styles';
+import { StyleButtonLoginWithGoogle, StyleContainer, StyleLine, StyleLink } from '~/components/auth.styles';
 import { loginResolver } from '~/resolvers';
 import { loginFormData } from '~/types/form.data';
 
@@ -50,7 +45,7 @@ function LoginPage() {
 
     return (
         <StyleContainer elevation={3} sx={{ width: 420 }}>
-            <Box sx={{ display: 'flex', columnGap: 2 }}>
+            <Box display='flex' columnGap={2}>
                 <Image src='/logo-icon.png' alt='logo' width={48} height={48} />
                 <Box>
                     <Typography variant='h1'>Đăng nhập</Typography>
@@ -103,7 +98,7 @@ function LoginPage() {
                     )}
                 />
 
-                <Box sx={{ mb: 4 }}>
+                <Box mb={4}>
                     <Typography variant='body2' component='span'>
                         Quên mật khẩu? Nhấn vào đây{' '}
                     </Typography>
@@ -134,7 +129,7 @@ function LoginPage() {
                 </Typography>
             </Box>
 
-            <Box sx={{ display: 'flex', justifyContent: 'center', columnGap: 1 }}>
+            <Box display='flex' justifyContent='center' columnGap={1}>
                 <StyleButtonLoginWithGoogle variant='contained'>
                     <Google_icon sx={{ fontSize: '1rem' }} />
                     Google

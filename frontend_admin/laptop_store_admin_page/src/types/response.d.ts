@@ -26,3 +26,7 @@ export interface IRegisterResponse extends ISuccessResponse {
 export interface IProductDetailResponse extends ISuccessResponse {
     data: IProduct;
 }
+
+export interface IAllProductResponse extends ISuccessResponse {
+    data: IProduct[];
+}

@@ -23,5 +23,8 @@ export enum EPath {
     AUTH_SEND_MAIL_VERIFY = '/auth/send-mail-verify',
     AUTH_NOTIFY_SEND_MAIL = '/auth/notify-send-mail',
     AUTH_REGISTRATION_CONFIRM = 'auth/registration-confirm',
+    MANAGE_HOME = '/manage/home',
     MANAGE_PRODUCT_LIST = '/manage/product/list',
+    MANAGE_PRODUCT_ADD = '/manage/product/add',
+    MANAGE_ORDER_LIST = '/manage/order/list',
 }

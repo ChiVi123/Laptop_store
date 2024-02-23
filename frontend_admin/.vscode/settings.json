@@ -4,8 +4,9 @@
     "editor.fontFamily": "Cascadia Code, Fira Code, Roboto Mono, monospace",
     "editor.fontLigatures": true,
     "editor.wordWrap": "wordWrapColumn",
-    "editor.wordWrapColumn": 100,
-    "editor.rulers": [100, 120, 140],
+    "editor.wordWrapColumn": 120,
+    "editor.rulers": [120, 140, 160],
+    "editor.fontSize": 12,
     "[typescriptreact]": {
         "editor.codeActionsOnSave": {
             "source.organizeImports": "explicit"
@@ -16,5 +17,5 @@
             "source.organizeImports": "explicit"
         }
     },
-    "cSpell.words": ["fetaos", "fontsource", "hookform", "roboto"]
+    "cSpell.words": ["fetaos", "fontsource", "hookform", "Parens", "roboto"]
 }

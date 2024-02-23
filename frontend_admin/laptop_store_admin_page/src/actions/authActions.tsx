@@ -8,10 +8,10 @@ import { request } from './request';
 
 export async function verifyTokenAction(token: string) {
     try {
-        const response = await request.get<ILoginResponse, IErrorResponse>(
-            'auth/registration-confirm',
-            { params: { token }, cache: 'no-cache' },
-        );
+        const response = await request.get<ILoginResponse, IErrorResponse>('auth/registration-confirm', {
+            params: { token },
+            cache: 'no-cache',
+        });
         if (response.success) {
             cookies().set({
                 name: EKeys.TOKEN,
@@ -35,7 +35,12 @@ export async function loginAction(data: loginFormData) {
         });
 
         if (response.success) {
-            cookies().set(EKeys.TOKEN, response.data);
+            cookies().set({
+                name: EKeys.TOKEN,
+                value: response.data,
+                httpOnly: true,
+                secure: true,
+            });
         }
 
         return response;
@@ -46,15 +51,12 @@ export async function loginAction(data: loginFormData) {
 
 export async function registerAction(data: registerFormData) {
     try {
-        const response = await request.post<IRegisterResponse, IErrorResponse>(
-            'auth/register-admin',
-            {
-                params: { app_url: EPath.AUTH_REGISTRATION_CONFIRM },
-                data,
-                json: true,
-                cache: 'no-cache',
-            },
-        );
+        const response = await request.post<IRegisterResponse, IErrorResponse>('auth/register-admin', {
+            params: { app_url: EPath.AUTH_REGISTRATION_CONFIRM },
+            data,
+            json: true,
+            cache: 'no-cache',
+        });
         return response;
     } catch (error) {
         console.log(error);
@@ -63,14 +65,11 @@ export async function registerAction(data: registerFormData) {
 
 export async function sendEmailVerifyAction(email: string) {
     try {
-        const response = await request.put<IVoidResponse, IErrorResponse>(
-            'auth/send-verification-token',
-            {
-                data: { email, appURL: EPath.AUTH_REGISTRATION_CONFIRM },
-                json: true,
-                cache: 'no-cache',
-            },
-        );
+        const response = await request.put<IVoidResponse, IErrorResponse>('auth/send-verification-token', {
+            data: { email, appURL: EPath.AUTH_REGISTRATION_CONFIRM },
+            json: true,
+            cache: 'no-cache',
+        });
         return response;
     } catch (error) {
         console.log(error);

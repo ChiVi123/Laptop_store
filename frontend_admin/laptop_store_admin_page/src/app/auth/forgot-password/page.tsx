@@ -26,7 +26,6 @@ function ForgotPasswordPage() {
         setDisabled(true);
 
         const result = await sendEmailResetPasswordAction(data.email);
-        console.log({ result });
 
         if (result?.success) {
             router.push(EPath.AUTH_NOTIFY_SEND_MAIL.concat('?variant=reset-password'));
@@ -70,13 +69,7 @@ function ForgotPasswordPage() {
                     )}
                 />
 
-                <Button
-                    type='submit'
-                    variant='contained'
-                    disabled={disabled}
-                    fullWidth
-                    sx={{ mt: 1 }}
-                >
+                <Button type='submit' variant='contained' disabled={disabled} fullWidth sx={{ mt: 1 }}>
                     Đặt lại mật khẩu
                 </Button>
             </Box>

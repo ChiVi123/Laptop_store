@@ -10,8 +10,8 @@ import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { loginAction } from '~/actions/authActions';
 import { EPath } from '~/common/enums';
 import { loginDefaultValues } from '~/common/values';
-import PasswordField from '~/components/auth.password';
-import { StyleButtonLoginWithGoogle, StyleContainer, StyleLine, StyleLink } from '~/components/auth.styles';
+import PasswordField from '~/components/auth/password.field';
+import { StyleButtonLoginWithGoogle, StyleContainer, StyleLine, StyleLink } from '~/components/auth/styles';
 import { loginResolver } from '~/resolvers';
 import { loginFormData } from '~/types/form.data';
 

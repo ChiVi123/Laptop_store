@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { sendEmailVerifyAction } from '~/actions/authActions';
 import { EPath } from '~/common/enums';
-import { StyleContainer, StyleLink } from '~/components/auth.styles';
+import { StyleContainer, StyleLink } from '~/components/auth/styles';
 import { sendMailResolver } from '~/resolvers';
 import { sendMailFormData } from '~/types/form.data';
 
@@ -68,13 +68,7 @@ function SendEmailVerifyPage() {
                     )}
                 />
 
-                <Button
-                    type='submit'
-                    variant='contained'
-                    disabled={disabled}
-                    fullWidth
-                    sx={{ mt: 1 }}
-                >
+                <Button type='submit' variant='contained' disabled={disabled} fullWidth sx={{ mt: 1 }}>
                     Gửi
                 </Button>
             </Box>

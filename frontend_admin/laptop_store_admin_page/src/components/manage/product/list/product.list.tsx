@@ -1,7 +1,7 @@
 'use client';
 
-import { Edit as EditIconMUI } from '@mui/icons-material';
-import { Typography } from '@mui/material';
+import EditIconMUI from '@mui/icons-material/Edit';
+import Typography from '@mui/material/Typography';
 import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 import { Fragment, useMemo } from 'react';
 import { IProduct } from '~/types/models';
@@ -14,18 +14,18 @@ interface IProps {
 function ProductList({ rows }: IProps) {
     const columns = useMemo<GridColDef[]>(
         () => [
-            { field: 'id', headerName: 'ID', type: 'number' },
-            { field: 'name', headerName: 'Ten san pham', width: 420 },
-            { field: 'quantityStock', headerName: 'Ton kho', type: 'number', width: 100 },
+            { field: 'id', headerName: 'ID', type: 'number', width: 40 },
+            { field: 'name', headerName: 'Tên sản phẩm', width: 420 },
+            { field: 'quantityStock', headerName: 'Tồn kho', type: 'number', width: 100 },
             {
                 field: 'price',
-                headerName: 'Gia ban',
+                headerName: 'Giá bán',
                 type: 'number',
                 width: 134,
             },
             {
                 field: 'createdDate',
-                headerName: 'Ngay tao',
+                headerName: 'Ngày tạo',
                 width: 140,
                 valueGetter: (params) => formatLocalDate(params.value),
             },
@@ -47,7 +47,7 @@ function ProductList({ rows }: IProps) {
     return (
         <Fragment>
             <Typography variant='h3' mb={2}>
-                {rows.length} San pham
+                {rows.length} Sản phẩm
             </Typography>
             <DataGrid
                 rows={rows}

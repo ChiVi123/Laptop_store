@@ -1,7 +1,6 @@
-import { Toolbar } from '@mui/material';
 import Box from '@mui/material/Box';
-import Header from '~/components/manage.header';
-import Navigate from '~/components/manage.navigate';
+import Toolbar from '@mui/material/Toolbar';
+import { Header, Navigate } from '~/components/manage';
 import { IOnlyChildren } from '~/types/props';
 
 function ManageLayout({ children }: IOnlyChildren) {

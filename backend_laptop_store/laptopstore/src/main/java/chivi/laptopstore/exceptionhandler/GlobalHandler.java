@@ -19,7 +19,6 @@ public class GlobalHandler {
     public ResponseEntity<?> commonHandler(BaseException baseException) {
         ErrorResponse errorResponse = new ErrorResponse(baseException.getCode());
         errorResponse.putItem(baseException.getMessage());
-        log.error("Status: {}", baseException.getCode());
         return ResponseEntity.status(baseException.getCode()).body(errorResponse);
     }
 
@@ -43,7 +42,6 @@ public class GlobalHandler {
     public ErrorResponse authenticationHandler(AuthenticationException exception) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED.value());
         errorResponse.putItem(exception.getMessage());
-        log.error("AuthenticationException");
         return errorResponse;
     }
 }

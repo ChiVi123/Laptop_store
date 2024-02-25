@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { verifyTokenAction } from '~/actions/authActions';
 import { EPath } from '~/common/enums';
-import { StyleContainer } from '~/components/auth.styles';
+import { StyleContainer } from '~/components/auth/styles';
 
 interface IProps {
     searchParams: { [key: string]: string | string[] | undefined };

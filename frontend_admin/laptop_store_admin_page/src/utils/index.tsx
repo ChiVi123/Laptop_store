@@ -14,11 +14,7 @@ export function logger(label: string, ...args: any[]) {
     }
 }
 
-export function toCurrency(
-    value: number,
-    locales: string = 'vi',
-    options?: Intl.NumberFormatOptions,
-): string {
+export function toCurrency(value: number, locales: string = 'vi', options?: Intl.NumberFormatOptions): string {
     const targetOptions = { style: 'currency', currency: 'VND' };
     Object.assign(targetOptions, options);
     return value.toLocaleString(locales, targetOptions);
@@ -78,10 +74,7 @@ export const fetaos = (function () {
         return ''.concat(_baseURL, path, pathVariablesPath, paramsPath);
     }
 
-    async function get<GSuccessResponse, GErrorResponse>(
-        path: string,
-        options: IPathRequestInit = {},
-    ) {
+    async function get<GSuccessResponse, GErrorResponse>(path: string, options: IPathRequestInit = {}) {
         const url = createURL(path, options);
         try {
             const response = await fetch(url, options);
@@ -94,15 +87,12 @@ export const fetaos = (function () {
             throw reason;
         }
     }
-    async function post<GSuccessResponse, GErrorResponse>(
-        path: string,
-        options: IDataRequestInit = {},
-    ) {
+    async function post<GSuccessResponse, GErrorResponse>(path: string, options: IDataRequestInit = {}) {
         const url = createURL(path, options);
         options.method = 'POST';
 
         if (options.json) {
-            options.headers = { 'content-type': 'application/json' };
+            options.headers = { ...options.headers, 'content-type': 'application/json' };
             options.body = JSON.stringify(options.data);
         }
 
@@ -117,10 +107,7 @@ export const fetaos = (function () {
             throw reason;
         }
     }
-    async function put<GSuccessResponse, GErrorResponse>(
-        path: string,
-        options: IDataRequestInit = {},
-    ) {
+    async function put<GSuccessResponse, GErrorResponse>(path: string, options: IDataRequestInit = {}) {
         const url = createURL(path, options);
         options.method = 'PUT';
 
@@ -140,10 +127,7 @@ export const fetaos = (function () {
             throw reason;
         }
     }
-    async function patch<GSuccessResponse, GErrorResponse>(
-        path: string,
-        options: IDataRequestInit = {},
-    ) {
+    async function patch<GSuccessResponse, GErrorResponse>(path: string, options: IDataRequestInit = {}) {
         const url = createURL(path, options);
         options.method = 'PATCH';
 
@@ -163,10 +147,7 @@ export const fetaos = (function () {
             throw reason;
         }
     }
-    async function _delete<GSuccessResponse, GErrorResponse>(
-        path: string,
-        options: IDataRequestInit = {},
-    ) {
+    async function _delete<GSuccessResponse, GErrorResponse>(path: string, options: IDataRequestInit = {}) {
         const url = createURL(path, options);
         options.method = 'DELETE';
 

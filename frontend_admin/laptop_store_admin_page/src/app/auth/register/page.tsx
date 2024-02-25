@@ -7,7 +7,7 @@ import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { registerAction } from '~/actions/authActions';
 import { EPath } from '~/common/enums';
 import { registerDefaultValues } from '~/common/values';
-import { StyleContainer, StyleField, StyleLabel, StyleLink } from '~/components/auth.styles';
+import { StyleContainer, StyleField, StyleLabel, StyleLink } from '~/components/auth/styles';
 import { registerResolver } from '~/resolvers';
 import { registerFormData } from '~/types/form.data';
 
@@ -123,12 +123,7 @@ function RegisterPage() {
                     <Fragment key={item.id}>{renderField(item)}</Fragment>
                 ))}
 
-                <Button
-                    type='submit'
-                    variant='contained'
-                    disabled={disabled}
-                    sx={{ width: 380, ml: 'auto' }}
-                >
+                <Button type='submit' variant='contained' disabled={disabled} sx={{ width: 380, ml: 'auto' }}>
                     Đăng ký
                 </Button>
             </Box>

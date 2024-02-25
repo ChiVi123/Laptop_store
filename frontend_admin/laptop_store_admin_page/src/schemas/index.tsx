@@ -20,3 +20,10 @@ export const registerSchema = yup.object({
         .oneOf([yup.ref('password')], EInvalid.PASSWORD_CONFIRM_MATCH),
 });
 export const sendMailSchema = yup.object({ email });
+export const addProductSchema = yup.object({
+    name: yupString().required(),
+    price: yup.number().positive().required(),
+    description: yupString().required(),
+    categoryId: yup.number().integer().positive().required(),
+    brandId: yup.number().integer().positive().required(),
+});

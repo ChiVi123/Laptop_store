@@ -4,6 +4,8 @@ import chivi.laptopstore.common.EAccountRole;
 import chivi.laptopstore.security.jwt.JwtAuthenticationEntryPoint;
 import chivi.laptopstore.security.jwt.JwtFilter;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -26,6 +28,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @AllArgsConstructor
@@ -39,9 +42,10 @@ public class SecurityConfig {
             "/api/v1/checkout/*/success",
             "/api/v1/checkout/*/cancel"
     };
-
     private final String ALLOWED_GET_URL = "/api/v1/public/**";
 
+    @Value("${app.allowed.origins}")
+    private String[] allowedOrigins;
 
     @Bean
     public SecurityFilterChain configure(HttpSecurity httpSecurity) throws Exception {
@@ -67,14 +71,13 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        List<String> allowedOrigins = Arrays.asList("http://localhost:4000", "http://localhost:4001");
         List<String> allowedMethods = Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS");
         List<String> allowedHeaders = Arrays.asList("authorization", "content-type", "x-auth-token", "origin", "x-request-with", "accept");
         List<String> exposedHeaders = List.of("x-auth-token");
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         UrlBasedCorsConfigurationSource corsConfigurationSource = new UrlBasedCorsConfigurationSource();
 
-        corsConfiguration.setAllowedOrigins(allowedOrigins);
+        corsConfiguration.setAllowedOrigins(List.of(allowedOrigins));
         corsConfiguration.setAllowedMethods(allowedMethods);
         corsConfiguration.setAllowedHeaders(allowedHeaders);
         corsConfiguration.setExposedHeaders(exposedHeaders);
@@ -100,7 +103,6 @@ public class SecurityConfig {
         String threadNamePrefix = "ThreadPoolTaskScheduler";
         int poolSize = 5;
         ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
-
         threadPoolTaskScheduler.setPoolSize(poolSize);
         threadPoolTaskScheduler.setThreadNamePrefix(threadNamePrefix);
         return threadPoolTaskScheduler;

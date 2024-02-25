@@ -1,12 +1,13 @@
 'use client';
 
-import { Tab, Tabs } from '@mui/material';
+import Tab from '@mui/material/Tab';
+import Tabs from '@mui/material/Tabs';
 import { useState } from 'react';
 
 function TabsWrap() {
     const [tab, setTab] = useState(0);
 
-    function handleChangeTab(event: React.SyntheticEvent, newValue: number) {
+    function handleChangeTab(_: React.SyntheticEvent, newValue: number) {
         setTab(newValue);
     }
 

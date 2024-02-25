@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { sendEmailResetPasswordAction } from '~/actions/authActions';
 import { EPath } from '~/common/enums';
-import { StyleContainer, StyleLink } from '~/components/auth.styles';
+import { StyleContainer, StyleLink } from '~/components/auth/styles';
 import { sendMailResolver } from '~/resolvers';
 import { sendMailFormData } from '~/types/form.data';
 

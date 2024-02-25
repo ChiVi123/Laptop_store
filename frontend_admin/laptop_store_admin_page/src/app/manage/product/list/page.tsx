@@ -1,12 +1,17 @@
 import { Add as AddIconMUI, SearchRounded as SearchRoundedIconMUI } from '@mui/icons-material';
-import { Box, Breadcrumbs, Button, InputAdornment, Link as LinkMUI, TextField, Typography } from '@mui/material';
+import Box from '@mui/material/Box';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Button from '@mui/material/Button';
+import InputAdornment from '@mui/material/InputAdornment';
+import LinkMUI from '@mui/material/Link';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { Fragment } from 'react';
 import { findAllProduct } from '~/actions/request';
 import { EPath } from '~/common/enums';
-import ProductList from '~/components/manage.product.list';
-import TabsWrap from '~/components/manage.product.tabs.wrap';
+import { ProductList, TabsWrap } from '~/components/manage/product/list';
 
 async function ProductListPage() {
     const result = (await findAllProduct()) || { data: [] };
@@ -20,15 +25,15 @@ async function ProductListPage() {
             <Box p='18px 24px 12px' bgcolor='white'>
                 <Breadcrumbs separator='>'>
                     <LinkMUI href={EPath.MANAGE_HOME} underline='hover' color='grey.400' component={Link}>
-                        Trang chu
+                        Trang chủ
                     </LinkMUI>
                     <Typography color='text.primary' component='span'>
-                        Danh sach san pham
+                        Danh sách sản phẩm
                     </Typography>
                 </Breadcrumbs>
 
                 <Typography variant='h2' mt={2}>
-                    Danh sach san pham
+                    Danh sách sản phẩm
                 </Typography>
             </Box>
             <Box bgcolor='white'>
@@ -46,7 +51,7 @@ async function ProductListPage() {
                     id='input-search-product'
                     variant='outlined'
                     size='small'
-                    placeholder='Nhap ten san pham...'
+                    placeholder='Tìm kiếm theo tên...'
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position='start'>
@@ -56,7 +61,7 @@ async function ProductListPage() {
                     }}
                 />
                 <Button variant='outlined' endIcon={<AddIconMUI />}>
-                    Bo loc
+                    Bộ lọc
                 </Button>
             </Box>
             <Box px={3}>

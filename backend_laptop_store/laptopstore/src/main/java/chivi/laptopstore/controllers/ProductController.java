@@ -38,7 +38,6 @@ public class ProductController {
     @GetMapping(RequestMaps.PRODUCT_PATHNAME_PUBLIC + "{slug}")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse findBySlug(@PathVariable String slug) {
-        log.error("Slug: {}", slug);
         return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, productService.getBySlug(slug));
     }
 

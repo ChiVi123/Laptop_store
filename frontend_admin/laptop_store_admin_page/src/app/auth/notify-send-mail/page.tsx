@@ -1,4 +1,4 @@
-import { StyleContainer } from '~/components/auth.styles';
+import { StyleContainer } from '~/components/auth/styles';
 
 interface IProps {
     searchParams: { [key: string]: string | string[] | undefined };

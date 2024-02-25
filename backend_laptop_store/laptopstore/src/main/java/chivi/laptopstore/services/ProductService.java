@@ -51,13 +51,13 @@ public class ProductService {
     }
 
     public ProductEntity createProduct(CategoryEntity category, BrandEntity brand, ProductRequest productRequest) {
-        String slug = CustomString.toSlug(productRequest.getName());
+        String slug = CustomString.toSlug(productRequest.getName().trim());
         ProductEntity product = ProductEntity
                 .builder()
-                .name(productRequest.getName())
+                .name(productRequest.getName().trim())
                 .slug(slug)
                 .price(productRequest.getPrice())
-                .description(productRequest.getDescription())
+                .description(productRequest.getDescription().trim())
                 .category(category)
                 .brand(brand)
                 .build();

@@ -20,7 +20,19 @@
     "Use state": {
         "scope": "typescriptreact",
         "prefix": "ust",
-        "body": ["const [$1, set$1] = useState$4<$2>($3);"],
+        "body": ["const [$1, $1] = useState$4<$2>($3);"],
         "description": "Use state"
+    },
+    "Export default": {
+        "scope": "typescriptreact",
+        "prefix": "edf",
+        "body": ["export { default as $2 } from '$1';"],
+        "description": "Export default"
+    },
+    "Export const": {
+        "scope": "typescriptreact",
+        "prefix": "ecst",
+        "body": ["export const $1 = $2;"],
+        "description": "Export const"
     }
 }

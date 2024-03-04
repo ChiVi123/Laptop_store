@@ -1,9 +1,6 @@
 'use client';
 
-import {
-    KeyboardArrowDown as KeyboardArrowDownIconMUI,
-    Notifications as NotificationsIconMUI,
-} from '@mui/icons-material';
+import { KeyboardArrowDown as KeyboardArrowDownIcon, Notifications as NotificationsIcon } from '@mui/icons-material';
 import { AppBar, Avatar, Badge, Button, IconButton, Menu, MenuItem, Toolbar } from '@mui/material';
 import { useState } from 'react';
 
@@ -54,7 +51,7 @@ function Header({ width }: { width: number }) {
             <Toolbar sx={{ justifyContent: 'flex-end', gap: 2 }}>
                 <IconButton>
                     <Badge badgeContent={2} color='warning'>
-                        <NotificationsIconMUI />
+                        <NotificationsIcon />
                     </Badge>
                 </IconButton>
                 <Button
@@ -62,7 +59,7 @@ function Header({ width }: { width: number }) {
                     variant='outlined'
                     disableRipple
                     startIcon={<Avatar {...stringAvatar('I Love You')} />}
-                    endIcon={<KeyboardArrowDownIconMUI />}
+                    endIcon={<KeyboardArrowDownIcon />}
                     sx={{ color: ({ palette }) => palette.grey[600], borderRadius: '999px' }}
                     onClick={handleOpenMenu}
                 >

@@ -32,7 +32,7 @@ public class CategoryService {
 
     public CategoryEntity createCategory(BaseInfoRequest baseInfoRequest) {
         String url = this.handleCategoryUrl(baseInfoRequest);
-        CategoryEntity category = new CategoryEntity(baseInfoRequest.getName(), url);
+        CategoryEntity category = new CategoryEntity(baseInfoRequest.getName(), url, baseInfoRequest.getStatus());
         return categoryRepository.save(category);
     }
 

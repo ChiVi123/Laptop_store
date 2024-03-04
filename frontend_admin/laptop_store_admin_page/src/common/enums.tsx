@@ -1,7 +1,7 @@
 export enum EKeys {
     TOKEN = 'token',
+    IMAGE = 'image',
 }
-
 export enum EInvalid {
     FULL_NAME_REQUIRED = 'Hãy nhập họ tên',
     EMAIL_FORMAT = 'Email không hợp lệ',
@@ -10,12 +10,15 @@ export enum EInvalid {
     PASSWORD_CONFIRM_REQUIRED = 'Hãy xác nhận mật khẩu',
     PASSWORD_CONFIRM_MATCH = 'Mật khẩu không khớp',
 }
-
 export enum EAccountRole {
     ADMIN = 'ADMIN',
     CUSTOMER = 'CUSTOMER',
 }
-
+export enum EProductStatus {
+    DRAFT = 'DRAFT',
+    ENABLED = 'ENABLED',
+    DISABLED = 'DISABLED',
+}
 export enum EPath {
     AUTH_LOGIN = '/auth/login',
     AUTH_REGISTER = '/auth/register',
@@ -24,7 +27,8 @@ export enum EPath {
     AUTH_NOTIFY_SEND_MAIL = '/auth/notify-send-mail',
     AUTH_REGISTRATION_CONFIRM = 'auth/registration-confirm',
     MANAGE_HOME = '/manage/home',
-    MANAGE_PRODUCT_LIST = '/manage/product/list',
-    MANAGE_PRODUCT_ADD = '/manage/product/add',
+    MANAGE_CATEGORY = '/manage/category',
     MANAGE_ORDER_LIST = '/manage/order/list',
+    MANAGE_PRODUCT_ADD = '/manage/product/add',
+    MANAGE_PRODUCT_LIST = '/manage/product/list',
 }

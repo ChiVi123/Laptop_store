@@ -1,8 +1,10 @@
 package chivi.laptopstore.controllers;
 
+import chivi.laptopstore.common.EEntityStatus;
 import chivi.laptopstore.common.RequestMaps;
 import chivi.laptopstore.common.ResponseMessage;
 import chivi.laptopstore.models.entities.AccountEntity;
+import chivi.laptopstore.models.entities.ProductEntity;
 import chivi.laptopstore.models.entities.VerificationTokenEntity;
 import chivi.laptopstore.models.responses.SuccessResponse;
 import chivi.laptopstore.services.AccountService;
@@ -10,6 +12,7 @@ import chivi.laptopstore.services.DevService;
 import freemarker.template.TemplateException;
 import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping(RequestMaps.API_V1_DEV)
 @AllArgsConstructor
@@ -31,6 +35,16 @@ public class DevController {
         Map<String, Object> model = new HashMap<>();
         devService.sendEmail(email, model);
         return new SuccessResponse(email);
+    }
+
+    @PostMapping("enum")
+    @ResponseStatus(HttpStatus.OK)
+    public SuccessResponse setEnum(@RequestBody Map<String, EEntityStatus> map) {
+        ProductEntity product = new ProductEntity();
+        product.setStatus(map.get("enum"));
+
+        log.error(product.toString());
+        return new SuccessResponse("", product);
     }
 
     @PutMapping("update-verification-token")

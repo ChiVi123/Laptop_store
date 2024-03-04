@@ -14,7 +14,7 @@ interface IProps {
     onChange?: (value: string) => void;
 }
 
-function Select({ id, placeholder, items, value, content, error, helperText, onChange }: IProps) {
+function SelectField({ id, placeholder, items, value, content, error, helperText, onChange }: IProps) {
     const [selected, setSelected] = useState<string>('');
 
     function handleSelectCategory(event: SelectChangeEvent) {
@@ -27,10 +27,11 @@ function Select({ id, placeholder, items, value, content, error, helperText, onC
     return (
         <FormControl size='small' fullWidth error={error}>
             <SelectMUI
-                id={id}
+                id={'select-' + id}
                 value={selected}
                 displayEmpty
                 error={error}
+                inputProps={{ id }}
                 sx={{ '& em': { color: ({ palette }) => palette.action.disabled } }}
                 onChange={handleSelectCategory}
             >
@@ -48,4 +49,4 @@ function Select({ id, placeholder, items, value, content, error, helperText, onC
     );
 }
 
-export default Select;
+export default SelectField;

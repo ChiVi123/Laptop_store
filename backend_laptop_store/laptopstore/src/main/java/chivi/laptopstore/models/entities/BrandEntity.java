@@ -1,5 +1,6 @@
 package chivi.laptopstore.models.entities;
 
+import chivi.laptopstore.common.EEntityStatus;
 import chivi.laptopstore.common.EntityNames;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -26,6 +27,8 @@ public class BrandEntity {
 
     @Column(name = EntityNames.COLUMN_BRAND_SLUG, unique = true, nullable = false)
     private String slug;
+
+    private EEntityStatus status;
 
     @CreatedDate
     @Column(name = EntityNames.CREATED_AT)

@@ -1,5 +1,6 @@
 package chivi.laptopstore.models.entities;
 
+import chivi.laptopstore.common.EEntityStatus;
 import chivi.laptopstore.common.EntityNames;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -9,6 +10,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -21,11 +24,20 @@ public class CategoryEntity {
     @Column(name = EntityNames.COLUMN_CATEGORY_ID)
     private Long id;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = EntityNames.PARENT_ID, referencedColumnName = EntityNames.COLUMN_CATEGORY_ID)
+    private CategoryEntity category;
+
     @Column(name = EntityNames.COLUMN_CATEGORY_NAME, unique = true, nullable = false)
     private String name;
 
     @Column(name = EntityNames.COLUMN_CATEGORY_URL, unique = true, nullable = false)
     private String url;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CategoryEntity> children = new ArrayList<>();
+
+    private EEntityStatus status;
 
     @CreatedDate
     @Column(name = EntityNames.CREATED_AT)
@@ -35,8 +47,17 @@ public class CategoryEntity {
     @Column(name = EntityNames.UPDATED_AT)
     private LocalDateTime lastModifiedDate;
 
-    public CategoryEntity(String name, String url) {
+    public CategoryEntity(String name, String url, EEntityStatus status) {
         this.name = name;
         this.url = url;
+        this.status = status;
+    }
+
+    public void addChildren(List<CategoryEntity> children) {
+        this.children.addAll(children);
+    }
+
+    public void removeChild(CategoryEntity child) {
+        this.children.remove(child);
     }
 }

@@ -1,4 +1,4 @@
-import { Add as AddIconMUI, SearchRounded as SearchRoundedIconMUI } from '@mui/icons-material';
+import { Add as AddIcon, SearchRounded as SearchRoundedIcon } from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Button from '@mui/material/Button';
@@ -6,12 +6,18 @@ import InputAdornment from '@mui/material/InputAdornment';
 import LinkMUI from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { Fragment } from 'react';
-import { findAllProduct } from '~/actions/request';
 import { EPath } from '~/common/enums';
 import { ProductList, TabsWrap } from '~/components/manage/product/list';
+import { findAllProduct } from '~/services/find.all';
+
+export const metadata: Metadata = {
+    title: 'List product | Laptop store',
+    description: 'Management page',
+};
 
 async function ProductListPage() {
     const result = (await findAllProduct()) || { data: [] };
@@ -23,7 +29,7 @@ async function ProductListPage() {
     return (
         <Fragment>
             <Box p='18px 24px 12px' bgcolor='white'>
-                <Breadcrumbs separator='>'>
+                <Breadcrumbs separator='/'>
                     <LinkMUI href={EPath.MANAGE_HOME} underline='hover' color='grey.400' component={Link}>
                         Trang chủ
                     </LinkMUI>
@@ -55,12 +61,12 @@ async function ProductListPage() {
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position='start'>
-                                <SearchRoundedIconMUI fontSize='small' />
+                                <SearchRoundedIcon fontSize='small' />
                             </InputAdornment>
                         ),
                     }}
                 />
-                <Button variant='outlined' endIcon={<AddIconMUI />}>
+                <Button variant='outlined' endIcon={<AddIcon />}>
                     Bộ lọc
                 </Button>
             </Box>

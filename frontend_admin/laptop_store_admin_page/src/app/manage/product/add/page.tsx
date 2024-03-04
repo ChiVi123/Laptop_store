@@ -2,11 +2,17 @@ import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import LinkMUI from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
+import { Metadata } from 'next';
 import Link from 'next/link';
 import { Fragment } from 'react';
-import { findAllBrand, findAllCategory } from '~/actions/request';
 import { EPath } from '~/common/enums';
 import ProductForm from '~/components/manage/product/add/product.form';
+import { findAllBrand, findAllCategory } from '~/services/find.all';
+
+export const metadata: Metadata = {
+    title: 'Create product | Laptop store',
+    description: 'Management page',
+};
 
 async function ProductAddPage() {
     const [brandResponse, categoryResponse] = await Promise.all([findAllBrand(), findAllCategory()]);

@@ -1,17 +1,17 @@
-import { BarChart as BarChartIconMUI, Inbox as InboxIconMUI } from '@mui/icons-material';
+import { BarChart as BarChartIcon, Category as CategoryIcon, Inbox as InboxIcon } from '@mui/icons-material';
 import { INavigateItem } from '~/types/lists';
 import { EPath } from './enums';
 
 const navigateItems: INavigateItem[] = [
     {
         content: 'Trang chu',
-        icon: <BarChartIconMUI fontSize='small' />,
+        icon: <BarChartIcon fontSize='small' />,
         url: EPath.MANAGE_HOME,
         children: [],
     },
     {
         content: 'Đơn hàng',
-        icon: <InboxIconMUI fontSize='small' />,
+        icon: <InboxIcon fontSize='small' />,
         children: [
             {
                 content: 'Danh sách đơn hàng',
@@ -22,7 +22,7 @@ const navigateItems: INavigateItem[] = [
     },
     {
         content: 'San pham',
-        icon: <BarChartIconMUI fontSize='small' />,
+        icon: <BarChartIcon fontSize='small' />,
         children: [
             {
                 content: 'Danh sách san pham',
@@ -35,6 +35,12 @@ const navigateItems: INavigateItem[] = [
                 children: [],
             },
         ],
+    },
+    {
+        content: 'Danh muc',
+        icon: <CategoryIcon />,
+        url: EPath.MANAGE_CATEGORY,
+        children: [],
     },
 ];
 

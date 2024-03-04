@@ -2,20 +2,12 @@ import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import LinkMUI from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
-import { Metadata } from 'next';
 import Link from 'next/link';
 import { Fragment } from 'react';
 import { EPath } from '~/common/enums';
-import ProductForm from '~/components/manage/product/add/product.form';
-import { findAllBrand, findAllCategory } from '~/services/find.all';
+import Catalog from '~/components/manage/category/catalog';
 
-export const metadata: Metadata = {
-    title: 'Create product | Laptop store',
-    description: 'Management page',
-};
-async function ProductAddPage() {
-    const [brandResponse, categoryResponse] = await Promise.all([findAllBrand(), findAllCategory()]);
-
+function CategoryPage() {
     return (
         <Fragment>
             <Box p='18px 24px 12px' bgcolor='white'>
@@ -24,21 +16,18 @@ async function ProductAddPage() {
                         Trang chủ
                     </LinkMUI>
                     <Typography color='text.primary' component='span'>
-                        Tạo sản phẩm
+                        Danh muc
                     </Typography>
                 </Breadcrumbs>
 
                 <Typography variant='h2' mt={2}>
-                    Tạo sản phẩm
+                    Danh muc
                 </Typography>
             </Box>
 
-            <ProductForm
-                brands={brandResponse && 'data' in brandResponse ? brandResponse.data : []}
-                categories={categoryResponse && 'data' in categoryResponse ? categoryResponse.data : []}
-            />
+            <Catalog />
         </Fragment>
     );
 }
 
-export default ProductAddPage;
+export default CategoryPage;

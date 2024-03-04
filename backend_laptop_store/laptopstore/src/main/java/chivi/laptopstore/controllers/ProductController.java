@@ -4,6 +4,7 @@ import chivi.laptopstore.common.RequestMaps;
 import chivi.laptopstore.common.ResponseMessage;
 import chivi.laptopstore.models.entities.BrandEntity;
 import chivi.laptopstore.models.entities.CategoryEntity;
+import chivi.laptopstore.models.entities.ImageEntity;
 import chivi.laptopstore.models.entities.ProductEntity;
 import chivi.laptopstore.models.payloads.PagePayload;
 import chivi.laptopstore.models.requests.DiscountRequest;
@@ -19,6 +20,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -61,7 +64,14 @@ public class ProductController {
         CategoryEntity category = categoryService.getById(productRequest.getCategoryId());
         BrandEntity brand = brandService.getById(productRequest.getBrandId());
 
-        return new SuccessResponse(ResponseMessage.CREATE_SUCCESS, productService.createProduct(category, brand, productRequest));
+        return new SuccessResponse(ResponseMessage.CREATE_SUCCESS, productService.createProduct(productRequest, category, brand));
+    }
+
+    @PutMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "add-all-image/{productId}")
+    @ResponseStatus(HttpStatus.OK)
+    public SuccessResponse addAllImage(@PathVariable Long productId, @RequestBody List<ImageEntity> images) {
+        ProductEntity product = productService.getById(productId);
+        return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, productService.addImagesProduct(product, images));
     }
 
     @PutMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "edit/{productId}")

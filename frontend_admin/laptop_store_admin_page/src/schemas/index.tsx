@@ -22,8 +22,11 @@ export const registerSchema = yup.object({
 export const sendMailSchema = yup.object({ email });
 export const addProductSchema = yup.object({
     name: yupString().required(),
-    price: yup.number().positive().required(),
-    description: yupString().required(),
     categoryId: yup.number().integer().positive().required(),
     brandId: yup.number().integer().positive().required(),
+    description: yupString().required(),
+    price: yup.number().positive().required(),
+    quantityStock: yup.number().min(0).required(),
+    images: yup.array().min(1),
+    status: yupString(),
 });

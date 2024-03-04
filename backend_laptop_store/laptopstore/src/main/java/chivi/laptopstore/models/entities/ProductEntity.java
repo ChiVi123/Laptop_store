@@ -1,24 +1,24 @@
 package chivi.laptopstore.models.entities;
 
+import chivi.laptopstore.common.EEntityStatus;
 import chivi.laptopstore.common.EntityNames;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = EntityNames.TABLE_PRODUCT)
 @NoArgsConstructor
-@Getter
-@Setter
+@Data
 public class ProductEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,19 +31,30 @@ public class ProductEntity {
     @Column(name = EntityNames.COLUMN_PRODUCT_SLUG, unique = true, nullable = false)
     private String slug;
 
+    @ManyToOne
+    @JoinColumn(name = EntityNames.COLUMN_CATEGORY_ID)
+    private CategoryEntity category;
+
+    @ManyToOne
+    @JoinColumn(name = EntityNames.COLUMN_BRAND_ID)
+    private BrandEntity brand;
+
+    @Column(columnDefinition = "longtext")
+    private String description;
+
     @Column(nullable = false)
     private BigDecimal price;
+
+    @Column(name = EntityNames.COLUMN_QUANTITY_STOCK, columnDefinition = "int default 0")
+    private int quantityStock;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ImageEntity> images = new ArrayList<>();
 
     private BigDecimal discount;
 
     @Column(name = EntityNames.COLUMN_DISCOUNT_RATE)
     private float discountRate;
-
-    @Column(columnDefinition = "longtext")
-    private String description;
-
-    @Column(name = EntityNames.COLUMN_QUANTITY_STOCK, columnDefinition = "int default 0")
-    private int quantityStock;
 
     @Column(name = EntityNames.COLUMN_QUANTITY_SOLD, columnDefinition = "int default 0")
     private int quantitySold;
@@ -54,13 +65,7 @@ public class ProductEntity {
     @Column(name = EntityNames.COLUMN_REVIEW_COUNT, columnDefinition = "int default 0")
     private int reviewCount;
 
-    @ManyToOne
-    @JoinColumn(name = EntityNames.COLUMN_CATEGORY_ID)
-    private CategoryEntity category;
-
-    @ManyToOne
-    @JoinColumn(name = EntityNames.COLUMN_BRAND_ID)
-    private BrandEntity brand;
+    private EEntityStatus status;
 
     @CreatedDate
     @Column(name = EntityNames.CREATED_AT)
@@ -70,13 +75,11 @@ public class ProductEntity {
     @Column(name = EntityNames.UPDATED_AT)
     private LocalDateTime lastModifiedDate;
 
-    @Builder
-    private ProductEntity(String name, String slug, BigDecimal price, String description, CategoryEntity category, BrandEntity brand) {
-        this.name = name;
-        this.slug = slug;
-        this.price = price;
-        this.description = description;
-        this.category = category;
-        this.brand = brand;
+    public void addAllImage(List<ImageEntity> images) {
+        this.images.addAll(images);
+    }
+
+    public void removeImage(ImageEntity image) {
+        this.images.remove(image);
     }
 }

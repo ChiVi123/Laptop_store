@@ -1,6 +1,6 @@
 'use client';
 
-import { ExpandMore as ExpandMoreIconMUI } from '@mui/icons-material';
+import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import {
     Accordion,
     AccordionDetails,
@@ -41,7 +41,7 @@ function Navigate({ width }: IProps) {
                     <ListItem key={index} disablePadding>
                         <Accordion elevation={0} sx={{ width: '100%', backgroundColor: 'transparent' }}>
                             <AccordionSummary
-                                expandIcon={navigate.children.length ? <ExpandMoreIconMUI /> : <Fragment />}
+                                expandIcon={navigate.children.length ? <ExpandMoreIcon /> : <Fragment />}
                                 sx={{
                                     minHeight: '0 !important',
                                     px: 2,

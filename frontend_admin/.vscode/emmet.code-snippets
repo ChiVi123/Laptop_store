@@ -2,7 +2,7 @@
     "Create component": {
         "scope": "typescriptreact",
         "prefix": "ffc",
-        "body": ["function $1() {", "	return <div></div>", "};", "", "export default $1;"],
+        "body": ["function $1() {", "    return <div></div>", "};", "", "export default $1;"],
         "description": "Create component"
     },
     "Create component layout": {
@@ -10,12 +10,18 @@
         "prefix": "ffcl",
         "body": [
             "function $1Layout({ children }: $2Type) {",
-            "	return (<div>{children}</div>)",
+            "    return (<div>{children}</div>)",
             "};",
             "",
             "export default $1Layout;"
         ],
         "description": "Create component layout"
+    },
+    "Logger": {
+        "scope": "typescriptreact",
+        "prefix": "logger",
+        "body": ["logger$1({ $2 });"],
+        "description": "Use state"
     },
     "Use state": {
         "scope": "typescriptreact",

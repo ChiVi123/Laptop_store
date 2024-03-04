@@ -35,16 +35,16 @@ public class JwtUtils {
     public String getSubjectFromToken(String token) {
         try {
             return Jwts.parser().verifyWith(SECRET_KEY).build().parseSignedClaims(token).getPayload().getSubject();
-        } catch (SignatureException e) {
-            log.error("Invalid JWT signature: {}", e.getMessage());
-        } catch (MalformedJwtException e) {
-            log.error("Invalid JWT token: {}", e.getMessage());
-        } catch (ExpiredJwtException e) {
-            log.error("JWT token is expired: {}", e.getMessage());
-        } catch (UnsupportedJwtException e) {
-            log.error("JWT token is unsupported: {}", e.getMessage());
-        } catch (IllegalArgumentException e) {
-            log.error("JWT claims string is empty: {}", e.getMessage());
+        } catch (SignatureException signatureException) {
+            log.error("Invalid JWT signature: {}", signatureException.getMessage());
+        } catch (MalformedJwtException malformedJwtException) {
+            log.error("Invalid JWT token: {}", malformedJwtException.getMessage());
+        } catch (ExpiredJwtException expiredJwtException) {
+            log.error("JWT token is expired: {}", expiredJwtException.getMessage());
+        } catch (UnsupportedJwtException unsupportedJwtException) {
+            log.error("JWT token is unsupported: {}", unsupportedJwtException.getMessage());
+        } catch (IllegalArgumentException illegalArgumentException) {
+            log.error("JWT claims string is empty: {}", illegalArgumentException.getMessage());
         }
 
         return null;

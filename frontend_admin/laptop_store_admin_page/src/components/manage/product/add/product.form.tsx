@@ -1,15 +1,21 @@
 'use client';
 
-import { Box, Button, Paper, TextField, Typography } from '@mui/material';
+import { Box, Button, FormHelperText, Paper, TextField, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { addProductAction } from '~/actions/productActions';
-import { EPath } from '~/common/enums';
+import { uploadMultiImageAction } from '~/actions/uploadActions';
+import { EKeys, EPath, EProductStatus } from '~/common/enums';
+import { productDefaultValues } from '~/common/values';
 import { addProductResolver } from '~/resolvers';
 import { addProductFormData } from '~/types/form.data';
 import { IBrand, ICategory } from '~/types/models';
-import { FormLabel, SelectField } from '..';
+import EditorField from '../editor.field';
+import FormLabel from '../form.label';
+import ImageField from '../image.field';
+import NumberField from '../number.field';
+import SelectField from '../select.field';
 import { StyleBackgroundFormGroup } from '../styles';
 
 interface IProps {
@@ -25,14 +31,27 @@ function ProductForm({ categories, brands }: IProps) {
         handleSubmit,
     } = useForm<addProductFormData>({
         resolver: addProductResolver,
-        defaultValues: { name: '', price: 0, description: '' },
+        defaultValues: productDefaultValues,
     });
     const [loading, setLoading] = useState<boolean>(false);
     const router = useRouter();
 
-    const handleOnSubmit: SubmitHandler<addProductFormData> = async (data) => {
+    const handleOnSubmit: SubmitHandler<addProductFormData> = async (data, event) => {
         setLoading(true);
-        const result = await addProductAction(data);
+
+        if (!event) {
+            return;
+        }
+
+        const status = (event.nativeEvent as SubmitEvent).submitter?.ariaLabel || EProductStatus.DRAFT;
+
+        if (data.images && data.images.length) {
+            const formData = new FormData();
+            data.images.forEach((image) => formData.append(EKeys.IMAGE, image));
+            data.images = await uploadMultiImageAction(formData);
+        }
+
+        const result = await addProductAction({ ...data, status });
 
         if (result?.success) {
             router.push(EPath.MANAGE_PRODUCT_LIST);
@@ -73,7 +92,6 @@ function ProductForm({ categories, brands }: IProps) {
                                 render={({ field: { value, onChange } }) => (
                                     <TextField
                                         id='input-name'
-                                        // name='name'
                                         type='text'
                                         label=''
                                         placeholder='Nhập tên sản phẩm...'
@@ -138,20 +156,12 @@ function ProductForm({ categories, brands }: IProps) {
                         Mô tả sản phẩm
                     </Typography>
                     <Controller
-                        name='description'
                         control={control}
-                        render={({ field: { value, onChange } }) => (
-                            <TextField
-                                id='description'
-                                name='description'
-                                label=''
-                                placeholder='Hãy viết nội dung hay...'
-                                autoComplete='off'
-                                size='small'
-                                fullWidth
+                        name='description'
+                        render={({ field: { onChange } }) => (
+                            <EditorField
                                 error={Boolean(errors.description?.message)}
-                                helperText={errors.description?.message}
-                                value={value}
+                                helperText={errors.description?.message || ''}
                                 onChange={onChange}
                             />
                         )}
@@ -171,15 +181,9 @@ function ProductForm({ categories, brands }: IProps) {
                                 name='price'
                                 control={control}
                                 render={({ field: { value, onChange } }) => (
-                                    <TextField
+                                    <NumberField
                                         id='input-price'
-                                        // name='price'
-                                        type='number'
-                                        label=''
                                         placeholder='Nhập giá sản phẩm...'
-                                        autoComplete='off'
-                                        size='small'
-                                        fullWidth
                                         error={Boolean(errors.price?.message)}
                                         helperText={errors.price?.message}
                                         value={value}
@@ -192,28 +196,46 @@ function ProductForm({ categories, brands }: IProps) {
                             <FormLabel id='input-quantityStock' required>
                                 Tồn kho
                             </FormLabel>
-                            <TextField
-                                id='input-quantityStock'
+                            <Controller
+                                control={control}
                                 name='quantityStock'
-                                type='number'
-                                label=''
-                                placeholder='Nhập số lượng...'
-                                autoComplete='off'
-                                size='small'
-                                fullWidth
+                                render={({ field: { value, onChange } }) => (
+                                    <NumberField
+                                        id='input-quantityStock'
+                                        placeholder='Nhập số lượng...'
+                                        error={Boolean(errors.quantityStock?.message)}
+                                        helperText={errors.quantityStock?.message}
+                                        value={value}
+                                        onChange={onChange}
+                                    />
+                                )}
                             />
                         </StyleBackgroundFormGroup>
                     </Box>
                 </div>
 
+                <div>
+                    <Typography variant='h2' mb={2}>
+                        Ảnh sản phẩm
+                    </Typography>
+                    <Box border='1px solid' borderRadius={1} sx={{ p: 2, borderColor: 'border.main' }}>
+                        <Controller
+                            control={control}
+                            name='images'
+                            render={({ field: { onChange } }) => <ImageField onChange={onChange} />}
+                        />
+                    </Box>
+                    <FormHelperText error={Boolean(errors.images?.message)}>{errors.images?.message}</FormHelperText>
+                </div>
+
                 <Box display='flex' justifyContent='flex-end' gap={1}>
-                    <Button type='button' variant='outlined'>
+                    <Button type='submit' aria-label={EProductStatus.DRAFT} variant='outlined' disabled={loading}>
                         Lưu nháp
                     </Button>
-                    <Button type='button' variant='contained'>
+                    <Button type='submit' aria-label={EProductStatus.DISABLED} variant='contained' disabled={loading}>
                         Lưu và ẩn sản phẩm
                     </Button>
-                    <Button type='submit' variant='contained' disabled={loading}>
+                    <Button type='submit' aria-label={EProductStatus.ENABLED} variant='contained' disabled={loading}>
                         Lưu và bán sản phẩm ngay
                     </Button>
                 </Box>

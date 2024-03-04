@@ -1,4 +1,4 @@
-import { EAccountRole } from '~/common/enums';
+import { EAccountRole, EProductStatus } from '~/common/enums';
 
 export interface IAccount {
     id: number;
@@ -11,6 +11,15 @@ export interface IAccount {
     role: EAccountRole;
     createdDate: string;
     lastModifiedDate: string;
+}
+export interface IImage {
+    id: number;
+    public_id: string;
+    width: number;
+    height: number;
+    bytes: number;
+    secure_url: string;
+    folder: string;
 }
 export interface ICategory {
     id: number;
@@ -30,16 +39,18 @@ export interface IProduct {
     id: number;
     name: string;
     slug: string;
-    price: number;
+    brand: IBrand;
+    category: ICategory;
+    description: string;
     discount: number | null;
     discountRate: number;
-    description: string;
-    quantityStock: number;
+    images: IImage[];
+    price: number;
     quantitySold: number;
+    quantityStock: number;
     ratingAverage: number;
     reviewCount: number;
-    category: ICategory;
-    brand: IBrand;
+    status: EProductStatus;
     createdDate: string;
     lastModifiedDate: string;
 }

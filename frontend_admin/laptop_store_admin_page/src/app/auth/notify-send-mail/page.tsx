@@ -1,12 +1,12 @@
 import { StyleContainer } from '~/components/auth/styles';
 
 interface IProps {
-    searchParams: { [key: string]: string | string[] | undefined };
+    searchParams: { [key: string]: string | undefined };
 }
 
 function NotifySendMail({ searchParams }: IProps) {
     let notify;
-    if (searchParams.variant && typeof searchParams.variant === 'string') {
+    if (searchParams.variant) {
         switch (searchParams.variant) {
             case 'verify':
                 notify = 'xác thực';

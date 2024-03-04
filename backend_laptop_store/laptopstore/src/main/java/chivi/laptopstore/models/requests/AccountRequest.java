@@ -8,6 +8,7 @@ import lombok.Data;
 public class AccountRequest {
     @NotBlank(message = ValidationMessage.NOT_BLANK)
     private String username;
+
     @NotBlank(message = ValidationMessage.NOT_BLANK)
     private String fullName;
 }

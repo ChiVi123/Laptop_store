@@ -7,7 +7,7 @@ import { EPath } from '~/common/enums';
 import { StyleContainer } from '~/components/auth/styles';
 
 interface IProps {
-    searchParams: { [key: string]: string | string[] | undefined };
+    searchParams: { [key: string]: string | undefined };
 }
 
 function RegistrationConfirmPage({ searchParams }: IProps) {
@@ -25,7 +25,7 @@ function RegistrationConfirmPage({ searchParams }: IProps) {
             }
         }
 
-        if (typeof searchParams.token === 'string' && ignoreRef.current) {
+        if (searchParams.token && ignoreRef.current) {
             fetchApi(searchParams.token);
         }
 

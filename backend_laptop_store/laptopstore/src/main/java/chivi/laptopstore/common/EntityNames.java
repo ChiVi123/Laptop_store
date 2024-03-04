@@ -6,6 +6,7 @@ public class EntityNames {
     public static final String TABLE_BRAND = "brand";
     public static final String TABLE_CATEGORY = "category";
     public static final String TABLE_PRODUCT = "product";
+    public static final String TABLE_IMAGE = "image";
 
     // Column name
     public static final String COLUMN_ACCOUNT_ID = "account_id";
@@ -31,7 +32,11 @@ public class EntityNames {
     public static final String COLUMN_RATING_AVERAGE = "rating_average";
     public static final String COLUMN_REVIEW_COUNT = "review_count";
     public static final String COLUMN_LIKE_COUNT = "like_count";
+    
 
+    public static final String COLUMN_IMAGE_ID = "image_id";
+
+    public static final String PARENT_ID = "parent_id";
     public static final String CREATED_AT = "created_at";
     public static final String UPDATED_AT = "updated_at";
 }

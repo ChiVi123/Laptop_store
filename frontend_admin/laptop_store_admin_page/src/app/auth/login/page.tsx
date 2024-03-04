@@ -33,7 +33,7 @@ function LoginPage() {
             return;
         }
 
-        if (result?.error.hasOwnProperty('message')) {
+        if (result?.error?.message) {
             const { message } = result.error;
             if (message.includes('is not verified')) {
                 router.push(EPath.AUTH_SEND_MAIL_VERIFY);

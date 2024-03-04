@@ -3,6 +3,7 @@ package chivi.laptopstore.services;
 import chivi.laptopstore.common.ResponseMessage;
 import chivi.laptopstore.models.entities.BrandEntity;
 import chivi.laptopstore.models.entities.CategoryEntity;
+import chivi.laptopstore.models.entities.ImageEntity;
 import chivi.laptopstore.models.entities.ProductEntity;
 import chivi.laptopstore.models.exceptions.ConflictException;
 import chivi.laptopstore.models.exceptions.CustomBadRequestException;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -50,17 +52,18 @@ public class ProductService {
         }
     }
 
-    public ProductEntity createProduct(CategoryEntity category, BrandEntity brand, ProductRequest productRequest) {
+    public ProductEntity createProduct(ProductRequest productRequest, CategoryEntity category, BrandEntity brand) {
         String slug = CustomString.toSlug(productRequest.getName().trim());
-        ProductEntity product = ProductEntity
-                .builder()
-                .name(productRequest.getName().trim())
-                .slug(slug)
-                .price(productRequest.getPrice())
-                .description(productRequest.getDescription().trim())
-                .category(category)
-                .brand(brand)
-                .build();
+        ProductEntity product = new ProductEntity();
+        product.setName(productRequest.getName().trim());
+        product.setSlug(slug);
+        product.setCategory(category);
+        product.setBrand(brand);
+        product.setDescription(productRequest.getDescription().trim());
+        product.setPrice(productRequest.getPrice());
+        product.setQuantityStock(productRequest.getQuantityStock());
+        product.setStatus(productRequest.getStatus());
+        product.addAllImage(productRequest.getImages());
 
         return productRepository.save(product);
     }
@@ -78,6 +81,11 @@ public class ProductService {
         product.setCategory(category);
         product.setBrand(brand);
 
+        return productRepository.save(product);
+    }
+
+    public ProductEntity addImagesProduct(ProductEntity product, List<ImageEntity> images) {
+        product.addAllImage(images);
         return productRepository.save(product);
     }
 

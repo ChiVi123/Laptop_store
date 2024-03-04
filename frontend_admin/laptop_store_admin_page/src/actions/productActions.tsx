@@ -3,21 +3,15 @@
 import { cookies } from 'next/headers';
 import { EKeys } from '~/common/enums';
 import { addProductFormData } from '~/types/form.data';
-import { IErrorResponse, IProductDetailResponse } from '~/types/response';
-import { logger } from '~/utils';
-import { request } from './request';
+import { logger, request } from '~/utils';
 
 export async function addProductAction(data: addProductFormData) {
-    const authorization = `Bearer ${cookies().get(EKeys.TOKEN)?.value}`;
+    const auth = `Bearer ${cookies().get(EKeys.TOKEN)?.value}`;
 
     try {
-        const response = await request.post<IProductDetailResponse, IErrorResponse>('admin/products/create', {
-            data,
-            json: true,
-            headers: { Authorization: authorization },
-        });
-        return response;
+        const response = await request.post('admin/products/create', { auth, data });
+        return await response.json();
     } catch (error) {
-        logger(addProductAction.name, error);
+        logger({ [addProductAction.name]: error });
     }
 }

@@ -24,15 +24,15 @@ public class CategoryEntity {
     @Column(name = EntityNames.COLUMN_CATEGORY_ID)
     private Long id;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = EntityNames.PARENT_ID, referencedColumnName = EntityNames.COLUMN_CATEGORY_ID)
-    private CategoryEntity category;
+    private int level;
+
+    private int position;
 
     @Column(name = EntityNames.COLUMN_CATEGORY_NAME, unique = true, nullable = false)
     private String name;
 
     @Column(name = EntityNames.COLUMN_CATEGORY_URL, unique = true, nullable = false)
-    private String url;
+    private String path;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CategoryEntity> children = new ArrayList<>();
@@ -47,17 +47,23 @@ public class CategoryEntity {
     @Column(name = EntityNames.UPDATED_AT)
     private LocalDateTime lastModifiedDate;
 
-    public CategoryEntity(String name, String url, EEntityStatus status) {
+    public CategoryEntity(int level, int position, String name, String path, EEntityStatus status) {
+        this.level = level;
+        this.position = position;
         this.name = name;
-        this.url = url;
+        this.path = path;
         this.status = status;
     }
 
-    public void addChildren(List<CategoryEntity> children) {
-        this.children.addAll(children);
+    public void addChild(CategoryEntity child) {
+        this.children.add(child);
     }
 
     public void removeChild(CategoryEntity child) {
         this.children.remove(child);
+    }
+
+    public int getChildrenSize() {
+        return this.children.size();
     }
 }

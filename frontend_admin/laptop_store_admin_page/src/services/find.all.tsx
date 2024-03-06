@@ -13,7 +13,7 @@ export async function findAllProduct() {
 }
 export async function findAllCategory() {
     try {
-        const response = await request.get('public/categories/find-all');
+        const response = await request.get('public/categories/tree-view');
         return await response.json();
     } catch (error) {
         logger({ [findAllCategory.name]: error });

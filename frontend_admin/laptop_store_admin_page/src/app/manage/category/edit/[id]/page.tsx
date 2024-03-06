@@ -6,13 +6,12 @@ import Link from 'next/link';
 import { Fragment } from 'react';
 import { EPath } from '~/common/enums';
 import CategoryTreeView from '~/components/manage/category/category.tree.view';
-import { findAllCategory } from '~/services/find.all';
-import { logger } from '~/utils';
 
-async function CategoryPage() {
-    const treeView = await findAllCategory();
-    logger({ treeView });
+interface IProps {
+    params: { id: string };
+}
 
+function EditCategoryPage({ params: { id } }: IProps) {
     return (
         <Fragment>
             <Box p='18px 24px 12px' bgcolor='white'>
@@ -31,10 +30,10 @@ async function CategoryPage() {
             </Box>
 
             <Box px={3} py={2}>
-                <CategoryTreeView categoryId={0} />
+                <CategoryTreeView categoryId={Number(id)} />
             </Box>
         </Fragment>
     );
 }
 
-export default CategoryPage;
+export default EditCategoryPage;

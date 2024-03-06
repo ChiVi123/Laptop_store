@@ -2,9 +2,12 @@
 
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Box, Button, ButtonGroup, Modal, Typography } from '@mui/material';
+import { Box, Button, FormControlLabel, Paper, Switch, TextField } from '@mui/material';
 import { TreeView } from '@mui/x-tree-view';
-import { DragEvent, useMemo, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { DragEvent, FormEvent, Fragment, SyntheticEvent, useMemo, useRef, useState } from 'react';
+import { EPath } from '~/common/enums';
 import { ICategory } from '~/types/models';
 import { logger } from '~/utils';
 import CustomTreeItem from './custom.tree.item';
@@ -13,10 +16,6 @@ declare global {
     interface DOMStringMap {
         id: string;
     }
-
-    interface Array<T> {
-        swap(a: number, b: number): T[];
-    }
 }
 
 interface IDragAndDropStatus {
@@ -24,15 +23,9 @@ interface IDragAndDropStatus {
     dragFrom: number | null;
     dragTo: number | null;
 }
-// interface IProps {
-//     categories: any[];
-//     onClick: (value: any) => void;
-// }
-
 interface ICategoryDemo extends Omit<ICategory, 'createdDate' | 'lastModifiedDate' | 'url'> {
     parentId: number | null;
     children: ICategoryDemo[];
-    joinAndClone(table: ICategoryDemo[]): ICategoryDemo;
     joinByOrderAndClone(categoryTable: ICategoryDemo[], relationTable: Relation[]): ICategoryDemo;
 }
 
@@ -45,7 +38,6 @@ class Relation {
         this.childId = childId;
     }
 }
-
 class CategoryDemo implements ICategoryDemo {
     public parentId: number | null;
     public id: number;
@@ -69,36 +61,29 @@ class CategoryDemo implements ICategoryDemo {
         }, [] as ICategoryDemo[]);
         return new CategoryDemo(this.parentId, this.id, this.name, children);
     }
-
-    public joinAndClone(table: ICategoryDemo[]): ICategoryDemo {
-        const children = table.reduce((prev, current) => {
-            if (current.parentId === this.id) {
-                prev.push(current.joinAndClone(table));
-            }
-            return prev;
-        }, [] as ICategoryDemo[]);
-        return new CategoryDemo(this.parentId, this.id, this.name, children);
-    }
 }
 
 const initTbl: ICategoryDemo[] = [
-    new CategoryDemo(null, 1, 'Laptop', []),
+    new CategoryDemo(null, 0, 'root', []),
+    new CategoryDemo(0, 1, 'Laptop', []),
     new CategoryDemo(1, 2, 'Thuong hieu', []),
     new CategoryDemo(13, 3, 'Core I5', []),
     new CategoryDemo(1, 4, 'Cau hinh', []),
     new CategoryDemo(7, 5, 'O cung SSD', []),
     new CategoryDemo(2, 6, 'MSI', []),
     new CategoryDemo(8, 7, 'O cung', []),
-    new CategoryDemo(null, 8, 'Linh kien may tinh', []),
+    new CategoryDemo(0, 8, 'Linh kien may tinh', []),
     new CategoryDemo(2, 9, 'Apple (Macbook)', []),
     new CategoryDemo(4, 10, 'Laptop I3', []),
-    new CategoryDemo(null, 11, 'San pham Apple', []),
+    new CategoryDemo(0, 11, 'San pham Apple', []),
     new CategoryDemo(7, 12, 'O cung HDD', []),
     new CategoryDemo(8, 13, 'CPU', []),
     new CategoryDemo(13, 14, 'Core I3', []),
 ];
-
 const initRelation: Relation[] = [
+    new Relation(0, 1),
+    new Relation(0, 11),
+    new Relation(0, 8),
     new Relation(1, 2),
     new Relation(1, 4),
     new Relation(2, 6),
@@ -112,34 +97,19 @@ const initRelation: Relation[] = [
     new Relation(13, 14),
 ];
 
-Array.prototype.swap = function (a: number, b: number) {
-    this[a] = this.splice(b, 1, this[a])[0];
-    return this;
-};
+interface IProps {
+    categoryId?: number;
+    categoryParentId?: number;
+}
 
-const style = {
-    position: 'absolute' as 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-};
-
-function Catalog() {
-    const [dragAndDrop, setDragAndDrop] = useState<IDragAndDropStatus>({
-        type: '',
-        dragTo: null,
-        dragFrom: null,
-    });
-    const [open, setOpen] = useState(false);
+function CategoryTreeView({ categoryId, categoryParentId }: IProps) {
+    const [dragAndDrop, setDragAndDrop] = useState<IDragAndDropStatus>({ type: '', dragTo: null, dragFrom: null });
     const [categoryTable, setCategoryTable] = useState<ICategoryDemo[]>(initTbl);
     const [relationTable, setRelationTable] = useState<Relation[]>(initRelation);
 
-    const catalog = useMemo(() => {
+    const inputNameRef = useRef<HTMLInputElement>();
+
+    const categoryTree = useMemo(() => {
         const roots = categoryTable.filter((item) => item.parentId === null);
 
         return roots.reduce(function (prev, current) {
@@ -147,6 +117,26 @@ function Catalog() {
             return prev;
         }, [] as ICategoryDemo[]);
     }, [categoryTable, relationTable]);
+    const category = useMemo(() => categoryTable.find((item) => item.id === categoryId), [categoryId, categoryTable]);
+    const expanded = useMemo(() => {
+        if (categoryId === undefined) {
+            return [];
+        }
+
+        let result: string[] = [categoryId.toString()];
+        let parentId: number | null | undefined = categoryId;
+        do {
+            const item = categoryTable.find((item) => item.id === parentId);
+            if (item && item.parentId !== null) {
+                result.push(item.parentId.toString());
+            }
+            parentId = item?.parentId;
+        } while (parentId !== null);
+
+        return result.reverse();
+    }, [categoryId, categoryTable]);
+
+    const router = useRouter();
 
     const styleBefore = {
         content: '""',
@@ -166,6 +156,9 @@ function Catalog() {
         zIndex: 2,
     };
 
+    function handleSetSelected(_: SyntheticEvent, nodeId: string) {
+        router.push(EPath.MANAGE_CATEGORY.concat('/edit/', nodeId));
+    }
     function handleDragStart(event: DragEvent<HTMLElement>) {
         event.stopPropagation();
         const dragFrom = Number(event.currentTarget.dataset.id);
@@ -203,12 +196,23 @@ function Catalog() {
         }
         setDragAndDrop({ type: 'handleDragEnd', dragFrom: null, dragTo: null });
     }
-    function handleOpen(value: any) {
-        // setCategory(value);
-        setOpen(true);
+    function handleDelete(id: number) {
+        setCategoryTable((prev) => prev.filter((item) => item.id !== id));
+        setRelationTable((prev) => prev.filter((item) => item.childId !== id || item.parentId !== id));
     }
-    function handleClose() {
-        setOpen(false);
+    function handleSubmit(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        const { current } = inputNameRef;
+        if (current && current.value !== category?.name) {
+            setCategoryTable((prev) =>
+                prev.map((item) => {
+                    if (item.id === category?.id) {
+                        item.name = current.value;
+                    }
+                    return item;
+                }),
+            );
+        }
     }
 
     function renderTreeItem(node: ICategoryDemo) {
@@ -216,15 +220,7 @@ function Catalog() {
             <CustomTreeItem
                 key={node.id}
                 nodeId={node.id.toString()}
-                label={
-                    <Box display='flex' alignItems='center' justifyContent='space-between'>
-                        <Typography>{node.name}</Typography>
-                        <ButtonGroup variant='outlined' color='inherit' size='small'>
-                            <Button>Chỉnh sửa</Button>
-                            <Button>Xóa</Button>
-                        </ButtonGroup>
-                    </Box>
-                }
+                label={node.name.concat(` (ID: ${node.id})`)}
                 data-id={node.id}
                 draggable
                 onDragStart={handleDragStart}
@@ -241,38 +237,66 @@ function Catalog() {
         );
     }
 
-    if (true) {
-        logger({ catalog });
+    if (false) {
+        logger({ categoryTree });
     }
 
     return (
-        <Box px={8} py={2} sx={{ '& > *': { mb: 4 } }}>
-            <TreeView
-                aria-label='category tree'
-                defaultCollapseIcon={<ExpandMoreIcon />}
-                defaultExpanded={['root-4']}
-                defaultExpandIcon={<ChevronRightIcon />}
-            >
-                {catalog.map((item) => renderTreeItem(item))}
-            </TreeView>
+        <Fragment>
+            <Paper elevation={0} sx={{ display: 'flex', justifyContent: 'space-between', p: 1 }}>
+                <Button
+                    variant='outlined'
+                    size='small'
+                    LinkComponent={Link}
+                    href={EPath.MANAGE_CATEGORY.concat(`/add/${categoryId}`)}
+                >
+                    Them moi
+                </Button>
 
-            <Modal
-                open={open}
-                onClose={handleClose}
-                aria-labelledby='modal-modal-title'
-                aria-describedby='modal-modal-description'
-            >
-                <Box sx={style}>
-                    <Typography id='modal-modal-title' variant='h6' component='h2'>
-                        Text in a modal
-                    </Typography>
-                    <Typography id='modal-modal-description' sx={{ mt: 2 }}>
-                        {/* {category?.name} */} bru
-                    </Typography>
+                <Button variant='contained' size='small' color='warning'>
+                    Xoa
+                </Button>
+            </Paper>
+
+            <Box display='flex' gap={4} mt={2}>
+                <TreeView
+                    aria-label='category tree'
+                    defaultCollapseIcon={<ExpandMoreIcon />}
+                    defaultExpanded={expanded}
+                    defaultExpandIcon={<ChevronRightIcon />}
+                    onNodeSelect={handleSetSelected}
+                    sx={{ flex: 1, height: '100%' }}
+                >
+                    {categoryTree.map((item) => renderTreeItem(item))}
+                </TreeView>
+
+                <Box width='40%' component='form' onSubmit={handleSubmit}>
+                    <TextField
+                        inputRef={inputNameRef}
+                        id='input-name'
+                        name='name'
+                        type='text'
+                        label=''
+                        placeholder='Nhập tên...'
+                        autoComplete='on'
+                        defaultValue={category?.name}
+                        size='small'
+                        fullWidth
+                    />
+                    <FormControlLabel
+                        label='Bat'
+                        control={<Switch inputProps={{ 'aria-label': 'category-status' }} defaultChecked />}
+                    />
+
+                    <Box>
+                        <Button type='submit' variant='contained' sx={{ mt: 2 }}>
+                            Luu
+                        </Button>
+                    </Box>
                 </Box>
-            </Modal>
-        </Box>
+            </Box>
+        </Fragment>
     );
 }
 
-export default Catalog;
+export default CategoryTreeView;

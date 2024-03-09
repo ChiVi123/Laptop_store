@@ -11,12 +11,15 @@ export async function findAllProduct() {
         logger({ [findAllProduct.name]: error });
     }
 }
-export async function findAllCategory() {
+export async function findAllCategoryRoot() {
     try {
-        const response = await request.get('public/categories/tree-view');
+        const response = await request.get('public/categories/tree-view', {
+            cache: 'no-cache',
+            next: { tags: [EKeys.CATEGORY_TREE_VIEW] },
+        });
         return await response.json();
     } catch (error) {
-        logger({ [findAllCategory.name]: error });
+        logger({ [findAllCategoryRoot.name]: error });
     }
 }
 export async function findAllBrand() {

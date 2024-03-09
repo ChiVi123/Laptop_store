@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface ICategoryRepository extends JpaRepository<CategoryEntity, Long> {
-    List<CategoryEntity> findAllByLevelOrderByPositionAsc(int level);
+    List<CategoryEntity> findAllByLevel(int level);
 
     boolean existsByName(String name);
 }

@@ -30,3 +30,9 @@ export const addProductSchema = yup.object({
     images: yup.array().min(1),
     status: yupString(),
 });
+export const addCategorySchema = yup.object({
+    parentId: yup.number().integer().positive(),
+    name: yupString().required(),
+    path: yupString(),
+    status: yupString(),
+});

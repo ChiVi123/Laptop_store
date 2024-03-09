@@ -6,12 +6,10 @@ import Link from 'next/link';
 import { Fragment } from 'react';
 import { EPath } from '~/common/enums';
 import CategoryTreeView from '~/components/manage/category/category.tree.view';
-import { findAllCategory } from '~/services/find.all';
-import { logger } from '~/utils';
+import { findAllCategoryRoot } from '~/services/find.all';
 
 async function CategoryPage() {
-    const treeView = await findAllCategory();
-    logger({ treeView });
+    const result = await findAllCategoryRoot();
 
     return (
         <Fragment>
@@ -31,7 +29,7 @@ async function CategoryPage() {
             </Box>
 
             <Box px={3} py={2}>
-                <CategoryTreeView categoryId={0} />
+                <CategoryTreeView categoryTree={result.data} category={result.data[0]} />
             </Box>
         </Fragment>
     );

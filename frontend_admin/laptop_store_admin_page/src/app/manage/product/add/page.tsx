@@ -7,14 +7,14 @@ import Link from 'next/link';
 import { Fragment } from 'react';
 import { EPath } from '~/common/enums';
 import ProductForm from '~/components/manage/product/add/product.form';
-import { findAllBrand, findAllCategory } from '~/services/find.all';
+import { findAllBrand, findAllCategoryRoot } from '~/services/find.all';
 
 export const metadata: Metadata = {
     title: 'Create product | Laptop store',
     description: 'Management page',
 };
 async function ProductAddPage() {
-    const [brandResponse, categoryResponse] = await Promise.all([findAllBrand(), findAllCategory()]);
+    const [brandResponse, categoryResponse] = await Promise.all([findAllBrand(), findAllCategoryRoot()]);
 
     return (
         <Fragment>

@@ -1,8 +1,7 @@
 'use client';
 
 import EditIcon from '@mui/icons-material/Edit';
-import { Chip } from '@mui/material';
-import Typography from '@mui/material/Typography';
+import { Box, Chip, Typography } from '@mui/material';
 import {
     DataGrid,
     GridActionsCellItem,
@@ -11,7 +10,7 @@ import {
     GridRowSelectionModel,
 } from '@mui/x-data-grid';
 import Image from 'next/image';
-import { Fragment, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { EProductStatus } from '~/common/enums';
 import { mapStatus } from '~/common/maps';
 import { IImage, IProduct } from '~/types/models';
@@ -26,7 +25,6 @@ function ProductList({ rows }: IProps) {
     const columns = useMemo<GridColDef[]>(
         () => [
             { field: 'id', headerName: 'ID', type: 'number', width: 40 },
-
             {
                 field: 'images',
                 headerName: '',
@@ -80,7 +78,7 @@ function ProductList({ rows }: IProps) {
         [],
     );
     return (
-        <Fragment>
+        <Box px={1} py={2} mx={3} bgcolor='white'>
             <Typography variant='h3' mb={2}>
                 {rows.length} Sản phẩm
             </Typography>
@@ -98,7 +96,7 @@ function ProductList({ rows }: IProps) {
                 rowSelectionModel={rowSelectionModel}
                 onRowSelectionModelChange={(newRowSelection) => setRowSelectionModel(newRowSelection)}
             />
-        </Fragment>
+        </Box>
     );
 }
 

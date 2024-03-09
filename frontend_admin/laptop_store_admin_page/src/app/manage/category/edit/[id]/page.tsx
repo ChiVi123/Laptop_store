@@ -6,12 +6,17 @@ import Link from 'next/link';
 import { Fragment } from 'react';
 import { EPath } from '~/common/enums';
 import CategoryTreeView from '~/components/manage/category/category.tree.view';
+import { findAllCategoryRoot } from '~/services/find.all';
+import { findCategoryById } from '~/services/find.one';
 
 interface IProps {
     params: { id: string };
 }
 
-function EditCategoryPage({ params: { id } }: IProps) {
+async function EditCategoryPage({ params: { id } }: IProps) {
+    const resultTreeView = await findAllCategoryRoot();
+    const resultCategory = await findCategoryById(Number(id));
+
     return (
         <Fragment>
             <Box p='18px 24px 12px' bgcolor='white'>
@@ -30,7 +35,7 @@ function EditCategoryPage({ params: { id } }: IProps) {
             </Box>
 
             <Box px={3} py={2}>
-                <CategoryTreeView categoryId={Number(id)} />
+                <CategoryTreeView categoryTree={resultTreeView.data} category={resultCategory.data} />
             </Box>
         </Fragment>
     );

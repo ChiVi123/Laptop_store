@@ -2,7 +2,9 @@ package chivi.laptopstore.models.entities;
 
 import chivi.laptopstore.common.EEntityStatus;
 import chivi.laptopstore.common.EntityNames;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -26,13 +28,13 @@ public class CategoryEntity {
 
     private int level;
 
-    private int position;
-
     @Column(name = EntityNames.COLUMN_CATEGORY_NAME, unique = true, nullable = false)
     private String name;
 
     @Column(name = EntityNames.COLUMN_CATEGORY_URL, unique = true, nullable = false)
     private String path;
+
+    private String director;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CategoryEntity> children = new ArrayList<>();
@@ -47,11 +49,12 @@ public class CategoryEntity {
     @Column(name = EntityNames.UPDATED_AT)
     private LocalDateTime lastModifiedDate;
 
-    public CategoryEntity(int level, int position, String name, String path, EEntityStatus status) {
+    @Builder
+    public CategoryEntity(int level, String name, String path, String director, EEntityStatus status) {
         this.level = level;
-        this.position = position;
         this.name = name;
         this.path = path;
+        this.director = director;
         this.status = status;
     }
 
@@ -63,7 +66,13 @@ public class CategoryEntity {
         this.children.remove(child);
     }
 
-    public int getChildrenSize() {
-        return this.children.size();
+    @JsonIgnore
+    public String getNewDirector() {
+        return this.director.equals("") ? this.id.toString() : this.director + "," + this.id;
+    }
+
+    @JsonIgnore
+    public int getChildLevel() {
+        return this.level + 1;
     }
 }

@@ -1,8 +1,21 @@
 'use client';
 
 import { KeyboardArrowDown as KeyboardArrowDownIcon, Notifications as NotificationsIcon } from '@mui/icons-material';
-import { AppBar, Avatar, Badge, Button, IconButton, Menu, MenuItem, Toolbar } from '@mui/material';
+import {
+    AppBar,
+    Avatar,
+    Badge,
+    Button,
+    Divider,
+    IconButton,
+    Link as LinkMUI,
+    Menu,
+    MenuItem,
+    Toolbar,
+} from '@mui/material';
+import Link from 'next/link';
 import { useState } from 'react';
+import { EPath } from '~/common/enums';
 
 function stringToColor(string: string) {
     let hash = 0;
@@ -82,7 +95,12 @@ function Header({ width }: { width: number }) {
                 >
                     <MenuItem onClick={handleCloseMenu}>Profile</MenuItem>
                     <MenuItem onClick={handleCloseMenu}>Profile</MenuItem>
-                    <MenuItem onClick={handleCloseMenu}>Profile</MenuItem>
+                    <Divider />
+                    <MenuItem>
+                        <LinkMUI underline='none' color='inherit' component={Link} href={EPath.AUTH_LOGIN}>
+                            Dang xuat
+                        </LinkMUI>
+                    </MenuItem>
                 </Menu>
             </Toolbar>
         </AppBar>

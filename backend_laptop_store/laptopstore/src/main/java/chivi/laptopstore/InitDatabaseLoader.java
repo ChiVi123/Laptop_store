@@ -20,7 +20,7 @@ public class InitDatabaseLoader implements CommandLineRunner {
             log.info("Categories have already");
             return;
         }
-        categoryRepository.save(new CategoryEntity(0, 0, "root", "/", EEntityStatus.ENABLED));
+        categoryRepository.save(new CategoryEntity(0, "root", "/", "", EEntityStatus.ENABLED));
         log.info("Category root level");
     }
 }

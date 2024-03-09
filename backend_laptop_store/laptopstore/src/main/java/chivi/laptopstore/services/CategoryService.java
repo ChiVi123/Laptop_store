@@ -5,7 +5,6 @@ import chivi.laptopstore.models.exceptions.ConflictException;
 import chivi.laptopstore.models.exceptions.CustomNotFoundException;
 import chivi.laptopstore.models.requests.CategoryRequest;
 import chivi.laptopstore.repositories.entities.ICategoryRepository;
-import chivi.laptopstore.utils.CustomString;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,7 +20,7 @@ public class CategoryService {
 
     public List<CategoryEntity> getTreeView() {
         int rootLevel = 0;
-        return categoryRepository.findAllByLevelOrderByPositionAsc(rootLevel);
+        return categoryRepository.findAllByLevel(rootLevel);
     }
 
     public CategoryEntity getById(Long id) {
@@ -34,27 +33,29 @@ public class CategoryService {
         }
     }
 
-    public CategoryEntity createCategoryChild(CategoryEntity parent, CategoryRequest request) {
-        String path = this.handlePath(request.getPath(), request.getName());
-        int level = parent.getLevel() + 1;
-        int position = parent.getChildrenSize() + 1;
-        CategoryEntity category = new CategoryEntity(level, position, request.getName(), path, request.getStatus());
+    public CategoryEntity createRoot(CategoryRequest request) {
+        String director = "";
+        int level = 0;
+        return categoryRepository.save(request.getBuilder().level(level).director(director).build());
+    }
 
-        parent.addChild(category);
+    public CategoryEntity saveChild(CategoryEntity parent, CategoryRequest request) {
+        String director = parent.getNewDirector();
+        int level = parent.getChildLevel();
+        parent.addChild(request.getBuilder().level(level).director(director).build());
         return categoryRepository.save(parent);
     }
 
-    public CategoryEntity editCategory(CategoryEntity category, CategoryRequest request) {
-        String path = this.handlePath(request.getPath(), request.getName());
+    public CategoryEntity editInfo(CategoryEntity category, CategoryRequest request) {
         category.setName(request.getName());
-        category.setPath(path);
+        category.setPath(request.handlePath());
         return categoryRepository.save(category);
     }
 
     public Map<String, CategoryEntity> moveChildNewPosition(CategoryEntity child, CategoryEntity oldParent, CategoryEntity parent) {
         oldParent.removeChild(child);
-        child.setLevel(parent.getLevel() + 1);
-        child.setPosition(parent.getChildrenSize() + 1);
+        child.setLevel(parent.getChildLevel());
+        child.setDirector(parent.getNewDirector());
         parent.addChild(child);
 
         CategoryEntity updateOldParent = categoryRepository.save(oldParent);
@@ -62,12 +63,12 @@ public class CategoryService {
         return Map.of("old", updateOldParent, "new", updateParent);
     }
 
-    public void deleteCategory(CategoryEntity child, CategoryEntity parent) {
+    public void deleteChild(CategoryEntity child, CategoryEntity parent) {
         parent.removeChild(child);
         categoryRepository.save(parent);
     }
 
-    private String handlePath(String path, String name) {
-        return path == null ? CustomString.toSlug(name) : path;
+    public void deleteEntity(CategoryEntity category) {
+        categoryRepository.delete(category);
     }
 }

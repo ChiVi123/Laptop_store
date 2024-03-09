@@ -70,11 +70,8 @@ async function ProductListPage() {
                     Bộ lọc
                 </Button>
             </Box>
-            <Box px={3}>
-                <Box px={1} py={2} bgcolor='white'>
-                    <ProductList rows={'data' in result ? result.data : []} />
-                </Box>
-            </Box>
+
+            <ProductList rows={'data' in result ? result.data : []} />
         </Fragment>
     );
 }

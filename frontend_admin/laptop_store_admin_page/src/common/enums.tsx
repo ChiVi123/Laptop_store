@@ -1,6 +1,7 @@
 export enum EKeys {
     TOKEN = 'token',
     IMAGE = 'image',
+    CATEGORY_TREE_VIEW = 'category-tree-view',
 }
 export enum EInvalid {
     FULL_NAME_REQUIRED = 'Hãy nhập họ tên',

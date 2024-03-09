@@ -6,12 +6,17 @@ import Link from 'next/link';
 import { Fragment } from 'react';
 import { EPath } from '~/common/enums';
 import CategoryTreeView from '~/components/manage/category/category.tree.view';
+import { findAllCategoryRoot } from '~/services/find.all';
+import { findCategoryById } from '~/services/find.one';
 
 interface IProps {
-    params: { parent: string };
+    params: { parentId: string };
 }
 
-function AddCategoryPage({ params: { parent } }: IProps) {
+async function AddCategoryPage({ params: { parentId } }: IProps) {
+    const resultTreeView = await findAllCategoryRoot();
+    const resultCategory = await findCategoryById(Number(parentId));
+
     return (
         <Fragment>
             <Box p='18px 24px 12px' bgcolor='white'>
@@ -30,7 +35,7 @@ function AddCategoryPage({ params: { parent } }: IProps) {
             </Box>
 
             <Box px={3} py={2}>
-                <CategoryTreeView categoryParentId={Number(parent)} />
+                <CategoryTreeView categoryTree={resultTreeView.data} categoryParent={resultCategory.data} />
             </Box>
         </Fragment>
     );

@@ -8,3 +8,11 @@ export async function findProductBySlug(slug: string) {
         logger({ [findProductBySlug.name]: error });
     }
 }
+export async function findCategoryById(id: number) {
+    try {
+        const response = await request.get(`public/categories/${id}`, { cache: 'no-cache' });
+        return await response.json();
+    } catch (error) {
+        logger({ [findCategoryById.name]: error });
+    }
+}

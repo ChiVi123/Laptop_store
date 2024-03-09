@@ -10,10 +10,7 @@ function ManageLayout({ children }: IOnlyChildren) {
         <Box sx={{ display: 'flex' }}>
             <Navigate width={widthDrawer} />
             <Header width={widthDrawer} />
-            <Box
-                component='main'
-                sx={{ width: `calc(100% - ${widthDrawer}px)`, pb: 4, minHeight: '100vh', bgcolor: '#f0f2f5' }}
-            >
+            <Box component='main' width={`calc(100% - ${widthDrawer}px)`} minHeight='100vh' pb={4} bgcolor='#f0f2f5'>
                 <Toolbar></Toolbar>
                 {children}
             </Box>

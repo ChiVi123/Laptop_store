@@ -23,8 +23,11 @@ export interface IImage {
 }
 export interface ICategory {
     id: number;
+    level: number;
+    director: string;
     name: string;
-    url: string;
+    path: string;
+    children: ICategory[];
     createdDate: string;
     lastModifiedDate: string;
 }

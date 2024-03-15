@@ -1,7 +1,17 @@
-import { EAccountRole, EProductStatus } from '~/common/enums';
+import { EAccountRole, EStatus } from '~/common/enums';
 
-export interface IAccount {
+interface IEntity {
     id: number;
+}
+interface IEntityStatus {
+    status: EStatus;
+}
+interface IEntityDateTime {
+    createdDate: string;
+    lastModifiedDate: string;
+}
+
+export interface IAccount extends IEntity, IEntityDateTime {
     username: string;
     fullName: string;
     email: string;
@@ -9,11 +19,8 @@ export interface IAccount {
     reviewCount: number;
     likeCount: number;
     role: EAccountRole;
-    createdDate: string;
-    lastModifiedDate: string;
 }
 export interface IImage {
-    id: number;
     public_id: string;
     width: number;
     height: number;
@@ -21,25 +28,19 @@ export interface IImage {
     secure_url: string;
     folder: string;
 }
-export interface ICategory {
-    id: number;
+export interface ICategory extends IEntity, IEntityStatus, IEntityDateTime {
     level: number;
     director: string;
     name: string;
     path: string;
     children: ICategory[];
-    createdDate: string;
-    lastModifiedDate: string;
 }
-export interface IBrand {
-    id: number;
+export interface IBrand extends IEntity, IEntityStatus, IEntityDateTime {
     name: string;
     slug: string;
-    createdDate: string;
-    lastModifiedDate: string;
+    logo: IImage;
 }
-export interface IProduct {
-    id: number;
+export interface IProduct extends IEntity, IEntityStatus, IEntityDateTime {
     name: string;
     slug: string;
     brand: IBrand;
@@ -53,7 +54,4 @@ export interface IProduct {
     quantityStock: number;
     ratingAverage: number;
     reviewCount: number;
-    status: EProductStatus;
-    createdDate: string;
-    lastModifiedDate: string;
 }

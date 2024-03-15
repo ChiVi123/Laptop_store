@@ -1,7 +1,10 @@
 export enum EKeys {
     TOKEN = 'token',
     IMAGE = 'image',
+    LOGO = 'logo',
     CATEGORY_TREE_VIEW = 'category-tree-view',
+    PRODUCT_LIST = 'product-list',
+    BRAND_LIST = 'brand-list',
 }
 export enum EInvalid {
     FULL_NAME_REQUIRED = 'Hãy nhập họ tên',
@@ -15,7 +18,7 @@ export enum EAccountRole {
     ADMIN = 'ADMIN',
     CUSTOMER = 'CUSTOMER',
 }
-export enum EProductStatus {
+export enum EStatus {
     DRAFT = 'DRAFT',
     ENABLED = 'ENABLED',
     DISABLED = 'DISABLED',
@@ -28,6 +31,9 @@ export enum EPath {
     AUTH_NOTIFY_SEND_MAIL = '/auth/notify-send-mail',
     AUTH_REGISTRATION_CONFIRM = 'auth/registration-confirm',
     MANAGE_HOME = '/manage/home',
+    MANAGE_BRAND_ADD = '/manage/brand/add',
+    MANAGE_BRAND_EDIT = '/manage/brand/edit',
+    MANAGE_BRAND_LIST = '/manage/brand/list',
     MANAGE_CATEGORY = '/manage/category',
     MANAGE_ORDER_LIST = '/manage/order/list',
     MANAGE_PRODUCT_ADD = '/manage/product/add',

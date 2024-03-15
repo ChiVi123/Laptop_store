@@ -1,6 +1,5 @@
 'use client';
 
-import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { Box, Chip, Typography } from '@mui/material';
 import {
@@ -12,47 +11,37 @@ import {
 } from '@mui/x-data-grid';
 import Image from 'next/image';
 import { useMemo, useState } from 'react';
-import { deleteProductAction } from '~/actions/productActions';
 import { EStatus } from '~/common/enums';
 import { mapStatus } from '~/common/maps';
-import { IImage, IProduct } from '~/types/models';
-import { logger } from '~/utils';
+import { IBrand, IImage } from '~/types/models';
 import '~/utils/extends';
 
 interface IProps {
-    rows: IProduct[];
+    rows: IBrand[];
 }
 
-function ProductList({ rows }: IProps) {
+function BrandList({ rows }: IProps) {
     const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>([]);
-
-    async function handleDeleteItem(id: number) {
-        const result = await deleteProductAction(id);
-        logger({ result });
-    }
-
     const columns = useMemo<GridColDef[]>(
         () => [
             { field: 'id', headerName: 'ID', type: 'number', width: 40 },
             {
-                field: 'images',
-                headerName: '',
+                field: 'logo',
+                headerName: 'logo',
                 width: 120,
                 sortable: false,
                 filterable: false,
-                renderCell: (params: GridRenderCellParams<any, IImage[]>) => (
+                renderCell: (params: GridRenderCellParams<any, IImage>) => (
                     <Image
-                        src={params.value ? params.value[0].secure_url : ''}
-                        alt={params.value ? params.value[0].folder : ''}
+                        src={params.value ? params.value.secure_url : ''}
+                        alt={params.value ? params.value.folder : ''}
                         width={100}
                         height={100}
                         style={{ objectFit: 'contain' }}
                     />
                 ),
             },
-            { field: 'name', headerName: 'Tên sản phẩm', minWidth: 420 },
-            { field: 'quantityStock', headerName: 'Tồn kho', type: 'number', minWidth: 100 },
-            { field: 'price', headerName: 'Giá bán', type: 'number', minWidth: 134 },
+            { field: 'name', headerName: 'Tên thương hiệu', minWidth: 380 },
             {
                 field: 'createdDate',
                 headerName: 'Ngày tạo',
@@ -79,16 +68,8 @@ function ProductList({ rows }: IProps) {
                     <GridActionsCellItem
                         key={1}
                         icon={<EditIcon />}
-                        label='Chinh sua'
-                        showInMenu
+                        label='Edit'
                         onClick={() => console.log(params.id)}
-                    />,
-                    <GridActionsCellItem
-                        key={2}
-                        icon={<DeleteIcon />}
-                        label='Xoa'
-                        showInMenu
-                        onClick={() => handleDeleteItem(Number(params.id))}
                     />,
                 ],
             },
@@ -99,7 +80,7 @@ function ProductList({ rows }: IProps) {
     return (
         <Box px={1} py={2} mx={3} bgcolor='white'>
             <Typography variant='h3' mb={2}>
-                {rows.length} Sản phẩm
+                {rows.length} Loại thương hiệu
             </Typography>
             <DataGrid
                 rows={rows}
@@ -119,4 +100,4 @@ function ProductList({ rows }: IProps) {
     );
 }
 
-export default ProductList;
+export default BrandList;

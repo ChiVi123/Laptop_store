@@ -6,13 +6,15 @@ import { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { addProductAction } from '~/actions/productActions';
 import { uploadMultiImageAction } from '~/actions/uploadActions';
-import { EKeys, EPath, EProductStatus } from '~/common/enums';
+import { EKeys, EPath, EStatus } from '~/common/enums';
 import { productDefaultValues } from '~/common/values';
 import { addProductResolver } from '~/resolvers';
 import { addProductFormData } from '~/types/form.data';
 import { IBrand, ICategory } from '~/types/models';
+import { logger } from '~/utils';
+import FormLabel from '../../form.label';
+import CategorySelectField from '../category.select.field';
 import EditorField from '../editor.field';
-import FormLabel from '../form.label';
 import ImageField from '../image.field';
 import NumberField from '../number.field';
 import SelectField from '../select.field';
@@ -43,7 +45,9 @@ function ProductForm({ categories, brands }: IProps) {
             return;
         }
 
-        const status = (event.nativeEvent as SubmitEvent).submitter?.ariaLabel || EProductStatus.DRAFT;
+        const status = (event.nativeEvent as SubmitEvent).submitter?.ariaLabel || EStatus.DRAFT;
+
+        logger({ data }, { status });
 
         if (data.images && data.images.length) {
             const formData = new FormData();
@@ -114,15 +118,9 @@ function ProductForm({ categories, brands }: IProps) {
                                 name='categoryId'
                                 control={control}
                                 render={({ field: { onChange } }) => (
-                                    <SelectField
-                                        id='input-category'
-                                        placeholder='Danh mục'
-                                        items={categories}
-                                        value='id'
-                                        content='name'
-                                        error={Boolean(errors.categoryId?.message)}
-                                        helperText={errors.categoryId?.message || ''}
-                                        onChange={(newValue) => onChange(parseInt(newValue))}
+                                    <CategorySelectField
+                                        tree={categories}
+                                        onChange={(newValue) => onChange(newValue)}
                                     />
                                 )}
                             />
@@ -229,13 +227,13 @@ function ProductForm({ categories, brands }: IProps) {
                 </div>
 
                 <Box display='flex' justifyContent='flex-end' gap={1}>
-                    <Button type='submit' aria-label={EProductStatus.DRAFT} variant='outlined' disabled={loading}>
+                    <Button type='submit' aria-label={EStatus.DRAFT} variant='outlined' disabled={loading}>
                         Lưu nháp
                     </Button>
-                    <Button type='submit' aria-label={EProductStatus.DISABLED} variant='contained' disabled={loading}>
+                    <Button type='submit' aria-label={EStatus.DISABLED} variant='contained' disabled={loading}>
                         Lưu và ẩn sản phẩm
                     </Button>
-                    <Button type='submit' aria-label={EProductStatus.ENABLED} variant='contained' disabled={loading}>
+                    <Button type='submit' aria-label={EStatus.ENABLED} variant='contained' disabled={loading}>
                         Lưu và bán sản phẩm ngay
                     </Button>
                 </Box>

@@ -13,7 +13,7 @@ export async function findAllProduct() {
 }
 export async function findAllCategoryRoot() {
     try {
-        const response = await request.get('public/categories/tree-view', {
+        const response = await request.get('public/categories/all-root', {
             cache: 'no-cache',
             next: { tags: [EKeys.CATEGORY_TREE_VIEW] },
         });
@@ -24,7 +24,10 @@ export async function findAllCategoryRoot() {
 }
 export async function findAllBrand() {
     try {
-        const response = await request.get('public/brands/find-all');
+        const response = await request.get('public/brands/find-all', {
+            cache: 'no-cache',
+            next: { tags: [EKeys.BRAND_LIST] },
+        });
         return await response.json();
     } catch (error) {
         logger({ [findAllBrand.name]: error });

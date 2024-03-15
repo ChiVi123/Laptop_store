@@ -1,10 +1,14 @@
-import { BarChart as BarChartIcon, Category as CategoryIcon, Inbox as InboxIcon } from '@mui/icons-material';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import CategoryIcon from '@mui/icons-material/Category';
+import InboxIcon from '@mui/icons-material/Inbox';
+import LaptopMacIcon from '@mui/icons-material/LaptopMac';
+import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import { INavigateItem } from '~/types/lists';
 import { EPath } from './enums';
 
 const navigateItems: INavigateItem[] = [
     {
-        content: 'Trang chu',
+        content: 'Trang chủ',
         icon: <BarChartIcon fontSize='small' />,
         url: EPath.MANAGE_HOME,
         children: [],
@@ -21,26 +25,42 @@ const navigateItems: INavigateItem[] = [
         ],
     },
     {
-        content: 'San pham',
-        icon: <BarChartIcon fontSize='small' />,
+        content: 'Sản phẩm',
+        icon: <LaptopMacIcon fontSize='small' />,
         children: [
             {
-                content: 'Danh sách san pham',
+                content: 'Danh sách',
                 url: EPath.MANAGE_PRODUCT_LIST,
                 children: [],
             },
             {
-                content: 'Tao san pham',
+                content: 'Tạo mới',
                 url: EPath.MANAGE_PRODUCT_ADD,
                 children: [],
             },
         ],
     },
     {
-        content: 'Danh muc',
+        content: 'Danh mục',
         icon: <CategoryIcon />,
         url: EPath.MANAGE_CATEGORY,
         children: [],
+    },
+    {
+        content: 'Thương hiệu',
+        icon: <WorkspacePremiumIcon />,
+        children: [
+            {
+                content: 'Danh sách',
+                url: EPath.MANAGE_BRAND_LIST,
+                children: [],
+            },
+            {
+                content: 'Tạo mới',
+                url: EPath.MANAGE_BRAND_ADD,
+                children: [],
+            },
+        ],
     },
 ];
 

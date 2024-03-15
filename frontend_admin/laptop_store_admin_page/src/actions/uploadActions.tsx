@@ -14,6 +14,12 @@ const options: cloudinary.UploadApiOptions = {
     resource_type: 'image',
 };
 
+export async function uploadSingleImageAction(formData: FormData) {
+    const file = formData.get(EKeys.LOGO);
+    if (file instanceof File) {
+        return await handleUploadImage(file);
+    }
+}
 export async function uploadMultiImageAction(formData: FormData) {
     const imageResponses: cloudinary.UploadApiResponse[] = [];
     const files = formData.getAll(EKeys.IMAGE);
@@ -22,18 +28,18 @@ export async function uploadMultiImageAction(formData: FormData) {
     for (let index = 0; index < filesLength; index++) {
         const file = files[index];
         if (file instanceof File) {
-            const response = await uploadImage(file);
-            imageResponses.push(response as cloudinary.UploadApiResponse);
+            const response = await handleUploadImage(file);
+            imageResponses.push(response);
         }
     }
 
     return imageResponses;
 }
 
-async function uploadImage(file: File) {
+export async function handleUploadImage(file: File) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    return await new Promise((resolve) => {
+    return (await new Promise((resolve) => {
         cloudinary.v2.uploader
             .upload_stream(options, (_, uploadResult) => {
                 if (uploadResult) {
@@ -41,7 +47,7 @@ async function uploadImage(file: File) {
                 }
             })
             .end(buffer);
-    });
+    })) as cloudinary.UploadApiResponse;
 }
 //{
 //  "public_id": "laptop_store/tl7vi2c15ztyi8co65a2",

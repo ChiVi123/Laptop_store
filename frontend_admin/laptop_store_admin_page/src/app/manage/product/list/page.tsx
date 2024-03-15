@@ -1,4 +1,5 @@
-import { Add as AddIcon, SearchRounded as SearchRoundedIcon } from '@mui/icons-material';
+import AddIcon from '@mui/icons-material/Add';
+import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Button from '@mui/material/Button';
@@ -42,9 +43,11 @@ async function ProductListPage() {
                     Danh sách sản phẩm
                 </Typography>
             </Box>
+
             <Box bgcolor='white'>
                 <TabsWrap />
             </Box>
+
             <Box
                 display='flex'
                 alignItems='center'

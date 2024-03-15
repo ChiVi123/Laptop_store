@@ -26,7 +26,7 @@
     "Use state": {
         "scope": "typescriptreact",
         "prefix": "ust",
-        "body": ["const [$1, $1] = useState$4<$2>($3);"],
+        "body": "const [$1, set${1/(.*)/${1:/capitalize}/}] = useState$2($3);",
         "description": "Use state"
     },
     "Export default": {

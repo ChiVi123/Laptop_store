@@ -6,10 +6,10 @@ import { Box, Button, FormControlLabel, Paper, Switch, TextField } from '@mui/ma
 import { TreeView } from '@mui/x-tree-view';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { DragEvent, Fragment, SyntheticEvent, useCallback, useRef, useState } from 'react';
+import { DragEvent, Fragment, SyntheticEvent, useCallback, useMemo, useRef, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { createCategoryChildActions, movePositionCategoryAction } from '~/actions/categoryActions';
-import { EPath, EProductStatus } from '~/common/enums';
+import { createSubCategoryAction, deleteCategoryAction, moveCategoryAction } from '~/actions/categoryActions';
+import { EPath, EStatus } from '~/common/enums';
 import { addCategoryResolver } from '~/resolvers';
 import { addCategoryFormData } from '~/types/form.data';
 import { ICategory } from '~/types/models';
@@ -18,16 +18,14 @@ import CustomTreeItem from './custom.tree.item';
 
 declare global {
     interface DOMStringMap {
-        parentId: string;
         id: string;
     }
 }
 
 interface IDragAndDropStatus {
     type: 'handleDragStart' | 'handleDragOver' | 'handleDragEnter' | 'handleDragEnd' | '';
-    dragFromParent: number | null;
-    dragFromChild: number | null;
-    dragToParent: number | null;
+    dragFrom: number | null;
+    dropTo: number | null;
 }
 interface IProps {
     categoryTree: ICategory[];
@@ -35,11 +33,26 @@ interface IProps {
     categoryParent?: ICategory;
 }
 
+const styleBefore = {
+    content: '""',
+    position: 'absolute',
+    inset: 0,
+    display: 'flex',
+    justifyContent: 'center',
+    alignContent: 'center',
+    width: '100%',
+    height: '100%',
+    p: 1,
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    borderColor: 'primary.main',
+    borderRadius: 1,
+    color: 'primary.main',
+    zIndex: 2,
+};
+
 function CategoryTreeView({ categoryTree, category, categoryParent }: IProps) {
-    const initDragAndDrop = useCallback(
-        () => ({ type: '', dragFromParent: null, dragFromChild: null, dragToParent: null } as IDragAndDropStatus),
-        [],
-    );
+    const initDragAndDrop = useCallback(() => ({ type: '', dragFrom: null, dropTo: null } as IDragAndDropStatus), []);
     const {
         control,
         formState: { errors },
@@ -53,62 +66,51 @@ function CategoryTreeView({ categoryTree, category, categoryParent }: IProps) {
     const [disabled, setDisabled] = useState<boolean>(false);
     const inputNameRef = useRef<HTMLInputElement>();
     const router = useRouter();
-
-    const styleBefore = {
-        content: '""',
-        position: 'absolute',
-        inset: 0,
-        display: 'flex',
-        justifyContent: 'center',
-        alignContent: 'center',
-        width: '100%',
-        height: '100%',
-        p: 1,
-        borderWidth: 2,
-        borderStyle: 'dashed',
-        borderColor: 'primary.main',
-        borderRadius: 1,
-        color: 'primary.main',
-        zIndex: 2,
-    };
+    const defaultExpanded = useMemo(() => {
+        const expanded = category?.director.split(',') || categoryParent?.director.split(',') || [];
+        if (category) {
+            expanded.push(category.id.toString());
+        }
+        if (categoryParent) {
+            expanded.push(categoryParent.id.toString());
+        }
+        return expanded;
+    }, [category, categoryParent]);
 
     function handleSetSelected(_: SyntheticEvent, nodeId: string) {
         router.push(EPath.MANAGE_CATEGORY.concat('/edit/', nodeId));
     }
     function handleDragStart(event: DragEvent<HTMLElement>) {
         event.stopPropagation();
-        const dragFromParent = Number(event.currentTarget.dataset.parentId);
-        const dragFromChild = Number(event.currentTarget.dataset.id);
-        setDragAndDrop({ ...dragAndDrop, type: 'handleDragStart', dragFromParent, dragFromChild });
+        const dragFrom = Number(event.currentTarget.dataset.id);
+        setDragAndDrop({ ...dragAndDrop, type: 'handleDragStart', dragFrom });
     }
     function handleDragOver(event: DragEvent<HTMLElement>) {
         event.preventDefault();
     }
     function handleDragEnter(event: DragEvent<HTMLElement>) {
         event.stopPropagation();
-        const dragToParent = Number(event.currentTarget.dataset.id);
-        setDragAndDrop({ ...dragAndDrop, type: 'handleDragEnter', dragToParent });
+        const dropTo = Number(event.currentTarget.dataset.id);
+        setDragAndDrop({ ...dragAndDrop, type: 'handleDragEnter', dropTo });
     }
     async function handleDragEnd() {
-        const { dragFromParent, dragFromChild, dragToParent } = dragAndDrop;
-        if (
-            dragFromParent !== null &&
-            dragFromChild !== null &&
-            dragToParent !== null &&
-            dragToParent !== dragFromChild
-        ) {
-            const result = await movePositionCategoryAction(dragFromParent, dragFromChild, dragToParent);
+        const { dragFrom, dropTo } = dragAndDrop;
+        if (dragFrom !== null && dropTo !== null && dragFrom !== dropTo) {
+            const result = await moveCategoryAction(dragFrom, dropTo);
             logger({ result });
         }
         setDragAndDrop(initDragAndDrop());
     }
-    function handleDelete(id: number) {}
+    async function handleDeleteItem(id: number) {
+        const result = await deleteCategoryAction(id);
+        logger({ result });
+    }
 
     const handleOnSubmit: SubmitHandler<addCategoryFormData> = async (data) => {
         setDisabled(true);
         data.parentId = categoryParent?.id;
-        data.status = status ? EProductStatus.ENABLED : EProductStatus.DISABLED;
-        const result = await createCategoryChildActions(data);
+        data.status = status ? EStatus.ENABLED : EStatus.DISABLED;
+        const result = await createSubCategoryAction(data);
         setDisabled(false);
         logger({ result });
     };
@@ -120,7 +122,6 @@ function CategoryTreeView({ categoryTree, category, categoryParent }: IProps) {
                 id={`parent-${parentId}-${node.id}`}
                 nodeId={node.id.toString()}
                 label={node.name.concat(` (ID: ${node.id})`)}
-                data-parent-id={parentId}
                 data-id={node.id}
                 draggable
                 onDragStart={handleDragStart}
@@ -129,7 +130,7 @@ function CategoryTreeView({ categoryTree, category, categoryParent }: IProps) {
                 onDragEnd={handleDragEnd}
                 sx={{
                     position: 'relative',
-                    '& > .MuiTreeItem-content::before': dragAndDrop.dragToParent === node.id ? styleBefore : {},
+                    '& > .MuiTreeItem-content::before': dragAndDrop.dropTo === node.id ? styleBefore : {},
                 }}
             >
                 {node.children.map((child) => renderTreeItem(child, node.id))}
@@ -139,26 +140,33 @@ function CategoryTreeView({ categoryTree, category, categoryParent }: IProps) {
 
     return (
         <Fragment>
-            <Paper elevation={0} sx={{ display: 'flex', justifyContent: 'space-between', p: 1 }}>
-                <Button
-                    variant='outlined'
-                    size='small'
-                    LinkComponent={Link}
-                    href={EPath.MANAGE_CATEGORY.concat(`/add/${category?.id}`)}
-                >
-                    Them moi
-                </Button>
-
-                <Button variant='contained' size='small' color='warning'>
-                    Xoa
-                </Button>
-            </Paper>
+            {category && (
+                <Paper elevation={0} sx={{ display: 'flex', justifyContent: 'space-between', p: 1 }}>
+                    <Button
+                        variant='outlined'
+                        size='small'
+                        LinkComponent={Link}
+                        href={EPath.MANAGE_CATEGORY.concat(`/add/${category.id}`)}
+                    >
+                        Them moi
+                    </Button>
+                    <Button
+                        variant='contained'
+                        size='small'
+                        color='warning'
+                        disabled={disabled}
+                        onClick={() => handleDeleteItem(category.id)}
+                    >
+                        Xoa
+                    </Button>
+                </Paper>
+            )}
 
             <Box display='flex' gap={4} mt={2}>
                 <TreeView
                     aria-label='category tree'
                     defaultSelected={category?.id.toString() || categoryParent?.id.toString()}
-                    defaultExpanded={category?.director.split(',') || categoryParent?.director.split(',')}
+                    defaultExpanded={defaultExpanded}
                     defaultCollapseIcon={<ExpandMoreIcon />}
                     defaultExpandIcon={<ChevronRightIcon />}
                     onNodeSelect={handleSetSelected}
@@ -171,9 +179,7 @@ function CategoryTreeView({ categoryTree, category, categoryParent }: IProps) {
                     width='40%'
                     component='form'
                     onSubmit={handleSubmit(handleOnSubmit)}
-                    sx={{
-                        '& .MuiFormControl-root': { mb: 2 },
-                    }}
+                    sx={{ '& .MuiFormControl-root': { mb: 2 } }}
                 >
                     <Controller
                         control={control}
@@ -216,7 +222,7 @@ function CategoryTreeView({ categoryTree, category, categoryParent }: IProps) {
                         )}
                     />
                     <FormControlLabel
-                        label='Bat'
+                        label='Bật'
                         control={
                             <Switch
                                 inputProps={{ 'aria-label': 'category-status' }}

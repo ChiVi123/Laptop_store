@@ -1,6 +1,7 @@
 'use client';
 
-import { Clear as ClearIcon, CloudUpload as CloudUploadIcon } from '@mui/icons-material';
+import ClearIcon from '@mui/icons-material/Clear';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { Box, IconButton, Typography, Unstable_Grid2, styled } from '@mui/material';
 import Image from 'next/image';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';

@@ -1,7 +1,8 @@
 'use client';
 
+import { UploadApiResponse } from 'cloudinary';
 import * as yup from 'yup';
-import { EInvalid } from '~/common/enums';
+import { EInvalid, EStatus } from '~/common/enums';
 
 function yupString() {
     return yup.string().trim();
@@ -35,4 +36,15 @@ export const addCategorySchema = yup.object({
     name: yupString().required(),
     path: yupString(),
     status: yupString(),
+});
+export const addBrandSchema = yup.object({
+    name: yupString().required(),
+    logo: yup
+        .mixed<File | FormData | UploadApiResponse>()
+        .test('required', 'Them logo cho thuong hieu nay', (value) => Boolean(value))
+        .test('fileSize', 'File too large', (value) => {
+            if (value instanceof File) return value.size <= 1048576;
+            else return true;
+        }),
+    status: yup.string<EStatus>(),
 });

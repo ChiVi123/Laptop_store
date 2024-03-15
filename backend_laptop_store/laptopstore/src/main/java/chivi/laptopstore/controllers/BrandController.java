@@ -3,7 +3,7 @@ package chivi.laptopstore.controllers;
 import chivi.laptopstore.common.RequestMaps;
 import chivi.laptopstore.common.ResponseMessage;
 import chivi.laptopstore.models.entities.BrandEntity;
-import chivi.laptopstore.models.requests.BaseInfoRequest;
+import chivi.laptopstore.models.requests.BrandRequest;
 import chivi.laptopstore.models.responses.SuccessResponse;
 import chivi.laptopstore.services.BrandService;
 import jakarta.validation.Valid;
@@ -25,26 +25,26 @@ public class BrandController {
 
     @PostMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "create")
     @ResponseStatus(HttpStatus.CREATED)
-    public SuccessResponse createBrand(@Valid @RequestBody BaseInfoRequest baseInfoRequest) {
-        brandService.checkConflictByName(baseInfoRequest.getName());
-        BrandEntity brand = brandService.createBrand(baseInfoRequest);
+    public SuccessResponse createBrand(@Valid @RequestBody BrandRequest request) {
+        brandService.checkConflictByName(request.getName());
+        BrandEntity brand = brandService.create(request);
         return new SuccessResponse(ResponseMessage.CREATE_SUCCESS, brand);
     }
 
-    @PutMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "edit/{brandId}")
+    @PutMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "{brandId}/edit")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse editCategory(@PathVariable Long brandId, @Valid @RequestBody BaseInfoRequest baseInfoRequest) {
+    public SuccessResponse editCategory(@PathVariable Long brandId, @Valid @RequestBody BrandRequest request) {
         BrandEntity brand = brandService.getById(brandId);
-        if (!brand.getName().equals(baseInfoRequest.getName())) {
-            brandService.checkConflictByName(baseInfoRequest.getName());
+        if (!brand.getName().equals(request.getName())) {
+            brandService.checkConflictByName(request.getName());
         }
-        return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, brandService.editBrand(brand, baseInfoRequest));
+        return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, brandService.editInfo(brand, request));
     }
 
-    @DeleteMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "delete/{brandId}")
+    @DeleteMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "{brandId}/delete")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse deleteBrand(@PathVariable Long brandId) {
-        brandService.deleteBrand(brandId);
+        brandService.deleteById(brandId);
         return new SuccessResponse(ResponseMessage.DELETE_SUCCESS);
     }
 }

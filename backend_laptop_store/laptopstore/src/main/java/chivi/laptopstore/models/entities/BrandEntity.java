@@ -28,6 +28,9 @@ public class BrandEntity {
     @Column(name = EntityNames.COLUMN_BRAND_SLUG, unique = true, nullable = false)
     private String slug;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    private ImageEntity logo;
+
     private EEntityStatus status;
 
     @CreatedDate
@@ -38,8 +41,10 @@ public class BrandEntity {
     @Column(name = EntityNames.UPDATED_AT)
     private LocalDateTime lastModifiedDate;
 
-    public BrandEntity(String name, String slug) {
+    public BrandEntity(String name, String slug, ImageEntity logo, EEntityStatus status) {
         this.name = name;
         this.slug = slug;
+        this.logo = logo;
+        this.status = status;
     }
 }

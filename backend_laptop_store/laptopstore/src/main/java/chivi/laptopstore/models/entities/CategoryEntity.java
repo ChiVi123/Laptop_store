@@ -2,7 +2,9 @@ package chivi.laptopstore.models.entities;
 
 import chivi.laptopstore.common.EEntityStatus;
 import chivi.laptopstore.common.EntityNames;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
@@ -36,7 +38,13 @@ public class CategoryEntity {
 
     private String director;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToOne
+    @JoinColumn(name = "parent_id", referencedColumnName = EntityNames.COLUMN_CATEGORY_ID)
+    @JsonBackReference
+    private CategoryEntity parent;
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<CategoryEntity> children = new ArrayList<>();
 
     private EEntityStatus status;
@@ -60,10 +68,12 @@ public class CategoryEntity {
 
     public void addChild(CategoryEntity child) {
         this.children.add(child);
+        child.parent = this;
     }
 
     public void removeChild(CategoryEntity child) {
         this.children.remove(child);
+        child.parent = null;
     }
 
     @JsonIgnore

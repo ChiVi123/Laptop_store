@@ -10,65 +10,65 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
 @AllArgsConstructor
 public class CategoryService {
-    private final ICategoryRepository categoryRepository;
+    private final ICategoryRepository repository;
 
-    public List<CategoryEntity> getTreeView() {
-        int rootLevel = 0;
-        return categoryRepository.findAllByLevel(rootLevel);
+    public List<CategoryEntity> getAllRoot() {
+        return repository.findAllByParent_Id(null);
     }
 
     public CategoryEntity getById(Long id) {
-        return categoryRepository.findById(id).orElseThrow(() -> new CustomNotFoundException("category", id));
+        return repository.findById(id).orElseThrow(() -> new CustomNotFoundException("category", id));
     }
 
     public void checkConflictByName(String name) {
-        if (categoryRepository.existsByName(name)) {
+        if (repository.existsByName(name)) {
             throw new ConflictException("Category", name);
         }
     }
 
     public CategoryEntity createRoot(CategoryRequest request) {
-        String director = "";
-        int level = 0;
-        return categoryRepository.save(request.getBuilder().level(level).director(director).build());
+        String rootDirector = "";
+        int rootLevel = 0;
+        return repository.save(request.getBuilder().level(rootLevel).director(rootDirector).build());
     }
 
-    public CategoryEntity saveChild(CategoryEntity parent, CategoryRequest request) {
+    public CategoryEntity createSub(CategoryEntity parent, CategoryRequest request) {
         String director = parent.getNewDirector();
         int level = parent.getChildLevel();
         parent.addChild(request.getBuilder().level(level).director(director).build());
-        return categoryRepository.save(parent);
+        return repository.save(parent);
     }
 
     public CategoryEntity editInfo(CategoryEntity category, CategoryRequest request) {
         category.setName(request.getName());
         category.setPath(request.handlePath());
-        return categoryRepository.save(category);
+        return repository.save(category);
     }
 
-    public Map<String, CategoryEntity> moveChildNewPosition(CategoryEntity child, CategoryEntity oldParent, CategoryEntity parent) {
-        oldParent.removeChild(child);
-        child.setLevel(parent.getChildLevel());
-        child.setDirector(parent.getNewDirector());
-        parent.addChild(child);
-
-        CategoryEntity updateOldParent = categoryRepository.save(oldParent);
-        CategoryEntity updateParent = categoryRepository.save(parent);
-        return Map.of("old", updateOldParent, "new", updateParent);
+    public void move(CategoryEntity fromCategory, CategoryEntity toCategory) {
+        CategoryEntity parentFrom = fromCategory.getParent();
+        if (parentFrom == null) {
+            toCategory.addChild(fromCategory);
+            repository.save(toCategory);
+        } else {
+            parentFrom.removeChild(fromCategory);
+            toCategory.addChild(fromCategory);
+            repository.saveAll(List.of(parentFrom, toCategory));
+        }
     }
 
-    public void deleteChild(CategoryEntity child, CategoryEntity parent) {
-        parent.removeChild(child);
-        categoryRepository.save(parent);
-    }
-
-    public void deleteEntity(CategoryEntity category) {
-        categoryRepository.delete(category);
+    public void delete(CategoryEntity category) {
+        CategoryEntity parent = category.getParent();
+        if (parent != null) {
+            parent.removeChild(category);
+            repository.save(parent);
+        } else {
+            repository.delete(category);
+        }
     }
 }

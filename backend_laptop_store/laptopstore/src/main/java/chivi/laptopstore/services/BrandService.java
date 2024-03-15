@@ -4,7 +4,7 @@ import chivi.laptopstore.common.ResponseMessage;
 import chivi.laptopstore.models.entities.BrandEntity;
 import chivi.laptopstore.models.exceptions.ConflictException;
 import chivi.laptopstore.models.exceptions.CustomNotFoundException;
-import chivi.laptopstore.models.requests.BaseInfoRequest;
+import chivi.laptopstore.models.requests.BrandRequest;
 import chivi.laptopstore.models.responses.SuccessResponse;
 import chivi.laptopstore.repositories.entities.IBrandRepository;
 import chivi.laptopstore.utils.CustomString;
@@ -30,19 +30,17 @@ public class BrandService {
         }
     }
 
-    public BrandEntity createBrand(BaseInfoRequest baseInfoRequest) {
-        String slug = CustomString.toSlug(baseInfoRequest.getName());
-        return brandRepository.save(new BrandEntity(baseInfoRequest.getName(), slug));
+    public BrandEntity create(BrandRequest request) {
+        return brandRepository.save(request.getEntity());
     }
 
-    public BrandEntity editBrand(BrandEntity brand, BaseInfoRequest baseInfoRequest) {
-
-        brand.setName(baseInfoRequest.getName());
-        brand.setSlug(CustomString.toSlug(baseInfoRequest.getName()));
+    public BrandEntity editInfo(BrandEntity brand, BrandRequest request) {
+        brand.setName(request.getName());
+        brand.setSlug(CustomString.toSlug(request.getName()));
         return brandRepository.save(brand);
     }
 
-    public void deleteBrand(Long brandId) {
+    public void deleteById(Long brandId) {
         BrandEntity brand = this.getById(brandId);
         brandRepository.delete(brand);
     }

@@ -92,10 +92,10 @@ public class ProductController {
         return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, productService.updateDiscountProduct(product, discountRequest));
     }
 
-    @DeleteMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "delete/{productId}")
+    @DeleteMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "{id}/delete")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse deleteProduct(@PathVariable Long productId) {
-        productService.deleteProduct(productId);
+    public SuccessResponse deleteProduct(@PathVariable Long id) {
+        productService.deleteProduct(id);
         return new SuccessResponse(ResponseMessage.DELETE_SUCCESS);
     }
 

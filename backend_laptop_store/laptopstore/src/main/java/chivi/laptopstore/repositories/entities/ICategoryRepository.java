@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface ICategoryRepository extends JpaRepository<CategoryEntity, Long> {
-    List<CategoryEntity> findAllByLevel(int level);
+    List<CategoryEntity> findAllByParent_Id(Long parent_id);
 
     boolean existsByName(String name);
 }

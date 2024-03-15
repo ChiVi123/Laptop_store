@@ -3,7 +3,6 @@ package chivi.laptopstore.controllers;
 import chivi.laptopstore.common.RequestMaps;
 import chivi.laptopstore.common.ResponseMessage;
 import chivi.laptopstore.models.entities.CategoryEntity;
-import chivi.laptopstore.models.exceptions.BaseException;
 import chivi.laptopstore.models.requests.CategoryRequest;
 import chivi.laptopstore.models.responses.SuccessResponse;
 import chivi.laptopstore.services.CategoryService;
@@ -18,10 +17,10 @@ import org.springframework.web.bind.annotation.*;
 public class CategoryController {
     private final CategoryService categoryService;
 
-    @GetMapping(RequestMaps.CATEGORY_PATHNAME_PUBLIC + "tree-view")
+    @GetMapping(RequestMaps.CATEGORY_PATHNAME_PUBLIC + "all-root")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse findAllCategory() {
-        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, categoryService.getTreeView());
+        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, categoryService.getAllRoot());
     }
 
     @GetMapping(RequestMaps.CATEGORY_PATHNAME_PUBLIC + "{id}")
@@ -37,12 +36,12 @@ public class CategoryController {
         return new SuccessResponse(ResponseMessage.CREATE_SUCCESS, categoryService.createRoot(request));
     }
 
-    @PostMapping(RequestMaps.CATEGORY_PATHNAME_ADMIN + "create")
+    @PostMapping(RequestMaps.CATEGORY_PATHNAME_ADMIN + "create-sub")
     @ResponseStatus(HttpStatus.CREATED)
     public SuccessResponse createCategory(@Valid @RequestBody CategoryRequest request) {
         categoryService.checkConflictByName(request.getName());
         CategoryEntity parent = categoryService.getById(request.getParentId());
-        return new SuccessResponse(ResponseMessage.CREATE_SUCCESS, categoryService.saveChild(parent, request));
+        return new SuccessResponse(ResponseMessage.CREATE_SUCCESS, categoryService.createSub(parent, request));
     }
 
     @PutMapping(RequestMaps.CATEGORY_PATHNAME_ADMIN + "{id}/edit")
@@ -55,37 +54,20 @@ public class CategoryController {
         return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, categoryService.editInfo(category, request));
     }
 
-    @PutMapping(RequestMaps.CATEGORY_PATHNAME_ADMIN + "{id}/move/{from}/{to}")
+    @PutMapping(RequestMaps.CATEGORY_PATHNAME_ADMIN + "{fromId}/move/{toId}")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse moveItem(@PathVariable Long id, @PathVariable Long from, @PathVariable Long to) {
-        CategoryEntity child = categoryService.getById(id);
-        CategoryEntity oldParent = categoryService.getById(from);
-        CategoryEntity parent = categoryService.getById(to);
-        if (parent.getChildren().contains(child)) {
-            String format = "Child has id: %d already parent id: %d";
-            String message = String.format(format, child.getId(), parent.getId());
-            throw new BaseException(HttpStatus.CONFLICT.value(), message);
-        }
-        return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, categoryService.moveChildNewPosition(child, oldParent, parent));
+    public SuccessResponse moveItem(@PathVariable Long fromId, @PathVariable Long toId) {
+        CategoryEntity fromCategory = categoryService.getById(fromId);
+        CategoryEntity toCategory = categoryService.getById(toId);
+        categoryService.move(fromCategory, toCategory);
+        return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS);
     }
 
-    @DeleteMapping(RequestMaps.CATEGORY_PATHNAME_ADMIN + "{parentId}/{childId}/delete")
-    @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse deleteCategoryChild(@PathVariable Long parentId, @PathVariable Long childId) {
-        CategoryEntity parent = categoryService.getById(parentId);
-        CategoryEntity child = categoryService.getById(childId);
-        categoryService.deleteChild(parent, child);
-        return new SuccessResponse(ResponseMessage.DELETE_SUCCESS);
-    }
-
-    @DeleteMapping(RequestMaps.CATEGORY_PATHNAME_ADMIN + "{id}/delete-root")
+    @DeleteMapping(RequestMaps.CATEGORY_PATHNAME_ADMIN + "{id}/delete")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse deleteCategory(@PathVariable Long id) {
         CategoryEntity category = categoryService.getById(id);
-        if (category.getLevel() != 0) {
-            throw new BaseException(HttpStatus.BAD_REQUEST.value(), "Category must root level");
-        }
-        categoryService.deleteEntity(category);
+        categoryService.delete(category);
         return new SuccessResponse(ResponseMessage.DELETE_SUCCESS);
     }
 }

@@ -58,17 +58,14 @@ public class AuthenticationService {
         }
     }
 
-    public AccountEntity createAccount(RegisterRequest registerRequest, EAccountRole role) {
-        String encode = passwordEncoder.encode(registerRequest.getPassword());
-        AccountEntity account = AccountEntity
-                .builder()
-                .fullName(registerRequest.getFullName())
-                .email(registerRequest.getEmail())
-                .password(encode)
-                .role(role)
-                .status(EAccountStatus.NOT_VERIFIED)
-                .build();
-
+    public AccountEntity createAccount(RegisterRequest request, EAccountRole role) {
+        String encoded = passwordEncoder.encode(request.getPassword());
+        AccountEntity account = new AccountEntity();
+        account.setFullName(request.getFullName());
+        account.setEmail(request.getEmail());
+        account.setPassword(encoded);
+        account.setRole(role);
+        account.setStatus(EAccountStatus.NOT_VERIFIED);
         return accountRepository.save(account);
     }
 
@@ -78,8 +75,7 @@ public class AuthenticationService {
     }
 
     public void saveVerificationToken(AccountEntity account, String token) {
-        Long accountId = account.getId();
-        Optional<VerificationTokenEntity> optional = verificationTokenRepository.findByAccountId(accountId);
+        Optional<VerificationTokenEntity> optional = verificationTokenRepository.findByAccountId(account.getId());
 
         if (optional.isEmpty()) {
             verificationTokenRepository.save(new VerificationTokenEntity(account, token));

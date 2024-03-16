@@ -32,15 +32,15 @@ public class ProductController {
     private final BrandService brandService;
     private final CategoryService categoryService;
 
-    @GetMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "find-all")
+    @GetMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "all")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse findAllProduct() {
-        return productService.findAllProduct();
+    public SuccessResponse getAllProduct() {
+        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, productService.getAll());
     }
 
     @GetMapping(RequestMaps.PRODUCT_PATHNAME_PUBLIC + "{slug}")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse findBySlug(@PathVariable String slug) {
+    public SuccessResponse getProductBySlug(@PathVariable String slug) {
         return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, productService.getBySlug(slug));
     }
 
@@ -51,51 +51,49 @@ public class ProductController {
             @RequestParam(name = "page_size", defaultValue = "6") int pageSize
     ) {
         int currentPage = pageNumber - 1;
-        Page<ProductEntity> productPage = productService.findAllLatest(PageRequest.of(currentPage, pageSize));
+        Page<ProductEntity> productPage = productService.getAllLatest(PageRequest.of(currentPage, pageSize));
         PagePayload<ProductEntity> payload = new PagePayload<>(currentPage, productPage);
         return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, payload);
     }
 
     @PostMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "create")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse createProduct(@Valid @RequestBody ProductRequest productRequest) {
-        productService.checkConflictByName(productRequest.getName());
+    public SuccessResponse createProduct(@Valid @RequestBody ProductRequest request) {
+        productService.checkConflictByName(request.getName());
 
-        CategoryEntity category = categoryService.getById(productRequest.getCategoryId());
-        BrandEntity brand = brandService.getById(productRequest.getBrandId());
-
-        return new SuccessResponse(ResponseMessage.CREATE_SUCCESS, productService.createProduct(productRequest, category, brand));
+        CategoryEntity category = categoryService.getById(request.getCategoryId());
+        BrandEntity brand = brandService.getById(request.getBrandId());
+        return new SuccessResponse(ResponseMessage.CREATE_SUCCESS, productService.create(category, brand, request));
     }
 
-    @PutMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "add-all-image/{productId}")
+    @PutMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "{id}/add-all-image")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse addAllImage(@PathVariable Long productId, @RequestBody List<ImageEntity> images) {
-        ProductEntity product = productService.getById(productId);
+    public SuccessResponse addAllImage(@PathVariable Long id, @RequestBody List<ImageEntity> images) {
+        ProductEntity product = productService.getById(id);
         return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, productService.addImagesProduct(product, images));
     }
 
-    @PutMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "edit/{productId}")
+    @PutMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "{id}/edit")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse updateProduct(@PathVariable Long productId, @Valid @RequestBody ProductRequest productRequest) {
-        ProductEntity product = productService.getById(productId);
-        CategoryEntity category = categoryService.getById(productRequest.getCategoryId());
-        BrandEntity brand = brandService.getById(productRequest.getBrandId());
-
-        ProductEntity result = productService.updateProduct(product, category, brand, productRequest);
+    public SuccessResponse updateProduct(@PathVariable Long id, @Valid @RequestBody ProductRequest request) {
+        ProductEntity product = productService.getById(id);
+        CategoryEntity category = categoryService.getById(request.getCategoryId());
+        BrandEntity brand = brandService.getById(request.getBrandId());
+        ProductEntity result = productService.editInfo(product, category, brand, request);
         return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, result);
     }
 
-    @PatchMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "discount/{productId}")
+    @PatchMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "{id}/discount")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse updateDiscountProduct(@PathVariable Long productId, @Valid @RequestBody DiscountRequest discountRequest) {
-        ProductEntity product = productService.getById(productId);
-        return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, productService.updateDiscountProduct(product, discountRequest));
+    public SuccessResponse updateDiscountProduct(@PathVariable Long id, @Valid @RequestBody DiscountRequest request) {
+        ProductEntity product = productService.getById(id);
+        return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, productService.updateDiscount(product, request));
     }
 
     @DeleteMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "{id}/delete")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse deleteProduct(@PathVariable Long id) {
-        productService.deleteProduct(id);
+        productService.deleteById(id);
         return new SuccessResponse(ResponseMessage.DELETE_SUCCESS);
     }
 

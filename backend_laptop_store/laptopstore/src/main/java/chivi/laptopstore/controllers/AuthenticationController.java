@@ -64,10 +64,10 @@ public class AuthenticationController {
 
     @PostMapping(RequestMaps.AUTH_PATHNAME + "register-admin")
     @ResponseStatus(HttpStatus.CREATED)
-    public SuccessResponse registerAdmin(@RequestParam("app_url") String appURL, @Valid @RequestBody RegisterRequest registerRequest) {
-        authenticationService.checkConflictAccountByEmail(registerRequest.getEmail());
+    public SuccessResponse registerAdmin(@RequestParam("app_url") String appURL, @Valid @RequestBody RegisterRequest request) {
+        authenticationService.checkConflictAccountByEmail(request.getEmail());
 
-        AccountEntity account = authenticationService.createAccount(registerRequest, EAccountRole.ADMIN);
+        AccountEntity account = authenticationService.createAccount(request, EAccountRole.ADMIN);
         OnRegistrationEvent event = new OnRegistrationEvent(account, appURL);
 
         applicationEventPublisher.publishEvent(event);
@@ -76,10 +76,10 @@ public class AuthenticationController {
 
     @PostMapping(RequestMaps.AUTH_PATHNAME + "register-customer")
     @ResponseStatus(HttpStatus.CREATED)
-    public SuccessResponse registerCustomer(@RequestParam("app_url") String appURL, @Valid @RequestBody RegisterRequest registerRequest) {
-        authenticationService.checkConflictAccountByEmail(registerRequest.getEmail());
+    public SuccessResponse registerCustomer(@RequestParam("app_url") String appURL, @Valid @RequestBody RegisterRequest request) {
+        authenticationService.checkConflictAccountByEmail(request.getEmail());
 
-        AccountEntity account = authenticationService.createAccount(registerRequest, EAccountRole.CUSTOMER);
+        AccountEntity account = authenticationService.createAccount(request, EAccountRole.CUSTOMER);
         OnRegistrationEvent event = new OnRegistrationEvent(account, appURL);
 
         applicationEventPublisher.publishEvent(event);

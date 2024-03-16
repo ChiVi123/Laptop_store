@@ -3,14 +3,13 @@ package chivi.laptopstore.models.requests;
 import chivi.laptopstore.common.EEntityStatus;
 import chivi.laptopstore.common.ValidationMessage;
 import chivi.laptopstore.common.ValidationValues;
-import chivi.laptopstore.models.entities.CategoryEntity;
 import chivi.laptopstore.utils.CustomString;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
+import lombok.Setter;
 
-@Data
+@Setter
 public class CategoryRequest {
     private Long parentId;
 
@@ -24,12 +23,23 @@ public class CategoryRequest {
     @NotNull(message = ValidationMessage.NOT_NULL)
     private EEntityStatus status;
 
-    public CategoryEntity.CategoryEntityBuilder getBuilder() {
-        String path = this.handlePath();
-        return CategoryEntity.builder().name(this.name).path(path).status(this.status);
+    public Long getParentId() {
+        return this.parentId;
     }
 
-    public String handlePath() {
-        return this.path == null || this.path.equals("") ? CustomString.toSlug(this.name) : this.path;
+    public String getName() {
+        return this.name.trim();
+    }
+
+    public String getPath() {
+        return this.handlePath();
+    }
+
+    public EEntityStatus getStatus() {
+        return this.status;
+    }
+
+    private String handlePath() {
+        return this.path == null || this.path.equals("") ? CustomString.toSlug(this.name.trim()) : this.path.trim();
     }
 }

@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = EntityNames.TABLE_IMAGE)
-@Data
 @NoArgsConstructor
+@Data
 public class ImageEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

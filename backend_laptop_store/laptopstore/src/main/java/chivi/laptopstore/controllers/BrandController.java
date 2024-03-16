@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.*;
 public class BrandController {
     private final BrandService brandService;
 
-    @GetMapping(RequestMaps.BRAND_PATHNAME_PUBLIC + "find-all")
+    @GetMapping(RequestMaps.BRAND_PATHNAME_PUBLIC + "all")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse findAllBrand() {
-        return brandService.findAllBrand();
+    public SuccessResponse getAllBrand() {
+        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, brandService.getAll());
     }
 
     @PostMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "create")
@@ -31,20 +31,22 @@ public class BrandController {
         return new SuccessResponse(ResponseMessage.CREATE_SUCCESS, brand);
     }
 
-    @PutMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "{brandId}/edit")
+    @PutMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "{id}/edit")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse editCategory(@PathVariable Long brandId, @Valid @RequestBody BrandRequest request) {
-        BrandEntity brand = brandService.getById(brandId);
-        if (!brand.getName().equals(request.getName())) {
-            brandService.checkConflictByName(request.getName());
+    public SuccessResponse editCategory(@PathVariable Long id, @Valid @RequestBody BrandRequest request) {
+        BrandEntity brand = brandService.getById(id);
+        String oldName = brand.getName();
+        String newName = request.getName();
+        if (!oldName.equals(newName)) {
+            brandService.checkConflictByName(newName);
         }
         return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, brandService.editInfo(brand, request));
     }
 
-    @DeleteMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "{brandId}/delete")
+    @DeleteMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "{id}/delete")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse deleteBrand(@PathVariable Long brandId) {
-        brandService.deleteById(brandId);
+    public SuccessResponse deleteBrand(@PathVariable Long id) {
+        brandService.deleteById(id);
         return new SuccessResponse(ResponseMessage.DELETE_SUCCESS);
     }
 }

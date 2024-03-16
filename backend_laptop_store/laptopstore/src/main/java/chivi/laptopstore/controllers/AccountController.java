@@ -20,25 +20,25 @@ public class AccountController {
     private final AccountService accountService;
     private final JwtUtils jwtUtils;
 
-    @GetMapping(RequestMaps.ACCOUNT_PATHNAME_ADMIN + "find-all")
+    @GetMapping(RequestMaps.ACCOUNT_PATHNAME_ADMIN + "all")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse findAllAccount() {
-        return accountService.getAllAccount();
+    public SuccessResponse getAllAccount() {
+        return accountService.getAll();
     }
 
     @PutMapping(RequestMaps.ACCOUNT_PATHNAME_PRIVATE + "edit")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse editAccount(@Valid @RequestBody AccountRequest accountRequest, HttpServletRequest httpServletRequest) {
         String email = this.getEmailFromRequest(httpServletRequest);
-        AccountEntity account = accountService.editAccount(email, accountRequest);
-        return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, account);
-
+        AccountEntity account = accountService.getByEmail(email);
+        AccountEntity result = accountService.editInfo(account, accountRequest);
+        return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, result);
     }
 
-    @DeleteMapping(RequestMaps.ACCOUNT_PATHNAME_ADMIN + "delete/{accountId}")
+    @DeleteMapping(RequestMaps.ACCOUNT_PATHNAME_ADMIN + "{id}/delete")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse deleteAccount(@PathVariable Long accountId) {
-        accountService.deleteAccount(accountId);
+    public SuccessResponse deleteAccount(@PathVariable Long id) {
+        accountService.delete(id);
         return new SuccessResponse(ResponseMessage.DELETE_SUCCESS);
     }
 

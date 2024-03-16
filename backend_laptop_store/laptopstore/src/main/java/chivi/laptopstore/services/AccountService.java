@@ -13,36 +13,35 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class AccountService {
-    private final IAccountRepository accountRepository;
+    private final IAccountRepository repository;
     private final PasswordEncoder passwordEncoder;
 
-    public SuccessResponse getAllAccount() {
-        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, accountRepository.findAll());
+    public SuccessResponse getAll() {
+        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, repository.findAll());
     }
 
     public AccountEntity getByEmail(String email) {
-        return accountRepository.findByEmail(email).orElseThrow(() -> new CustomNotFoundException("account", email));
+        return repository.findByEmail(email).orElseThrow(() -> new CustomNotFoundException("account", email));
     }
 
     public void resetPassword(AccountEntity account, String newPassword) {
         String encode = passwordEncoder.encode(newPassword);
         account.setPassword(encode);
-        accountRepository.save(account);
+        repository.save(account);
     }
 
-    public AccountEntity editAccount(String email, AccountRequest accountRequest) {
-        AccountEntity account = this.getByEmail(email);
-        account.setUsername(accountRequest.getUsername());
-        account.setFullName(accountRequest.getFullName());
-        return accountRepository.save(account);
+    public AccountEntity editInfo(AccountEntity account, AccountRequest request) {
+        account.setUsername(request.getUsername());
+        account.setFullName(request.getFullName());
+        return repository.save(account);
     }
 
-    public void deleteAccount(Long accountId) {
+    public void delete(Long accountId) {
         AccountEntity account = this.getById(accountId);
-        accountRepository.delete(account);
+        repository.delete(account);
     }
 
     private AccountEntity getById(Long id) {
-        return accountRepository.findById(id).orElseThrow(() -> new CustomNotFoundException("account", id));
+        return repository.findById(id).orElseThrow(() -> new CustomNotFoundException("account", id));
     }
 }

@@ -1,47 +1,50 @@
 package chivi.laptopstore.services;
 
-import chivi.laptopstore.common.ResponseMessage;
 import chivi.laptopstore.models.entities.BrandEntity;
 import chivi.laptopstore.models.exceptions.ConflictException;
 import chivi.laptopstore.models.exceptions.CustomNotFoundException;
 import chivi.laptopstore.models.requests.BrandRequest;
-import chivi.laptopstore.models.responses.SuccessResponse;
 import chivi.laptopstore.repositories.entities.IBrandRepository;
-import chivi.laptopstore.utils.CustomString;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @AllArgsConstructor
 public class BrandService {
-    private final IBrandRepository brandRepository;
+    private final IBrandRepository repository;
 
-    public SuccessResponse findAllBrand() {
-        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, brandRepository.findAll());
+    public List<BrandEntity> getAll() {
+        return repository.findAll();
     }
 
     public BrandEntity getById(Long id) {
-        return brandRepository.findById(id).orElseThrow(() -> new CustomNotFoundException("brand", id));
+        return repository.findById(id).orElseThrow(() -> new CustomNotFoundException("brand", id));
     }
 
     public void checkConflictByName(String name) {
-        if (brandRepository.existsByName(name)) {
+        if (repository.existsByName(name)) {
             throw new ConflictException("Brand", name);
         }
     }
 
     public BrandEntity create(BrandRequest request) {
-        return brandRepository.save(request.getEntity());
+        BrandEntity brand = new BrandEntity();
+        brand.setName(request.getName());
+        brand.setSlug(request.getSlug());
+        brand.setLogo(request.getLogo());
+        return repository.save(brand);
     }
 
     public BrandEntity editInfo(BrandEntity brand, BrandRequest request) {
         brand.setName(request.getName());
-        brand.setSlug(CustomString.toSlug(request.getName()));
-        return brandRepository.save(brand);
+        brand.setSlug(request.getSlug());
+        return repository.save(brand);
     }
 
     public void deleteById(Long brandId) {
         BrandEntity brand = this.getById(brandId);
-        brandRepository.delete(brand);
+        repository.delete(brand);
     }
 }

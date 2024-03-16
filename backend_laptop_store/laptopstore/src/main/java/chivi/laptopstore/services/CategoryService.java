@@ -32,21 +32,34 @@ public class CategoryService {
     }
 
     public CategoryEntity createRoot(CategoryRequest request) {
-        String rootDirector = "";
         int rootLevel = 0;
-        return repository.save(request.getBuilder().level(rootLevel).director(rootDirector).build());
+        String rootDirector = "";
+        CategoryEntity category = new CategoryEntity();
+        category.setName(request.getName());
+        category.setPath(request.getPath());
+        category.setLevel(rootLevel);
+        category.setDirector(rootDirector);
+        category.setStatus(request.getStatus());
+        return repository.save(category);
     }
 
     public CategoryEntity createSub(CategoryEntity parent, CategoryRequest request) {
-        String director = parent.getNewDirector();
         int level = parent.getChildLevel();
-        parent.addChild(request.getBuilder().level(level).director(director).build());
+        String director = parent.getNewDirector();
+        CategoryEntity category = new CategoryEntity();
+        category.setName(request.getName());
+        category.setPath(request.getPath());
+        category.setLevel(level);
+        category.setDirector(director);
+        category.setStatus(request.getStatus());
+
+        parent.addChild(category);
         return repository.save(parent);
     }
 
     public CategoryEntity editInfo(CategoryEntity category, CategoryRequest request) {
         category.setName(request.getName());
-        category.setPath(request.handlePath());
+        category.setPath(request.getPath());
         return repository.save(category);
     }
 

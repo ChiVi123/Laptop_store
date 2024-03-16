@@ -6,40 +6,31 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@EntityListeners(AuditingEntityListener.class)
 @Table(name = EntityNames.TABLE_CATEGORY)
 @NoArgsConstructor
-@Data
-public class CategoryEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = EntityNames.COLUMN_CATEGORY_ID)
-    private Long id;
-
+@Getter
+@Setter
+public class CategoryEntity extends EntityStandard {
     private int level;
 
     @Column(name = EntityNames.COLUMN_CATEGORY_NAME, unique = true, nullable = false)
     private String name;
 
-    @Column(name = EntityNames.COLUMN_CATEGORY_URL, unique = true, nullable = false)
+    @Column(name = EntityNames.COLUMN_CATEGORY_PATH, unique = true, nullable = false)
     private String path;
 
     private String director;
 
     @ManyToOne
-    @JoinColumn(name = "parent_id", referencedColumnName = EntityNames.COLUMN_CATEGORY_ID)
+    @JoinColumn(name = EntityNames.JOIN_COLUMN_PARENT_ID, referencedColumnName = "id")
     @JsonBackReference
     private CategoryEntity parent;
 
@@ -48,23 +39,6 @@ public class CategoryEntity {
     private List<CategoryEntity> children = new ArrayList<>();
 
     private EEntityStatus status;
-
-    @CreatedDate
-    @Column(name = EntityNames.CREATED_AT)
-    private LocalDateTime createdDate;
-
-    @LastModifiedDate
-    @Column(name = EntityNames.UPDATED_AT)
-    private LocalDateTime lastModifiedDate;
-
-    @Builder
-    public CategoryEntity(int level, String name, String path, String director, EEntityStatus status) {
-        this.level = level;
-        this.name = name;
-        this.path = path;
-        this.director = director;
-        this.status = status;
-    }
 
     public void addChild(CategoryEntity child) {
         this.children.add(child);

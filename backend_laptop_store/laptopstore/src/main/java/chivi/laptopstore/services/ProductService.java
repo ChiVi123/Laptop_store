@@ -1,6 +1,5 @@
 package chivi.laptopstore.services;
 
-import chivi.laptopstore.common.ResponseMessage;
 import chivi.laptopstore.models.entities.BrandEntity;
 import chivi.laptopstore.models.entities.CategoryEntity;
 import chivi.laptopstore.models.entities.ImageEntity;
@@ -10,7 +9,6 @@ import chivi.laptopstore.models.exceptions.CustomBadRequestException;
 import chivi.laptopstore.models.exceptions.CustomNotFoundException;
 import chivi.laptopstore.models.requests.DiscountRequest;
 import chivi.laptopstore.models.requests.ProductRequest;
-import chivi.laptopstore.models.responses.SuccessResponse;
 import chivi.laptopstore.repositories.entities.IProductRepository;
 import chivi.laptopstore.utils.CustomString;
 import chivi.laptopstore.utils.PriceHandler;
@@ -28,68 +26,66 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class ProductService {
-    private final IProductRepository productRepository;
+    private final IProductRepository repository;
 
-    public SuccessResponse findAllProduct() {
-        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, productRepository.findAll());
+    public List<ProductEntity> getAll() {
+        return repository.findAll();
     }
 
-    public Page<ProductEntity> findAllLatest(Pageable pageable) {
-        return productRepository.findAllByOrderByCreatedDateDesc(pageable);
+    public Page<ProductEntity> getAllLatest(Pageable pageable) {
+        return repository.findAllByOrderByCreatedDateDesc(pageable);
     }
 
     public ProductEntity getBySlug(String slug) {
-        return productRepository.findBySlug(slug).orElseThrow(() -> new CustomNotFoundException("product", slug));
+        return repository.findBySlug(slug).orElseThrow(() -> new CustomNotFoundException("product", slug));
     }
 
     public ProductEntity getById(Long id) {
-        return productRepository.findById(id).orElseThrow(() -> new CustomNotFoundException("product", id));
+        return repository.findById(id).orElseThrow(() -> new CustomNotFoundException("product", id));
     }
 
     public void checkConflictByName(String name) {
-        if (productRepository.existsByName(name)) {
+        if (repository.existsByName(name)) {
             throw new ConflictException("Product", name);
         }
     }
 
-    public ProductEntity createProduct(ProductRequest productRequest, CategoryEntity category, BrandEntity brand) {
-        String slug = CustomString.toSlug(productRequest.getName().trim());
+    public ProductEntity create(CategoryEntity category, BrandEntity brand, ProductRequest request) {
         ProductEntity product = new ProductEntity();
-        product.setName(productRequest.getName().trim());
-        product.setSlug(slug);
+        product.setName(request.getName());
+        product.setSlug(request.getSlug());
         product.setCategory(category);
         product.setBrand(brand);
-        product.setDescription(productRequest.getDescription().trim());
-        product.setPrice(productRequest.getPrice());
-        product.setQuantityStock(productRequest.getQuantityStock());
-        product.setStatus(productRequest.getStatus());
-        product.addAllImage(productRequest.getImages());
-
-        return productRepository.save(product);
+        product.setDescription(request.getDescription());
+        product.setPrice(request.getPrice());
+        product.setQuantityStock(request.getQuantityStock());
+        product.setImages(request.getImages());
+        product.setStatus(request.getStatus());
+        return repository.save(product);
     }
 
-    public ProductEntity updateProduct(ProductEntity product, CategoryEntity category, BrandEntity brand, ProductRequest productRequest) {
-        if (!product.getName().equals(productRequest.getName())) {
-            this.checkConflictByName(productRequest.getName());
-            String slug = CustomString.toSlug(productRequest.getName());
-            product.setName(productRequest.getName());
+    public ProductEntity editInfo(ProductEntity product, CategoryEntity category, BrandEntity brand, ProductRequest request) {
+        if (!product.getName().equals(request.getName())) {
+            this.checkConflictByName(request.getName());
+            String slug = CustomString.toSlug(request.getName());
+            product.setName(request.getName());
             product.setSlug(slug);
         }
 
-        product.setPrice(productRequest.getPrice());
-        product.setDescription(productRequest.getDescription());
+        product.setPrice(request.getPrice());
+        product.setDescription(request.getDescription());
         product.setCategory(category);
         product.setBrand(brand);
 
-        return productRepository.save(product);
+        return repository.save(product);
     }
 
     public ProductEntity addImagesProduct(ProductEntity product, List<ImageEntity> images) {
         product.addAllImage(images);
-        return productRepository.save(product);
+        return repository.save(product);
     }
 
-    public ProductEntity updateDiscountProduct(ProductEntity product, DiscountRequest discountRequest) {
+    public ProductEntity updateDiscount(ProductEntity product, DiscountRequest discountRequest) {
         BigDecimal price = product.getPrice();
         BigDecimal discount = discountRequest.getDiscount();
         MathContext mathContext = new MathContext(4);
@@ -103,11 +99,11 @@ public class ProductService {
         product.setPrice(price);
         product.setDiscount(discount);
         product.setDiscountRate(rate.round(mathContext).floatValue());
-        return productRepository.save(product);
+        return repository.save(product);
     }
 
-    public void deleteProduct(Long productId) {
-        ProductEntity product = this.getById(productId);
-        productRepository.delete(product);
+    public void deleteById(Long id) {
+        ProductEntity product = this.getById(id);
+        repository.delete(product);
     }
 }

@@ -4,27 +4,19 @@ import chivi.laptopstore.common.EAccountRole;
 import chivi.laptopstore.common.EAccountStatus;
 import chivi.laptopstore.common.EntityNames;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Data;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
+import lombok.Setter;
 
 @Entity
-@EntityListeners(AuditingEntityListener.class)
 @Table(name = EntityNames.TABLE_ACCOUNT)
 @NoArgsConstructor
-@Data
-public class AccountEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = EntityNames.COLUMN_ACCOUNT_ID)
-    private Long id;
-
+@Getter
+@Setter
+public class AccountEntity extends EntityStandard {
     @Column(unique = true)
     private String username;
 
@@ -51,21 +43,4 @@ public class AccountEntity {
     private EAccountRole role;
 
     private EAccountStatus status;
-
-    @CreatedDate
-    @Column(name = EntityNames.CREATED_AT)
-    private LocalDateTime createdDate;
-
-    @LastModifiedDate
-    @Column(name = EntityNames.UPDATED_AT)
-    private LocalDateTime lastModifiedDate;
-
-    @Builder
-    public AccountEntity(String fullName, String email, String password, EAccountRole role, EAccountStatus status) {
-        this.fullName = fullName;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-        this.status = status;
-    }
 }

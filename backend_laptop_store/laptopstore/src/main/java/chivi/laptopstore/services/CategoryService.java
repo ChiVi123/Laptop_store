@@ -60,6 +60,7 @@ public class CategoryService {
     public CategoryEntity editInfo(CategoryEntity category, CategoryRequest request) {
         category.setName(request.getName());
         category.setPath(request.getPath());
+        category.setStatus(request.getStatus());
         return repository.save(category);
     }
 

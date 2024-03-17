@@ -2,7 +2,7 @@ import { addProductFormData, loginFormData, registerFormData } from '~/types/for
 
 export const loginDefaultValues: loginFormData = {
     email: '',
-    password: 'CrdyIGlWL2Rr6wToErci',
+    password: '123456789',
 };
 export const registerDefaultValues: registerFormData = {
     fullName: 'Chi Vi',

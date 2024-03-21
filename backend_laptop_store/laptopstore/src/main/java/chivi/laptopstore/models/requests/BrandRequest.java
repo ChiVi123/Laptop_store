@@ -16,6 +16,7 @@ public class BrandRequest {
     @Size(max = ValidationValues.STRING_MAX_LENGTH)
     private String name;
 
+    @NotNull(message = ValidationMessage.NOT_NULL)
     private ImageEntity logo;
 
     @NotNull(message = ValidationMessage.NOT_NULL)

@@ -1,5 +1,6 @@
 'use client';
 
+import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { Box, Chip, Typography } from '@mui/material';
 import {
@@ -7,14 +8,19 @@ import {
     GridActionsCellItem,
     GridColDef,
     GridRenderCellParams,
+    GridRowId,
     GridRowSelectionModel,
 } from '@mui/x-data-grid';
 import Image from 'next/image';
-import { useMemo, useState } from 'react';
-import { EStatus } from '~/common/enums';
+import { useRouter } from 'next/navigation';
+import { Fragment, useMemo, useState } from 'react';
+import { deleteBrandActon } from '~/actions/brandActions';
+import { EPath, EStatus } from '~/common/enums';
 import { mapStatus } from '~/common/maps';
 import { IBrand, IImage } from '~/types/models';
+import { logger } from '~/utils';
 import '~/utils/extends';
+import DeleteBrandAction from './delete.brand.action';
 
 interface IProps {
     rows: IBrand[];
@@ -22,26 +28,40 @@ interface IProps {
 
 function BrandList({ rows }: IProps) {
     const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>([]);
+    const router = useRouter();
+
+    async function handleDelete(id: GridRowId) {
+        const resultDeleteBrand = await deleteBrandActon(Number(id));
+        logger({ resultDeleteBrand });
+    }
+
     const columns = useMemo<GridColDef[]>(
         () => [
             { field: 'id', headerName: 'ID', type: 'number', width: 40 },
             {
                 field: 'logo',
-                headerName: 'logo',
+                headerName: 'Logo',
                 width: 120,
                 sortable: false,
                 filterable: false,
                 renderCell: (params: GridRenderCellParams<any, IImage>) => (
-                    <Image
-                        src={params.value ? params.value.secure_url : ''}
-                        alt={params.value ? params.value.folder : ''}
-                        width={100}
-                        height={100}
-                        style={{ objectFit: 'contain' }}
-                    />
+                    <Fragment>
+                        {params.value ? (
+                            <Image
+                                src={params.value ? params.value.secureUrl : ''}
+                                alt={params.value ? params.value.publicId : ''}
+                                width={100}
+                                height={100}
+                                priority
+                                style={{ objectFit: 'contain' }}
+                            />
+                        ) : (
+                            <Box width={100} height={100}></Box>
+                        )}
+                    </Fragment>
                 ),
             },
-            { field: 'name', headerName: 'Tên thương hiệu', minWidth: 380 },
+            { field: 'name', headerName: 'Tên thương hiệu', minWidth: 280 },
             {
                 field: 'createdDate',
                 headerName: 'Ngày tạo',
@@ -66,15 +86,24 @@ function BrandList({ rows }: IProps) {
                 type: 'actions',
                 getActions: (params) => [
                     <GridActionsCellItem
-                        key={1}
+                        key={0}
                         icon={<EditIcon />}
-                        label='Edit'
-                        onClick={() => console.log(params.id)}
+                        label='Chinh sua'
+                        showInMenu
+                        onClick={() => router.push(EPath.MANAGE_BRAND_EDIT.concat(params.id.toString()))}
+                    />,
+                    <DeleteBrandAction
+                        key={1}
+                        icon={<DeleteIcon />}
+                        label='Xoa'
+                        showInMenu
+                        closeMenuOnClick={false}
+                        onDelete={() => handleDelete(params.id)}
                     />,
                 ],
             },
         ],
-        [],
+        [router],
     );
 
     return (

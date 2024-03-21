@@ -1,8 +1,8 @@
 import { InferType } from 'yup';
 import {
-    addBrandSchema,
     addCategorySchema,
     addProductSchema,
+    brandSchema,
     loginSchema,
     registerSchema,
     sendMailSchema,
@@ -13,4 +13,4 @@ export type registerFormData = InferType<typeof registerSchema>;
 export type sendMailFormData = InferType<typeof sendMailSchema>;
 export type addProductFormData = InferType<typeof addProductSchema>;
 export type addCategoryFormData = InferType<typeof addCategorySchema>;
-export type addBrandFormData = InferType<typeof addBrandSchema>;
+export type brandFormData = InferType<typeof brandSchema>;

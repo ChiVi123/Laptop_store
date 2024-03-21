@@ -16,3 +16,11 @@ export async function findCategoryById(id: number) {
         logger({ [findCategoryById.name]: error });
     }
 }
+export async function findBrandById(id: number) {
+    try {
+        const response = await request.get(`public/brands/${id}`, { cache: 'no-cache' });
+        return await response.json();
+    } catch (error) {
+        logger({ [findBrandById.name]: error });
+    }
+}

@@ -15,8 +15,8 @@ public class ImageEntity {
     @Column(name = EntityNames.COLUMN_IMAGE_ID)
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String public_id;
+    @Column(name = EntityNames.COLUMN_IMAGE_PUBLIC_ID, unique = true, nullable = false)
+    private String publicId;
 
     private int width;
 
@@ -24,8 +24,8 @@ public class ImageEntity {
 
     private int bytes;
 
-    @Column(unique = true, nullable = false)
-    private String secure_url;
+    @Column(name = EntityNames.COLUMN_IMAGE_SECURE_URL, unique = true, nullable = false)
+    private String secureUrl;
 
     @Column(nullable = false)
     private String folder;

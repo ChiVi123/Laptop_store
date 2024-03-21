@@ -32,6 +32,8 @@ public class EntityNames {
 
 
     public static final String COLUMN_IMAGE_ID = "image_id";
+    public static final String COLUMN_IMAGE_PUBLIC_ID = "public_id";
+    public static final String COLUMN_IMAGE_SECURE_URL = "secure_url";
 
     public static final String COLUMN_CREATED_AT = "created_at";
     public static final String COLUMN_UPDATED_AT = "updated_at";

@@ -2,9 +2,9 @@
 
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
-    addBrandSchema,
     addCategorySchema,
     addProductSchema,
+    brandSchema,
     loginSchema,
     registerSchema,
     sendMailSchema,
@@ -15,4 +15,4 @@ export const registerResolver = yupResolver(registerSchema);
 export const sendMailResolver = yupResolver(sendMailSchema);
 export const addProductResolver = yupResolver(addProductSchema);
 export const addCategoryResolver = yupResolver(addCategorySchema);
-export const addBrandResolver = yupResolver(addBrandSchema);
+export const brandResolver = yupResolver(brandSchema);

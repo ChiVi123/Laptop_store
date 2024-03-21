@@ -32,7 +32,7 @@ export enum EPath {
     AUTH_REGISTRATION_CONFIRM = 'auth/registration-confirm',
     MANAGE_HOME = '/manage/home',
     MANAGE_BRAND_ADD = '/manage/brand/add',
-    MANAGE_BRAND_EDIT = '/manage/brand/edit',
+    MANAGE_BRAND_EDIT = '/manage/brand/edit/',
     MANAGE_BRAND_LIST = '/manage/brand/list',
     MANAGE_CATEGORY = '/manage/category',
     MANAGE_ORDER_LIST = '/manage/order/list',

@@ -1,46 +1,101 @@
 'use client';
 
 import { Box, Button, FormControlLabel, FormHelperText, Paper, Switch, TextField } from '@mui/material';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { createBrandAction } from '~/actions/brandActions';
+import { createBrandAction, editBrandAction, removeLogoBrandAction } from '~/actions/brandActions';
 import { uploadSingleImageAction } from '~/actions/uploadActions';
-import { EKeys, EStatus } from '~/common/enums';
-import { addBrandResolver } from '~/resolvers';
-import { addBrandFormData } from '~/types/form.data';
+import { EKeys, EPath, EStatus } from '~/common/enums';
+import { brandResolver } from '~/resolvers';
+import { brandFormData } from '~/types/form.data';
+import { IBrand, IImage } from '~/types/models';
 import { logger } from '~/utils';
 import FormLabel from '../form.label';
-import SingleImageField from '../single.image.field';
+import SingleImageField, { imageType } from '../single.image.field';
 
-function BrandForm() {
+interface IProps {
+    brand?: IBrand;
+}
+function BrandForm({ brand }: IProps) {
     const {
         control,
         formState: { errors },
+        setValue,
         handleSubmit,
-    } = useForm<addBrandFormData>({ resolver: addBrandResolver, defaultValues: { name: '' } });
+    } = useForm<brandFormData>({
+        resolver: brandResolver,
+        defaultValues: { name: brand?.name || '', logo: brand?.logo },
+    });
     const [loading, setLoading] = useState<boolean>(false);
-    const [status, setStatus] = useState<boolean>(true);
+    const [status, setStatus] = useState<boolean>(brand?.status === EStatus.ENABLED);
+    const router = useRouter();
 
-    const handleOnSubmit: SubmitHandler<addBrandFormData> = async (data) => {
+    async function handleRemoveImage(value: imageType) {
+        if (brand && !(value instanceof File)) {
+            setLoading(true);
+            await removeLogoBrandAction(brand.id);
+            setLoading(false);
+        }
+        setValue('logo', undefined);
+    }
+
+    const handleOnSubmit: SubmitHandler<brandFormData> = async (data) => {
         setLoading(true);
-        data.status = status ? EStatus.ENABLED : EStatus.DISABLED;
+        logger({ data });
+
         if (data.logo && data.logo instanceof File) {
             const formData = new FormData();
+
             formData.set(EKeys.LOGO, data.logo);
-            data.logo = await uploadSingleImageAction(formData);
+            const resultLogo = await uploadSingleImageAction(EKeys.LOGO, formData);
+
+            if (resultLogo) {
+                const logo: IImage = {
+                    publicId: resultLogo.public_id,
+                    width: resultLogo.width,
+                    height: resultLogo.height,
+                    bytes: resultLogo.bytes,
+                    folder: resultLogo?.folder,
+                    secureUrl: resultLogo.secure_url,
+                };
+                data.logo = logo;
+            }
         }
 
-        const result = await createBrandAction(data);
-        logger({ result });
+        data.status = status ? EStatus.ENABLED : EStatus.DISABLED;
+        let result;
 
+        if (brand?.id) {
+            result = await editBrandAction(brand.id, data);
+            if (result.success) {
+                setValue('name', result.data.name);
+                setValue('logo.publicId', result.data.logo.publicId);
+                setValue('logo.width', result.data.logo.width);
+                setValue('logo.height', result.data.logo.height);
+                setValue('logo.bytes', result.data.logo.bytes);
+                setValue('logo.folder', result.data.logo.folder);
+                setValue('logo.secureUrl', result.data.logo.secureUrl);
+                setValue('status', result.data.status);
+            }
+        } else {
+            result = await createBrandAction(data);
+            if (result.success) {
+                router.push(EPath.MANAGE_BRAND_EDIT.concat(result.data.id.toString()));
+            }
+        }
+
+        logger({ result });
         setLoading(false);
     };
+
+    logger({ logo: brand?.logo });
 
     return (
         <Paper
             component='form'
             elevation={0}
-            sx={{ p: 3, mt: 3, mx: 10, '& > div:not(:last-of-type)': { mb: 3 } }}
+            sx={{ width: 460, p: 3, mt: 3, mx: 'auto', '& > div:not(:last-of-type)': { mb: 3 } }}
             onSubmit={handleSubmit(handleOnSubmit)}
         >
             <div>
@@ -69,10 +124,19 @@ function BrandForm() {
             </div>
 
             <div>
+                <FormLabel id='input-logo' required>
+                    Logo
+                </FormLabel>
                 <Controller
                     control={control}
                     name='logo'
-                    render={({ field: { onChange } }) => <SingleImageField onChange={onChange} />}
+                    render={({ field: { value, onChange } }) => (
+                        <SingleImageField
+                            value={!(value instanceof FormData) ? value : undefined}
+                            onRemoveImage={handleRemoveImage}
+                            onChange={onChange}
+                        />
+                    )}
                 />
                 <FormHelperText error={Boolean(errors.logo?.message)}>{errors.logo?.message}</FormHelperText>
             </div>
@@ -90,7 +154,7 @@ function BrandForm() {
                 />
             </div>
 
-            <Box display='flex' justifyContent='flex-end'>
+            <Box display='flex'>
                 <Button type='submit' variant='contained' disabled={loading}>
                     Lưu
                 </Button>

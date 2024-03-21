@@ -21,11 +21,11 @@ export interface IAccount extends IEntity, IEntityDateTime {
     role: EAccountRole;
 }
 export interface IImage {
-    public_id: string;
+    publicId: string;
     width: number;
     height: number;
     bytes: number;
-    secure_url: string;
+    secureUrl: string;
     folder: string;
 }
 export interface ICategory extends IEntity, IEntityStatus, IEntityDateTime {

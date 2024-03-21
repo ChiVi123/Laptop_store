@@ -95,6 +95,12 @@
             <artifactId>freemarker</artifactId>
             <version>2.3.32</version>
         </dependency>
+        <!-- https://github.com/cloudinary/cloudinary_java?tab=readme-ov-file#installation -->
+        <dependency>
+            <groupId>com.cloudinary</groupId>
+            <artifactId>cloudinary-http45</artifactId>
+            <version>1.38.0</version>
+        </dependency>
 
     </dependencies>
 

@@ -17,7 +17,7 @@ public class BrandEntity extends EntityStandard {
     @Column(name = EntityNames.COLUMN_BRAND_SLUG, unique = true, nullable = false)
     private String slug;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private ImageEntity logo;
 
     private EEntityStatus status;

@@ -23,6 +23,12 @@ public class BrandController {
         return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, brandService.getAll());
     }
 
+    @GetMapping(RequestMaps.BRAND_PATHNAME_PUBLIC + "{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public SuccessResponse getBrandById(@PathVariable Long id) {
+        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, brandService.getById(id));
+    }
+
     @PostMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "create")
     @ResponseStatus(HttpStatus.CREATED)
     public SuccessResponse createBrand(@Valid @RequestBody BrandRequest request) {
@@ -33,7 +39,7 @@ public class BrandController {
 
     @PutMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "{id}/edit")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse editCategory(@PathVariable Long id, @Valid @RequestBody BrandRequest request) {
+    public SuccessResponse editBrand(@PathVariable Long id, @Valid @RequestBody BrandRequest request) {
         BrandEntity brand = brandService.getById(id);
         String oldName = brand.getName();
         String newName = request.getName();
@@ -43,10 +49,17 @@ public class BrandController {
         return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, brandService.editInfo(brand, request));
     }
 
+    @PutMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "{id}/remove-logo")
+    public SuccessResponse removeBrandLogo(@PathVariable Long id) {
+        BrandEntity brand = brandService.getById(id);
+        return new SuccessResponse(ResponseMessage.DELETE_SUCCESS, brandService.removeLogo(brand));
+    }
+
     @DeleteMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "{id}/delete")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse deleteBrand(@PathVariable Long id) {
-        brandService.deleteById(id);
+        BrandEntity brand = brandService.getById(id);
+        brandService.delete(brand);
         return new SuccessResponse(ResponseMessage.DELETE_SUCCESS);
     }
 }

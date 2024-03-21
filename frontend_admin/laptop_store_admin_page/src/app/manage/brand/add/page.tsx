@@ -20,10 +20,6 @@ function AddBrandPage() {
                         Tạo thương hiệu
                     </Typography>
                 </Breadcrumbs>
-
-                <Typography variant='h2' mt={2}>
-                    Tạo thương hiệu
-                </Typography>
             </Box>
 
             <BrandForm />

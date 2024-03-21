@@ -2,6 +2,7 @@
 
 import cloudinary from 'cloudinary';
 import { EKeys } from '~/common/enums';
+import { logger } from '~/utils';
 
 cloudinary.v2.config({
     cloud_name: process.env.REACT_CLOUDINARY_NAME,
@@ -14,10 +15,10 @@ const options: cloudinary.UploadApiOptions = {
     resource_type: 'image',
 };
 
-export async function uploadSingleImageAction(formData: FormData) {
-    const file = formData.get(EKeys.LOGO);
+export async function uploadSingleImageAction(key: string, formData: FormData) {
+    const file = formData.get(key);
     if (file instanceof File) {
-        return await handleUploadImage(file);
+        return await fetchUploadImage(file);
     }
 }
 export async function uploadMultiImageAction(formData: FormData) {
@@ -28,22 +29,27 @@ export async function uploadMultiImageAction(formData: FormData) {
     for (let index = 0; index < filesLength; index++) {
         const file = files[index];
         if (file instanceof File) {
-            const response = await handleUploadImage(file);
+            const response = await fetchUploadImage(file);
             imageResponses.push(response);
         }
     }
 
     return imageResponses;
 }
+export async function deleteImageAction(publicId: string) {
+    return await cloudinary.v2.uploader.destroy(publicId, { resource_type: 'image' });
+}
 
-export async function handleUploadImage(file: File) {
+async function fetchUploadImage(file: File) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     return (await new Promise((resolve) => {
         cloudinary.v2.uploader
-            .upload_stream(options, (_, uploadResult) => {
-                if (uploadResult) {
-                    return resolve(uploadResult);
+            .upload_stream(options, (uploadError, uploadSuccess) => {
+                if (uploadSuccess) {
+                    return resolve(uploadSuccess);
+                } else {
+                    logger({ [fetchUploadImage.name]: uploadError });
                 }
             })
             .end(buffer);

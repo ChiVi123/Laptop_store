@@ -2,18 +2,19 @@
 
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Box, Button, FormControlLabel, Paper, Switch, TextField } from '@mui/material';
+import { Box, Button, FormControlLabel, Switch, TextField } from '@mui/material';
 import { TreeView } from '@mui/x-tree-view';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { DragEvent, Fragment, SyntheticEvent, useCallback, useMemo, useRef, useState } from 'react';
+import { DragEvent, SyntheticEvent, useCallback, useMemo, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { createSubCategoryAction, deleteCategoryAction, moveCategoryAction } from '~/actions/categoryActions';
-import { EPath, EStatus } from '~/common/enums';
-import { addCategoryResolver } from '~/resolvers';
-import { addCategoryFormData } from '~/types/form.data';
+import { createCategoryAction, moveCategoryAction, updateCategoryAction } from '~/actions/categoryActions';
+import { ELabel, EPath, EStatus, EText } from '~/common/enums';
+import { categoryResolver } from '~/resolvers';
+import { categoryFormData } from '~/types/form.data';
 import { ICategory } from '~/types/models';
 import { logger } from '~/utils';
+import FormLabel from '../form.label';
 import CustomTreeItem from './custom.tree.item';
 
 declare global {
@@ -56,15 +57,15 @@ function CategoryTreeView({ categoryTree, category, categoryParent }: IProps) {
     const {
         control,
         formState: { errors },
+        setValue,
         handleSubmit,
     } = useForm({
-        resolver: addCategoryResolver,
+        resolver: categoryResolver,
         defaultValues: { name: category?.name || '', path: category?.path || '' },
     });
     const [dragAndDrop, setDragAndDrop] = useState(initDragAndDrop);
-    const [status, setStatus] = useState<boolean>(true);
+    const [status, setStatus] = useState<boolean>(() => Boolean(category?.status === EStatus.ENABLED));
     const [disabled, setDisabled] = useState<boolean>(false);
-    const inputNameRef = useRef<HTMLInputElement>();
     const router = useRouter();
     const defaultExpanded = useMemo(() => {
         const expanded = category?.director.split(',') || categoryParent?.director.split(',') || [];
@@ -76,9 +77,10 @@ function CategoryTreeView({ categoryTree, category, categoryParent }: IProps) {
         }
         return expanded;
     }, [category, categoryParent]);
+    const pathDefault = '0';
 
     function handleSetSelected(_: SyntheticEvent, nodeId: string) {
-        router.push(EPath.MANAGE_CATEGORY.concat('/edit/', nodeId));
+        router.push(EPath.MANAGE_CATEGORY_EDIT.concat(nodeId));
     }
     function handleDragStart(event: DragEvent<HTMLElement>) {
         event.stopPropagation();
@@ -101,25 +103,33 @@ function CategoryTreeView({ categoryTree, category, categoryParent }: IProps) {
         }
         setDragAndDrop(initDragAndDrop());
     }
-    async function handleDeleteItem(id: number) {
-        const result = await deleteCategoryAction(id);
-        logger({ result });
-    }
 
-    const handleOnSubmit: SubmitHandler<addCategoryFormData> = async (data) => {
+    const handleOnSubmit: SubmitHandler<categoryFormData> = async (data) => {
         setDisabled(true);
         data.parentId = categoryParent?.id;
         data.status = status ? EStatus.ENABLED : EStatus.DISABLED;
-        const result = await createSubCategoryAction(data);
+
+        if (category) {
+            const result = await updateCategoryAction(category.id, data);
+            if (result.success) {
+                setValue('name', result.data.name);
+                setValue('path', result.data.path);
+                setStatus(Boolean(result.data.status === EStatus.ENABLED));
+            }
+        } else {
+            const result = await createCategoryAction(data);
+            if (result.success) {
+                router.push(EPath.MANAGE_CATEGORY_EDIT.concat(result.data.id.toString()));
+            }
+        }
         setDisabled(false);
-        logger({ result });
     };
 
-    function renderTreeItem(node: ICategory, parentId?: number) {
+    function renderTreeItem(node: ICategory) {
         return (
             <CustomTreeItem
                 key={node.id}
-                id={`parent-${parentId}-${node.id}`}
+                id={`parent-${node.id}`}
                 nodeId={node.id.toString()}
                 label={node.name.concat(` (ID: ${node.id})`)}
                 data-id={node.id}
@@ -133,36 +143,30 @@ function CategoryTreeView({ categoryTree, category, categoryParent }: IProps) {
                     '& > .MuiTreeItem-content::before': dragAndDrop.dropTo === node.id ? styleBefore : {},
                 }}
             >
-                {node.children.map((child) => renderTreeItem(child, node.id))}
+                {node.children.map((child) => renderTreeItem(child))}
             </CustomTreeItem>
         );
     }
 
     return (
-        <Fragment>
-            {category && (
-                <Paper elevation={0} sx={{ display: 'flex', justifyContent: 'space-between', p: 1 }}>
+        <Box display='flex' gap={2} mt={2}>
+            <Box flex='1'>
+                <Box display='flex' alignItems='flex-start' gap={1} mb={2}>
                     <Button
                         variant='outlined'
-                        size='small'
                         LinkComponent={Link}
-                        href={EPath.MANAGE_CATEGORY.concat(`/add/${category.id}`)}
+                        href={EPath.MANAGE_CATEGORY_ADD.concat(pathDefault)}
                     >
-                        Them moi
+                        {EText.ADD_ROOT_CATEGORY}
                     </Button>
                     <Button
-                        variant='contained'
-                        size='small'
-                        color='warning'
-                        disabled={disabled}
-                        onClick={() => handleDeleteItem(category.id)}
+                        variant='outlined'
+                        LinkComponent={Link}
+                        href={EPath.MANAGE_CATEGORY_ADD.concat((category ? category.id : pathDefault).toString())}
                     >
-                        Xoa
+                        {EText.ADD_SUBCATEGORY}
                     </Button>
-                </Paper>
-            )}
-
-            <Box display='flex' gap={4} mt={2}>
+                </Box>
                 <TreeView
                     aria-label='category tree'
                     defaultSelected={category?.id.toString() || categoryParent?.id.toString()}
@@ -174,19 +178,27 @@ function CategoryTreeView({ categoryTree, category, categoryParent }: IProps) {
                 >
                     {categoryTree.map((item) => renderTreeItem(item))}
                 </TreeView>
+            </Box>
 
-                <Box
-                    width='40%'
-                    component='form'
-                    onSubmit={handleSubmit(handleOnSubmit)}
-                    sx={{ '& .MuiFormControl-root': { mb: 2 } }}
-                >
+            <Box
+                width='60%'
+                component='form'
+                onSubmit={handleSubmit(handleOnSubmit)}
+                sx={{ '& .MuiFormControl-root': { mb: 2 } }}
+            >
+                <Box display='flex' justifyContent='space-between' gap={3}>
+                    <FormLabel
+                        id='input-name'
+                        required
+                        sx={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'flex-end', minWidth: 148 }}
+                    >
+                        {ELabel.CATEGORY_NAME}
+                    </FormLabel>
                     <Controller
                         control={control}
                         name='name'
                         render={({ field: { value, onChange } }) => (
                             <TextField
-                                inputRef={inputNameRef}
                                 id='input-name'
                                 type='text'
                                 label=''
@@ -201,12 +213,19 @@ function CategoryTreeView({ categoryTree, category, categoryParent }: IProps) {
                             />
                         )}
                     />
+                </Box>
+                <Box display='flex' justifyContent='space-between' gap={3}>
+                    <FormLabel
+                        id='input-name'
+                        sx={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'flex-end', minWidth: 148 }}
+                    >
+                        URL
+                    </FormLabel>
                     <Controller
                         control={control}
                         name='path'
                         render={({ field: { value, onChange } }) => (
                             <TextField
-                                inputRef={inputNameRef}
                                 id='input-path'
                                 type='text'
                                 label=''
@@ -221,25 +240,26 @@ function CategoryTreeView({ categoryTree, category, categoryParent }: IProps) {
                             />
                         )}
                     />
-                    <FormControlLabel
-                        label='Bật'
-                        control={
-                            <Switch
-                                inputProps={{ 'aria-label': 'category-status' }}
-                                checked={status}
-                                onChange={(event) => setStatus(event.target.checked)}
-                            />
-                        }
-                    />
+                </Box>
+                <FormControlLabel
+                    label={ELabel.TURN_ON}
+                    control={
+                        <Switch
+                            inputProps={{ 'aria-label': 'category-status' }}
+                            checked={status}
+                            onChange={(event) => setStatus(event.target.checked)}
+                        />
+                    }
+                    sx={{ marginLeft: 18.5 }}
+                />
 
-                    <Box mt={2}>
-                        <Button type='submit' variant='contained' disabled={disabled}>
-                            Luu
-                        </Button>
-                    </Box>
+                <Box mt={2} ml={18.5}>
+                    <Button type='submit' variant='contained' disabled={disabled}>
+                        {EText.SAVE}
+                    </Button>
                 </Box>
             </Box>
-        </Fragment>
+        </Box>
     );
 }
 

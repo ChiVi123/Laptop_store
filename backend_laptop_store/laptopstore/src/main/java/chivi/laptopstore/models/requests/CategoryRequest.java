@@ -32,14 +32,10 @@ public class CategoryRequest {
     }
 
     public String getPath() {
-        return this.handlePath();
+        return this.path == null || this.path.equals("") ? CustomString.toSlug(this.name.trim()) : this.path.trim();
     }
 
     public EEntityStatus getStatus() {
         return this.status;
-    }
-
-    private String handlePath() {
-        return this.path == null || this.path.equals("") ? CustomString.toSlug(this.name.trim()) : this.path.trim();
     }
 }

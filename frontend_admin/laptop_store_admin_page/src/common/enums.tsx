@@ -35,7 +35,30 @@ export enum EPath {
     MANAGE_BRAND_EDIT = '/manage/brand/edit/',
     MANAGE_BRAND_LIST = '/manage/brand/list',
     MANAGE_CATEGORY = '/manage/category',
+    MANAGE_CATEGORY_ADD = '/manage/category/add/',
+    MANAGE_CATEGORY_EDIT = '/manage/category/edit/',
     MANAGE_ORDER_LIST = '/manage/order/list',
     MANAGE_PRODUCT_ADD = '/manage/product/add',
     MANAGE_PRODUCT_LIST = '/manage/product/list',
+}
+export enum ELabel {
+    AVATAR = 'Ảnh đại diện',
+    CATEGORY_NAME = 'Tên danh mục',
+    EMAIL = 'Email',
+    FULL_NAME = 'Họ và tên',
+    PASSWORD = 'Mật khẩu',
+    PHONE = 'Số điện thoại',
+    TURN_ON = 'Bật',
+    USERNAME = 'Tên tài khoản',
+}
+export enum EText {
+    ADD_ROOT_CATEGORY = 'Thêm danh mục gốc',
+    ADD_SUBCATEGORY = 'Thêm danh mục con',
+    CANCEL = 'Hủy',
+    DELETE = 'Xóa',
+    EDIT = 'Chỉnh sửa',
+    SAVE = 'Lưu',
+    SAVE_AND_DISABLE = 'Lưu và bán ngay',
+    SAVE_AND_DRAFT = 'Lưu nháp',
+    SAVE_AND_ENABLE = 'Lưu và ẩn đi',
 }

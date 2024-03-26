@@ -5,7 +5,7 @@ interface IMapStatusContent {
     color: 'default' | 'primary';
 }
 export const mapStatus: Record<EStatus, IMapStatusContent> = {
-    [EStatus.DISABLED]: { content: 'Nháp', color: 'default' },
+    [EStatus.DISABLED]: { content: 'Ẩn', color: 'default' },
     [EStatus.DRAFT]: { content: 'Nháp', color: 'default' },
-    [EStatus.ENABLED]: { content: 'Nháp', color: 'primary' },
+    [EStatus.ENABLED]: { content: 'Bật', color: 'primary' },
 };

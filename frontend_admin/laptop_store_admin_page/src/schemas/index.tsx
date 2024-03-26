@@ -21,14 +21,14 @@ export const registerSchema = yup.object({
         .oneOf([yup.ref('password')], EInvalid.PASSWORD_CONFIRM_MATCH),
 });
 export const sendMailSchema = yup.object({ email });
-export const addProductSchema = yup.object({
+export const productSchema = yup.object({
     name: yupString().required(),
     categoryId: yup.number().integer().positive().required(),
     brandId: yup.number().integer().positive().required(),
     description: yupString().required(),
     price: yup.number().positive().required(),
     quantityStock: yup.number().min(0).required(),
-    images: yup.array().min(1),
+    images: yup.array().of(yup.mixed<File | IImage>()).min(1),
     status: yupString(),
 });
 export const categorySchema = yup.object({

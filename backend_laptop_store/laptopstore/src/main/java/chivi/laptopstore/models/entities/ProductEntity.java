@@ -57,8 +57,8 @@ public class ProductEntity extends EntityStandard {
 
     private EEntityStatus status;
 
-    public void addAllImage(List<ImageEntity> images) {
-        this.images.addAll(images);
+    public void addImage(ImageEntity images) {
+        this.images.add(images);
     }
 
     public void removeImage(ImageEntity image) {

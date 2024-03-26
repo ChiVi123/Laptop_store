@@ -4,7 +4,6 @@ import chivi.laptopstore.common.RequestMaps;
 import chivi.laptopstore.common.ResponseMessage;
 import chivi.laptopstore.models.entities.BrandEntity;
 import chivi.laptopstore.models.entities.CategoryEntity;
-import chivi.laptopstore.models.entities.ImageEntity;
 import chivi.laptopstore.models.entities.ProductEntity;
 import chivi.laptopstore.models.payloads.PagePayload;
 import chivi.laptopstore.models.requests.DiscountRequest;
@@ -20,8 +19,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -66,13 +63,6 @@ public class ProductController {
         return new SuccessResponse(ResponseMessage.CREATE_SUCCESS, productService.create(category, brand, request));
     }
 
-    @PutMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "{id}/add-all-image")
-    @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse addAllImage(@PathVariable Long id, @RequestBody List<ImageEntity> images) {
-        ProductEntity product = productService.getById(id);
-        return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, productService.addImagesProduct(product, images));
-    }
-
     @PutMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "{id}/edit")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse updateProduct(@PathVariable Long id, @Valid @RequestBody ProductRequest request) {
@@ -90,10 +80,18 @@ public class ProductController {
         return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, productService.updateDiscount(product, request));
     }
 
+    @DeleteMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "{productId}/remove-image/{imageId}")
+    @ResponseStatus(HttpStatus.OK)
+    public SuccessResponse removeImageProduct(@PathVariable Long productId, @PathVariable Long imageId) {
+        ProductEntity product = productService.getById(productId);
+        return new SuccessResponse(ResponseMessage.DELETE_SUCCESS, productService.removeImage(product, imageId));
+    }
+
     @DeleteMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "{id}/delete")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse deleteProduct(@PathVariable Long id) {
-        productService.deleteById(id);
+        ProductEntity product = productService.getById(id);
+        productService.delete(product);
         return new SuccessResponse(ResponseMessage.DELETE_SUCCESS);
     }
 

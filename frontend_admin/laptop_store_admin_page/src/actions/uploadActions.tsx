@@ -36,9 +36,6 @@ export async function uploadMultiImageAction(formData: FormData) {
 
     return imageResponses;
 }
-export async function deleteImageAction(publicId: string) {
-    return await cloudinary.v2.uploader.destroy(publicId, { resource_type: 'image' });
-}
 
 async function fetchUploadImage(file: File) {
     const bytes = await file.arrayBuffer();

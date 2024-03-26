@@ -19,7 +19,7 @@ export async function generateMetadata({ params: { parentId } }: IProps): Promis
     const result = await findCategoryById(Number(parentId));
     const category: ICategory = result.data;
 
-    return { title: `${category.name} (ID: ${category.id}) | Laptop Store` };
+    return { title: `${category?.name || ''} (ID: ${category?.id || ''}) | Laptop Store` };
 }
 
 async function AddSubCategoryPage({ params: { parentId } }: IProps) {

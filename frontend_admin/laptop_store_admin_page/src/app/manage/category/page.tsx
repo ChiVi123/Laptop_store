@@ -14,7 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
     const result = await findAllCategoryRoot();
     const categoryRoot: ICategory = result.data[0];
 
-    return { title: `${categoryRoot.name} (ID: ${categoryRoot.id}) | Laptop Store` };
+    return { title: `${categoryRoot?.name || ''} (ID: ${categoryRoot?.id || ''}) | Laptop Store` };
 }
 
 async function CategoryPage() {

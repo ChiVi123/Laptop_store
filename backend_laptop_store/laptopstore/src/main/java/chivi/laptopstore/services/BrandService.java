@@ -10,7 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -52,21 +51,13 @@ public class BrandService {
     }
 
     public BrandEntity removeLogo(BrandEntity brand) {
-        try {
-            cloudinaryConfig.deleteImage(brand.getLogo().getPublicId());
-            brand.setLogo(null);
-        } catch (IOException ioException) {
-            log.error("Remove logo brand: {}", ioException.getMessage());
-        }
+        cloudinaryConfig.deleteImage(brand.getLogo().getPublicId());
+        brand.setLogo(null);
         return repository.save(brand);
     }
 
     public void delete(BrandEntity brand) {
-        try {
-            cloudinaryConfig.deleteImage(brand.getLogo().getPublicId());
-        } catch (IOException ioException) {
-            log.error("Remove logo brand: {}", ioException.getMessage());
-        }
+        cloudinaryConfig.deleteImage(brand.getLogo().getPublicId());
         repository.delete(brand);
     }
 }

@@ -1,4 +1,4 @@
-import { addProductFormData, loginFormData, registerFormData } from '~/types/form.data';
+import { loginFormData, productFormData, registerFormData } from '~/types/form.data';
 
 export const loginDefaultValues: loginFormData = {
     email: '',
@@ -10,9 +10,9 @@ export const registerDefaultValues: registerFormData = {
     password: '123456789',
     passwordConfirm: '123456789',
 };
-export const productDefaultValues: Omit<addProductFormData, 'categoryId' | 'brandId'> = {
-    name: 'Product 1',
-    description: '<h4>Thay vì sử dụng thiết kế phẳng</h4>',
+export const productDefaultValues: Omit<productFormData, 'categoryId' | 'brandId'> = {
+    name: '',
+    description: '',
     price: 10000,
     quantityStock: 10,
 };

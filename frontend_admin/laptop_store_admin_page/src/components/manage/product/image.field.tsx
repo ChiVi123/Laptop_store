@@ -5,6 +5,7 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { Box, IconButton, Typography, Unstable_Grid2, styled } from '@mui/material';
 import Image from 'next/image';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { IImage } from '~/types/models';
 
 const StyleVisuallyHiddenInput = styled('input')({
     position: 'absolute',
@@ -23,11 +24,13 @@ declare global {
     }
 }
 interface IProps {
-    onChange?: (value: File[]) => void;
+    value?: (File | IImage | undefined)[];
+    onRemove?: (value: IImage) => void;
+    onChange?: (value: (File | IImage | undefined)[]) => void;
 }
 
-function ImageField({ onChange }: IProps) {
-    const [fileImages, setFileImages] = useState<File[]>([]);
+function ImageField({ value, onRemove, onChange }: IProps) {
+    const [fileImages, setFileImages] = useState<(File | IImage | undefined)[]>(value || []);
     const shouldRevokeRef = useRef(true);
 
     useEffect(() => {
@@ -38,7 +41,9 @@ function ImageField({ onChange }: IProps) {
         return () => {
             if (shouldRevokeRef.current) {
                 fileImages.forEach((image) => {
-                    URL.revokeObjectURL(image.src);
+                    if (image instanceof File) {
+                        URL.revokeObjectURL(image.src);
+                    }
                 });
             }
             shouldRevokeRef.current = true;
@@ -60,11 +65,44 @@ function ImageField({ onChange }: IProps) {
     }
     function handleDeleteImage(index: number) {
         const [file] = fileImages.splice(index, 1);
-        if (file) {
+        if (file && file instanceof File) {
             URL.revokeObjectURL(file.src);
+        } else if (file && onRemove) {
+            onRemove(file);
         }
         shouldRevokeRef.current = false;
         setFileImages([...fileImages]);
+    }
+
+    function renderImageItem(image: File | IImage, index: number) {
+        const src = image instanceof File ? image.src : image.secureUrl;
+        const name = image instanceof File ? image.name : image.publicId;
+        return (
+            <Box
+                position='relative'
+                height={180}
+                borderRadius={1}
+                sx={{ borderWidth: 1, borderStyle: 'solid', borderColor: 'action.disabled' }}
+            >
+                <IconButton
+                    aria-label='delete-image'
+                    size='small'
+                    sx={{
+                        position: 'absolute',
+                        top: 2,
+                        right: 2,
+                        bgcolor: 'action.disabled',
+                        color: 'white',
+                        zIndex: 2,
+                        '&:hover': { bgcolor: 'action.active' },
+                    }}
+                    onClick={() => handleDeleteImage(index)}
+                >
+                    <ClearIcon fontSize='inherit' />
+                </IconButton>
+                <StyleImage src={src} alt={name} sizes='auto' fill priority />
+            </Box>
+        );
     }
 
     return (
@@ -97,30 +135,7 @@ function ImageField({ onChange }: IProps) {
             <Unstable_Grid2 container spacing={2}>
                 {fileImages.map((image, index) => (
                     <Unstable_Grid2 key={index} xs={3}>
-                        <Box
-                            position='relative'
-                            height={180}
-                            borderRadius={1}
-                            sx={{ borderWidth: 1, borderStyle: 'solid', borderColor: 'action.disabled' }}
-                        >
-                            <IconButton
-                                aria-label='delete-image'
-                                size='small'
-                                sx={{
-                                    position: 'absolute',
-                                    top: 2,
-                                    right: 2,
-                                    bgcolor: 'action.disabled',
-                                    color: 'white',
-                                    zIndex: 2,
-                                    '&:hover': { bgcolor: 'action.active' },
-                                }}
-                                onClick={() => handleDeleteImage(index)}
-                            >
-                                <ClearIcon fontSize='inherit' />
-                            </IconButton>
-                            <StyleImage src={image.src} alt={image.name} fill />
-                        </Box>
+                        {image && renderImageItem(image, index)}
                     </Unstable_Grid2>
                 ))}
                 {Boolean(fileImages.length) && (

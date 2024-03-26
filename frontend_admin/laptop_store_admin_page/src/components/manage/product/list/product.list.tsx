@@ -11,13 +11,15 @@ import {
     GridRowSelectionModel,
 } from '@mui/x-data-grid';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { deleteProductAction } from '~/actions/productActions';
-import { EStatus } from '~/common/enums';
+import { EPath, EStatus, EText } from '~/common/enums';
 import { mapStatus } from '~/common/maps';
 import { IImage, IProduct } from '~/types/models';
 import { logger } from '~/utils';
 import '~/utils/extends';
+import DeleteActionCell from './delete.action.cell';
 
 interface IProps {
     rows: IProduct[];
@@ -25,13 +27,14 @@ interface IProps {
 
 function ProductList({ rows }: IProps) {
     const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>([]);
+    const router = useRouter();
 
     async function handleDeleteItem(id: number) {
         const result = await deleteProductAction(id);
         logger({ result });
     }
 
-    const columns = useMemo<GridColDef[]>(
+    const columns = useMemo<GridColDef<(typeof rows)[number]>[]>(
         () => [
             { field: 'id', headerName: 'ID', type: 'number', width: 40 },
             {
@@ -42,10 +45,11 @@ function ProductList({ rows }: IProps) {
                 filterable: false,
                 renderCell: (params: GridRenderCellParams<any, IImage[]>) => (
                     <Image
-                        src={params.value ? params.value[0].secure_url : ''}
-                        alt={params.value ? params.value[0].folder : ''}
+                        src={params.value ? params.value[0].secureUrl : ''}
+                        alt={params.value ? params.value[0].publicId : ''}
                         width={100}
                         height={100}
+                        priority
                         style={{ objectFit: 'contain' }}
                     />
                 ),
@@ -79,21 +83,22 @@ function ProductList({ rows }: IProps) {
                     <GridActionsCellItem
                         key={1}
                         icon={<EditIcon />}
-                        label='Chinh sua'
+                        label={EText.EDIT}
                         showInMenu
-                        onClick={() => console.log(params.id)}
+                        onClick={() => router.push(EPath.MANAGE_PRODUCT_EDIT.concat(params.row.slug))}
                     />,
-                    <GridActionsCellItem
+                    <DeleteActionCell
                         key={2}
                         icon={<DeleteIcon />}
-                        label='Xoa'
+                        label={EText.DELETE}
                         showInMenu
-                        onClick={() => handleDeleteItem(Number(params.id))}
+                        closeMenuOnClick={false}
+                        onDelete={() => handleDeleteItem(Number(params.id))}
                     />,
                 ],
             },
         ],
-        [],
+        [router],
     );
 
     return (

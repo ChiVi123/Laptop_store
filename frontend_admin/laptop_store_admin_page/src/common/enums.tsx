@@ -39,6 +39,7 @@ export enum EPath {
     MANAGE_CATEGORY_EDIT = '/manage/category/edit/',
     MANAGE_ORDER_LIST = '/manage/order/list',
     MANAGE_PRODUCT_ADD = '/manage/product/add',
+    MANAGE_PRODUCT_EDIT = '/manage/product/edit/',
     MANAGE_PRODUCT_LIST = '/manage/product/list',
 }
 export enum ELabel {

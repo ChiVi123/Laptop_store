@@ -1,16 +1,16 @@
 'use client';
 
-import { Box, Button, FormHelperText, Paper, TextField, Typography } from '@mui/material';
+import { Box, Button, FormControlLabel, FormHelperText, Paper, Switch, TextField, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { addProductAction } from '~/actions/productActions';
+import { addProductAction, editProductAction, removeImageProductAction } from '~/actions/productActions';
 import { uploadMultiImageAction } from '~/actions/uploadActions';
-import { EKeys, EPath, EStatus } from '~/common/enums';
+import { EKeys, EPath, EStatus, EText } from '~/common/enums';
 import { productDefaultValues } from '~/common/values';
-import { addProductResolver } from '~/resolvers';
-import { addProductFormData } from '~/types/form.data';
-import { IBrand, ICategory } from '~/types/models';
+import { productResolver } from '~/resolvers';
+import { productFormData } from '~/types/form.data';
+import { IBrand, ICategory, IImage, IProduct } from '~/types/models';
 import { logger } from '~/utils';
 import FormLabel from '../../form.label';
 import CategorySelectField from '../category.select.field';
@@ -21,47 +21,77 @@ import SelectField from '../select.field';
 import { StyleBackgroundFormGroup } from '../styles';
 
 interface IProps {
+    product?: IProduct;
     categories: ICategory[];
     brands: IBrand[];
 }
 
-function ProductForm({ categories, brands }: IProps) {
+function ProductForm({ product, categories, brands }: IProps) {
+    const defaultValues = useMemo(() => {
+        if (!product) return productDefaultValues;
+
+        const { brand, category } = product;
+        return { ...product, brandId: brand.id, categoryId: category.id } as productFormData;
+    }, [product]);
     const {
         control,
         formState: { errors },
         setError,
         handleSubmit,
-    } = useForm<addProductFormData>({
-        resolver: addProductResolver,
-        defaultValues: productDefaultValues,
-    });
+    } = useForm<productFormData>({ resolver: productResolver, defaultValues });
     const [loading, setLoading] = useState<boolean>(false);
+    const [status, setStatus] = useState<boolean>(product?.status === EStatus.ENABLED);
     const router = useRouter();
 
-    const handleOnSubmit: SubmitHandler<addProductFormData> = async (data, event) => {
+    async function handleRemoveImage(value: IImage) {
+        if (product && value.id) {
+            const result = await removeImageProductAction(product.id, value.id);
+            logger({ result });
+        }
+    }
+
+    const handleOnSubmit: SubmitHandler<productFormData> = async (data, event) => {
         setLoading(true);
 
-        if (!event) {
-            return;
-        }
-
-        const status = (event.nativeEvent as SubmitEvent).submitter?.ariaLabel || EStatus.DRAFT;
-
-        logger({ data }, { status });
+        data.status = status ? EStatus.ENABLED : EStatus.DISABLED;
 
         if (data.images && data.images.length) {
             const formData = new FormData();
-            data.images.forEach((image) => formData.append(EKeys.IMAGE, image));
-            data.images = await uploadMultiImageAction(formData);
+
+            data.images.forEach((image) => {
+                if (image && image instanceof File) {
+                    formData.append(EKeys.IMAGE, image);
+                }
+            });
+
+            const resultImages = await uploadMultiImageAction(formData);
+            data.images = resultImages.map(
+                (image) =>
+                    ({
+                        publicId: image.public_id,
+                        width: image.width,
+                        height: image.height,
+                        bytes: image.bytes,
+                        folder: image?.folder,
+                        secureUrl: image.secure_url,
+                    } as IImage),
+            );
+        }
+        let result;
+
+        if (product) {
+            result = await editProductAction(product.id, data);
+        } else {
+            result = await addProductAction(data);
         }
 
-        const result = await addProductAction({ ...data, status });
-
         if (result?.success) {
-            router.push(EPath.MANAGE_PRODUCT_LIST);
+            router.push(EPath.MANAGE_PRODUCT_EDIT.concat(result.data.slug));
         } else if (result?.code === 409) {
             setError('name', { type: result?.code.toString(), message: result?.error?.message || 'error' });
         }
+
+        logger({ data }, { result });
 
         setLoading(false);
     };
@@ -77,6 +107,19 @@ function ProductForm({ categories, brands }: IProps) {
                     '& > div:not(:last-of-type)': { mb: 3 },
                 }}
             >
+                <div>
+                    <FormControlLabel
+                        label='Bật'
+                        control={
+                            <Switch
+                                inputProps={{ 'aria-label': 'product-status' }}
+                                checked={status}
+                                onChange={(event) => setStatus(event.target.checked)}
+                            />
+                        }
+                    />
+                </div>
+
                 <div>
                     <Typography variant='h2' mb={2}>
                         Thông tin chung
@@ -117,10 +160,12 @@ function ProductForm({ categories, brands }: IProps) {
                             <Controller
                                 name='categoryId'
                                 control={control}
-                                render={({ field: { onChange } }) => (
+                                render={({ field: { value, onChange } }) => (
                                     <CategorySelectField
+                                        id='input-category'
+                                        value={value}
                                         tree={categories}
-                                        onChange={(newValue) => onChange(newValue)}
+                                        onChange={onChange}
                                     />
                                 )}
                             />
@@ -132,13 +177,14 @@ function ProductForm({ categories, brands }: IProps) {
                             <Controller
                                 name='brandId'
                                 control={control}
-                                render={({ field: { onChange } }) => (
+                                render={({ field: { value, onChange } }) => (
                                     <SelectField
                                         id='input-brand'
                                         placeholder='Thương hiệu'
                                         items={brands}
-                                        value='id'
-                                        content='name'
+                                        value={value ? value.toString() : undefined}
+                                        optionKeyValue='id'
+                                        optionKeyLabel='name'
                                         error={Boolean(errors.brandId?.message)}
                                         helperText={errors.brandId?.message || ''}
                                         onChange={(newValue) => onChange(parseInt(newValue))}
@@ -156,8 +202,9 @@ function ProductForm({ categories, brands }: IProps) {
                     <Controller
                         control={control}
                         name='description'
-                        render={({ field: { onChange } }) => (
+                        render={({ field: { value, onChange } }) => (
                             <EditorField
+                                value={value}
                                 error={Boolean(errors.description?.message)}
                                 helperText={errors.description?.message || ''}
                                 onChange={onChange}
@@ -220,21 +267,17 @@ function ProductForm({ categories, brands }: IProps) {
                         <Controller
                             control={control}
                             name='images'
-                            render={({ field: { onChange } }) => <ImageField onChange={onChange} />}
+                            render={({ field: { value, onChange } }) => (
+                                <ImageField value={value} onRemove={handleRemoveImage} onChange={onChange} />
+                            )}
                         />
                     </Box>
                     <FormHelperText error={Boolean(errors.images?.message)}>{errors.images?.message}</FormHelperText>
                 </div>
 
                 <Box display='flex' justifyContent='flex-end' gap={1}>
-                    <Button type='submit' aria-label={EStatus.DRAFT} variant='outlined' disabled={loading}>
-                        Lưu nháp
-                    </Button>
-                    <Button type='submit' aria-label={EStatus.DISABLED} variant='contained' disabled={loading}>
-                        Lưu và ẩn sản phẩm
-                    </Button>
-                    <Button type='submit' aria-label={EStatus.ENABLED} variant='contained' disabled={loading}>
-                        Lưu và bán sản phẩm ngay
+                    <Button type='submit' variant='contained' disabled={loading}>
+                        {EText.SAVE}
                     </Button>
                 </Box>
             </Paper>

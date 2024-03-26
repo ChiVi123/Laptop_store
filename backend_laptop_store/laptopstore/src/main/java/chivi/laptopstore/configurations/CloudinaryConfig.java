@@ -1,13 +1,19 @@
 package chivi.laptopstore.configurations;
 
 import com.cloudinary.Cloudinary;
+import com.cloudinary.api.ApiResponse;
 import com.cloudinary.utils.ObjectUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
+@Slf4j
 @Configuration
 public class CloudinaryConfig {
     @Value("${app.cloudinary.name}")
@@ -27,7 +33,16 @@ public class CloudinaryConfig {
         ));
     }
 
-    public void deleteImage(String publicId) throws IOException {
-        cloudinary().uploader().destroy(publicId, ObjectUtils.asMap("resource_type", "image"));
+    public void deleteImage(String publicId) {
+        Map<?, ?> options = ObjectUtils.asMap("type", "upload", "resource_type", "image");
+        List<String> publicIds = Collections.singletonList(publicId);
+        try {
+            ApiResponse apiResponse = cloudinary().api().deleteResources(publicIds, options);
+            log.info("Cloudinary delete resources: {}", apiResponse);
+        } catch (IOException ioException) {
+            log.error("Cloudinary delete io exception: {}", ioException.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -21,6 +21,7 @@ export interface IAccount extends IEntity, IEntityDateTime {
     role: EAccountRole;
 }
 export interface IImage {
+    id?: number;
     publicId: string;
     width: number;
     height: number;

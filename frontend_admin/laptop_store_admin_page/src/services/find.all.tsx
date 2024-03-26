@@ -5,7 +5,11 @@ import { logger, request } from '~/utils';
 export async function findAllProduct() {
     const auth = `Bearer ${cookies().get(EKeys.TOKEN)?.value}`;
     try {
-        const response = await request.get('admin/products/all', { auth, cache: 'no-cache' });
+        const response = await request.get('admin/products/all', {
+            auth,
+            cache: 'no-cache',
+            next: { tags: [EKeys.PRODUCT_LIST] },
+        });
         return await response.json();
     } catch (error) {
         logger({ [findAllProduct.name]: error });

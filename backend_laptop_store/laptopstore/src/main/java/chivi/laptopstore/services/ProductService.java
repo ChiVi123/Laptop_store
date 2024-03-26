@@ -1,5 +1,6 @@
 package chivi.laptopstore.services;
 
+import chivi.laptopstore.configurations.CloudinaryConfig;
 import chivi.laptopstore.models.entities.BrandEntity;
 import chivi.laptopstore.models.entities.CategoryEntity;
 import chivi.laptopstore.models.entities.ImageEntity;
@@ -21,12 +22,14 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
 @AllArgsConstructor
 public class ProductService {
     private final IProductRepository repository;
+    private final CloudinaryConfig cloudinaryConfig;
 
     public List<ProductEntity> getAll() {
         return repository.findAll();
@@ -72,16 +75,14 @@ public class ProductService {
             product.setSlug(slug);
         }
 
-        product.setPrice(request.getPrice());
-        product.setDescription(request.getDescription());
         product.setCategory(category);
         product.setBrand(brand);
+        product.setPrice(request.getPrice());
+        product.setDescription(request.getDescription());
+        product.setStatus(request.getStatus());
 
-        return repository.save(product);
-    }
+        request.getImages().forEach(product::addImage);
 
-    public ProductEntity addImagesProduct(ProductEntity product, List<ImageEntity> images) {
-        product.addAllImage(images);
         return repository.save(product);
     }
 
@@ -102,8 +103,20 @@ public class ProductService {
         return repository.save(product);
     }
 
-    public void deleteById(Long id) {
-        ProductEntity product = this.getById(id);
+    public ProductEntity removeImage(ProductEntity product, Long publicId) {
+        Optional<ImageEntity> imageOptional = product.getImages().stream().filter(entity -> entity.getId().equals(publicId)).findFirst();
+        if (imageOptional.isPresent()) {
+            ImageEntity image = imageOptional.get();
+            cloudinaryConfig.deleteImage(image.getPublicId());
+            product.removeImage(image);
+        }
+        return repository.save(product);
+    }
+
+    public void delete(ProductEntity product) {
+        product.getImages().forEach(image -> {
+            cloudinaryConfig.deleteImage(image.getPublicId());
+        });
         repository.delete(product);
     }
 }

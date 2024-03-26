@@ -20,7 +20,7 @@ export async function generateMetadata({ params: { id } }: IProps): Promise<Meta
     const result = await findCategoryById(Number(id));
     const category: ICategory = result.data;
 
-    return { title: `${category.name} (ID: ${category.id}) | Laptop Store` };
+    return { title: `${category?.name || ''} (ID: ${category?.id || ''}) | Laptop Store` };
 }
 
 async function EditCategoryPage({ params: { id } }: IProps) {

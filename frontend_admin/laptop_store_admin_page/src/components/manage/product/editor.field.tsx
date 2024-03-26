@@ -10,12 +10,13 @@ import StarterKit from '@tiptap/starter-kit';
 import EditorToolbar from './editor.toolbar';
 
 interface IProps {
+    value?: string;
     error: boolean;
     helperText: string;
     onChange: (value: string) => void;
 }
 
-function EditorField({ error = false, helperText, onChange }: IProps) {
+function EditorField({ value, error = false, helperText, onChange }: IProps) {
     const editor = useEditor({
         extensions: [
             StarterKit,
@@ -24,7 +25,7 @@ function EditorField({ error = false, helperText, onChange }: IProps) {
             Link.configure({ openOnClick: false, autolink: true }),
             Image.configure({ inline: true, allowBase64: true }),
         ],
-        content: '<h4>Thay vì sử dụng thiết kế phẳng</h4>',
+        content: value || '',
         onUpdate({ editor }) {
             onChange(editor.getHTML() === '<p></p>' ? '' : editor.getHTML());
         },

@@ -1,7 +1,7 @@
 package chivi.laptopstore.models.entities;
 
-import chivi.laptopstore.common.EEntityStatus;
 import chivi.laptopstore.common.EntityNames;
+import chivi.laptopstore.common.EntityStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,5 +20,5 @@ public class BrandEntity extends EntityStandard {
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private ImageEntity logo;
 
-    private EEntityStatus status;
+    private EntityStatus status;
 }

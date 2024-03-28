@@ -1,7 +1,7 @@
 package chivi.laptopstore.models.entities;
 
-import chivi.laptopstore.common.EEntityStatus;
 import chivi.laptopstore.common.EntityNames;
+import chivi.laptopstore.common.EntityStatus;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -38,7 +38,7 @@ public class CategoryEntity extends EntityStandard {
     @JsonManagedReference
     private List<CategoryEntity> children = new ArrayList<>();
 
-    private EEntityStatus status;
+    private EntityStatus status;
 
     public void addChild(CategoryEntity child) {
         this.children.add(child);

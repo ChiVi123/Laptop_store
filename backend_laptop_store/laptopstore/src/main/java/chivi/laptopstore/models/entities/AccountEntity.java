@@ -1,7 +1,7 @@
 package chivi.laptopstore.models.entities;
 
-import chivi.laptopstore.common.EAccountRole;
-import chivi.laptopstore.common.EAccountStatus;
+import chivi.laptopstore.common.AccountRole;
+import chivi.laptopstore.common.AccountStatus;
 import chivi.laptopstore.common.EntityNames;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
@@ -40,7 +40,7 @@ public class AccountEntity extends EntityStandard {
     private int likeCount;
 
     @Column(name = EntityNames.COLUMN_ACCOUNT_ROLE)
-    private EAccountRole role;
+    private AccountRole role;
 
-    private EAccountStatus status;
+    private AccountStatus status;
 }

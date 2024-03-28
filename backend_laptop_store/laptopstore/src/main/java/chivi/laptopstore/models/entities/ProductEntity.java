@@ -1,7 +1,7 @@
 package chivi.laptopstore.models.entities;
 
-import chivi.laptopstore.common.EEntityStatus;
 import chivi.laptopstore.common.EntityNames;
+import chivi.laptopstore.common.EntityStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -55,7 +55,7 @@ public class ProductEntity extends EntityStandard {
     @Column(name = EntityNames.COLUMN_REVIEW_COUNT, columnDefinition = "int default 0")
     private int reviewCount;
 
-    private EEntityStatus status;
+    private EntityStatus status;
 
     public void addImage(ImageEntity images) {
         this.images.add(images);

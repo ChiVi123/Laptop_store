@@ -1,6 +1,6 @@
-package chivi.laptopstore.repositories.entities;
+package chivi.laptopstore.repositories;
 
-import chivi.laptopstore.common.EAccountStatus;
+import chivi.laptopstore.common.AccountStatus;
 import chivi.laptopstore.models.entities.AccountEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface IAccountRepository extends JpaRepository<AccountEntity, Long> {
     Optional<AccountEntity> findByEmail(String email);
 
-    Optional<AccountEntity> findByEmailAndStatusIn(String email, Collection<EAccountStatus> status);
+    Optional<AccountEntity> findByEmailAndStatusIn(String email, Collection<AccountStatus> status);
 
     boolean existsByEmail(String email);
 }

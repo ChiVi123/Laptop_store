@@ -1,6 +1,6 @@
 package chivi.laptopstore.common;
 
-public enum EAccountRole {
+public enum AccountRole {
     ADMIN,
     CUSTOMER
 }

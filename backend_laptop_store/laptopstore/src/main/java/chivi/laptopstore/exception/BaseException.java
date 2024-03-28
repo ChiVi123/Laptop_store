@@ -1,4 +1,4 @@
-package chivi.laptopstore.models.exceptions;
+package chivi.laptopstore.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

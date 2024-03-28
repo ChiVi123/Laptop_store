@@ -1,4 +1,4 @@
-package chivi.laptopstore.models.exceptions;
+package chivi.laptopstore.exception;
 
 import chivi.laptopstore.common.ResponseMessage;
 import org.springframework.http.HttpStatus;

@@ -1,4 +1,4 @@
-package chivi.laptopstore.repositories.entities;
+package chivi.laptopstore.repositories;
 
 import chivi.laptopstore.models.entities.ImageEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,6 +1,6 @@
 package chivi.laptopstore.common;
 
-public enum EAccountStatus {
+public enum AccountStatus {
     NOT_VERIFIED,
     ACTIVE,
     BLOCK

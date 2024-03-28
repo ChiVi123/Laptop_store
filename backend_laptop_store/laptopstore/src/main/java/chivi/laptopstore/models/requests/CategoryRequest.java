@@ -1,6 +1,6 @@
 package chivi.laptopstore.models.requests;
 
-import chivi.laptopstore.common.EEntityStatus;
+import chivi.laptopstore.common.EntityStatus;
 import chivi.laptopstore.common.ValidationMessage;
 import chivi.laptopstore.common.ValidationValues;
 import chivi.laptopstore.utils.CustomString;
@@ -21,7 +21,7 @@ public class CategoryRequest {
     private String path;
 
     @NotNull(message = ValidationMessage.NOT_NULL)
-    private EEntityStatus status;
+    private EntityStatus status;
 
     public Long getParentId() {
         return this.parentId;
@@ -35,7 +35,7 @@ public class CategoryRequest {
         return this.path == null || this.path.equals("") ? CustomString.toSlug(this.name.trim()) : this.path.trim();
     }
 
-    public EEntityStatus getStatus() {
+    public EntityStatus getStatus() {
         return this.status;
     }
 }

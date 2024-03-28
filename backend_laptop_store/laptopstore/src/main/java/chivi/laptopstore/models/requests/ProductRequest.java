@@ -1,6 +1,6 @@
 package chivi.laptopstore.models.requests;
 
-import chivi.laptopstore.common.EEntityStatus;
+import chivi.laptopstore.common.EntityStatus;
 import chivi.laptopstore.common.ValidationMessage;
 import chivi.laptopstore.common.ValidationValues;
 import chivi.laptopstore.models.entities.ImageEntity;
@@ -38,10 +38,11 @@ public class ProductRequest {
 
     private BigDecimal discount;
 
+    @NotNull(message = ValidationMessage.NOT_NULL)
     private List<ImageEntity> images;
 
     @NotNull(message = ValidationMessage.NOT_NULL)
-    private EEntityStatus status;
+    private EntityStatus status;
 
     public String getName() {
         return this.name.trim();
@@ -79,7 +80,7 @@ public class ProductRequest {
         return images;
     }
 
-    public EEntityStatus getStatus() {
+    public EntityStatus getStatus() {
         return status;
     }
 }

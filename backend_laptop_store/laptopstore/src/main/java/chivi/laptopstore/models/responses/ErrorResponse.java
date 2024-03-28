@@ -2,25 +2,21 @@ package chivi.laptopstore.models.responses;
 
 import lombok.Data;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Data
 public class ErrorResponse {
-    private final boolean success = false;
-    private int code;
-    private Map<String, Object> error;
+    private String message;
+    private List<Map<String, Object>> errors;
 
-    public ErrorResponse(int code) {
-        this.code = code;
-        this.error = new HashMap<>();
+    public ErrorResponse(String message) {
+        this.message = message;
+        this.errors = new ArrayList<>();
     }
 
-    public void putItem(String key, Object value) {
-        this.error.put(key, value);
-    }
-
-    public void putItem(Object value) {
-        this.error.put("message", value);
+    public void addFieldItem(String field, String message) {
+        this.errors.add(Map.of("field", field, "message", message));
     }
 }

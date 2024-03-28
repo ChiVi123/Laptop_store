@@ -4,17 +4,16 @@ import lombok.Data;
 
 @Data
 public class SuccessResponse {
-    private final boolean success = true;
     private String message;
-    private Object data;
+    private Object payload;
 
-    public SuccessResponse(String message, Object data) {
+    public SuccessResponse(String message, Object payload) {
         this.message = message;
-        this.data = data;
+        this.payload = payload;
     }
 
     public SuccessResponse(String message) {
         this.message = message;
-        this.data = "";
+        this.payload = "";
     }
 }

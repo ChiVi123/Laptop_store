@@ -1,6 +1,6 @@
 package chivi.laptopstore.configurations;
 
-import chivi.laptopstore.common.EAccountRole;
+import chivi.laptopstore.common.AccountRole;
 import chivi.laptopstore.security.jwt.JwtAuthenticationEntryPoint;
 import chivi.laptopstore.security.jwt.JwtFilter;
 import lombok.AllArgsConstructor;
@@ -52,21 +52,21 @@ public class SecurityConfig {
         String adminRoute = "/api/v1/admin/**";
         String privateRoute = "/api/v1/private/**";
 
-        httpSecurity.csrf(AbstractHttpConfigurer::disable)
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint))
+        return httpSecurity
+                .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(authorize -> authorize.requestMatchers(ALLOWED_LIST_URL).permitAll())
-                .authorizeHttpRequests(authorize -> authorize.requestMatchers(HttpMethod.GET, ALLOWED_GET_URL).permitAll())
-                .authorizeHttpRequests(authorize -> authorize.requestMatchers(adminRoute).hasAnyAuthority(EAccountRole.ADMIN.name()))
+                .authorizeHttpRequests(authorize -> authorize.requestMatchers(this.ALLOWED_LIST_URL).permitAll())
+                .authorizeHttpRequests(authorize -> authorize.requestMatchers(HttpMethod.GET, this.ALLOWED_GET_URL).permitAll())
+                .authorizeHttpRequests(authorize -> authorize.requestMatchers(adminRoute).hasAnyAuthority(AccountRole.ADMIN.name()))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(privateRoute)
-                        .hasAnyAuthority(EAccountRole.CUSTOMER.name(), EAccountRole.ADMIN.name())
+                        .hasAnyAuthority(AccountRole.CUSTOMER.name(), AccountRole.ADMIN.name())
                         .anyRequest()
                         .authenticated()
-                );
-        httpSecurity.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-
-        return httpSecurity.build();
+                )
+                .addFilterBefore(this.jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(this.jwtAuthenticationEntryPoint))
+                .build();
     }
 
     @Bean
@@ -77,13 +77,12 @@ public class SecurityConfig {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         UrlBasedCorsConfigurationSource corsConfigurationSource = new UrlBasedCorsConfigurationSource();
 
-        corsConfiguration.setAllowedOrigins(List.of(allowedOrigins));
+        corsConfiguration.setAllowedOrigins(List.of(this.allowedOrigins));
         corsConfiguration.setAllowedMethods(allowedMethods);
         corsConfiguration.setAllowedHeaders(allowedHeaders);
         corsConfiguration.setExposedHeaders(exposedHeaders);
         corsConfiguration.setAllowCredentials(true);
         corsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
-
         return corsConfigurationSource;
     }
 

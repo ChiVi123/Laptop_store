@@ -1,33 +1,41 @@
-import { IAccount, IBrand, ICategory, IProduct } from './models';
+import { IAccount, IBrand, ICategory, IImage, IProduct } from './models';
 
-interface ISuccessResponse {
+export interface IResponse {
     message: string;
-    success: true;
+    payload: '';
 }
-
 export interface IErrorResponse {
-    code: number;
-    error: Record<string, string>;
-    success: false;
+    message: string;
+    errors?: Record<string, unknown>[];
 }
-export interface IVoidResponse extends ISuccessResponse {
-    data: '';
+export interface IErrorData {
+    httpCode: number;
+    payload: IErrorResponse;
 }
-export interface ILoginResponse extends ISuccessResponse {
-    data: string;
+export interface ILoginResponse extends IResponse {
+    payload: string;
 }
-export interface IRegisterResponse extends ISuccessResponse {
-    data: IAccount;
+export interface IAccountResponse extends IResponse {
+    payload: IAccount;
 }
-export interface IProductDetailResponse extends ISuccessResponse {
-    data: IProduct;
+export interface IProductResponse extends IResponse {
+    payload: IProduct;
 }
-export interface IAllProductResponse extends ISuccessResponse {
-    data: IProduct[];
+export interface IBrandResponse extends IResponse {
+    payload: IBrand;
 }
-export interface IAllCategoryResponse extends ISuccessResponse {
-    data: ICategory[];
+export interface ICategoryResponse extends IResponse {
+    payload: ICategory;
 }
-export interface IAllBrandResponse extends ISuccessResponse {
-    data: IBrand[];
+export interface IListImageResponse extends IResponse {
+    payload: IImage[];
+}
+export interface IListProductResponse extends IResponse {
+    payload: IProduct[];
+}
+export interface IListCategoryResponse extends IResponse {
+    payload: ICategory[];
+}
+export interface IListBrandResponse extends IResponse {
+    payload: IBrand[];
 }

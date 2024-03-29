@@ -6,17 +6,29 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Fragment } from 'react';
 import { EPath } from '~/common/enums';
-import ProductForm from '~/components/manage/product/add/product.form';
-import { findAllBrand, findAllCategoryRoot } from '~/services/find.all';
-import { findProductBySlug } from '~/services/find.one';
+import ProductForm from '~/components/manage/product/product.form';
+import { findAllService, findOneService } from '~/services';
+import { logger, parseError } from '~/utils';
 
 interface IProps {
     params: { slug: string };
 }
 
 async function EditProductPage({ params: { slug } }: IProps) {
-    const productResponse = await findProductBySlug(slug);
-    const [brandResponse, categoryResponse] = await Promise.all([findAllBrand(), findAllCategoryRoot()]);
+    const productResult = await findOneService.productBySlug(slug);
+    const [brandResult, categoryResult] = await Promise.all([findAllService.brand(), findAllService.rootCategory()]);
+
+    if (brandResult && 'error' in brandResult) {
+        logger({ brand: parseError(brandResult) });
+    }
+
+    if (categoryResult && 'error' in categoryResult) {
+        logger({ brand: parseError(categoryResult) });
+    }
+
+    if ('error' in productResult) {
+        logger({ product: parseError(productResult) });
+    }
 
     return (
         <Fragment>
@@ -36,19 +48,16 @@ async function EditProductPage({ params: { slug } }: IProps) {
             </Box>
 
             <ProductForm
-                product={productResponse.data}
-                brands={brandResponse && 'data' in brandResponse ? brandResponse.data : []}
-                categories={categoryResponse && 'data' in categoryResponse ? categoryResponse.data : []}
+                product={'error' in productResult ? undefined : productResult}
+                brands={Array.isArray(brandResult) ? brandResult : []}
+                categories={Array.isArray(categoryResult) ? categoryResult : []}
             />
         </Fragment>
     );
 }
 
 export async function generateMetadata({ params: { slug } }: IProps): Promise<Metadata> {
-    const result = await findProductBySlug(slug);
-
-    return {
-        title: ''.concat(result.data.name, ' | Laptop store'),
-    };
+    const result = await findOneService.productBySlug(slug);
+    return { title: ''.concat('error' in result ? '' : result.name, ' | Laptop store') };
 }
 export default EditProductPage;

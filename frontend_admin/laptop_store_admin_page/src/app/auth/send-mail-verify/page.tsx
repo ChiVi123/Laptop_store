@@ -1,14 +1,14 @@
 'use client';
 
 import { Box, Button, TextField, Typography } from '@mui/material';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { sendEmailVerifyAction } from '~/actions/authActions';
 import { EPath } from '~/common/enums';
 import { StyleContainer, StyleLink } from '~/components/auth/styles';
 import { sendMailResolver } from '~/resolvers';
+import { authService } from '~/services';
 import { sendMailFormData } from '~/types/form.data';
+import { logger, parseError } from '~/utils';
 
 function SendEmailVerifyPage() {
     const {
@@ -19,18 +19,13 @@ function SendEmailVerifyPage() {
         resolver: sendMailResolver,
         defaultValues: { email: '' },
     });
-    const router = useRouter();
     const [disabled, setDisabled] = useState<boolean>(false);
 
     const handleOnSubmit: SubmitHandler<sendMailFormData> = async (data) => {
         setDisabled(true);
-
-        const result = await sendEmailVerifyAction(data.email);
-        if (result?.success) {
-            router.push(EPath.AUTH_NOTIFY_SEND_MAIL.concat('?variant=verify'));
-            return;
-        }
-
+        const result = await authService.sendEmailVerify(data.email);
+        if (!result) return;
+        logger({ error: parseError(result) });
         setDisabled(false);
     };
 

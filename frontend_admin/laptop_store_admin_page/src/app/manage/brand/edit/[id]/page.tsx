@@ -7,14 +7,18 @@ import Link from 'next/link';
 import { Fragment } from 'react';
 import { EPath } from '~/common/enums';
 import BrandForm from '~/components/manage/brand/brand.form';
-import { findBrandById } from '~/services/find.one';
+import { findOneService } from '~/services';
+import { logger, parseError } from '~/utils';
 
 interface IProps {
     params: { id: string };
 }
 
 async function EditBrandPage({ params: { id } }: IProps) {
-    const result = await findBrandById(Number(id));
+    const result = await findOneService.brandById(Number(id));
+    if ('error' in result) {
+        logger({ error: parseError(result) });
+    }
     return (
         <Fragment>
             <Box p='18px 24px 12px' mb={2} bgcolor='white'>
@@ -32,16 +36,13 @@ async function EditBrandPage({ params: { id } }: IProps) {
                 </Typography>
             </Box>
 
-            <BrandForm brand={result.data} />
+            <BrandForm brand={'error' in result ? undefined : result} />
         </Fragment>
     );
 }
 
 export async function generateMetadata({ params: { id } }: IProps): Promise<Metadata> {
-    const result = await findBrandById(Number(id));
-
-    return {
-        title: ''.concat(result.data.name, ' | Laptop store'),
-    };
+    const result = await findOneService.brandById(Number(id));
+    return { title: ''.concat('error' in result ? '' : result.name, ' | Laptop store') };
 }
 export default EditBrandPage;

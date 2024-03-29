@@ -1,14 +1,14 @@
 'use client';
 
 import { Box, Button, TextField, Typography } from '@mui/material';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { sendEmailResetPasswordAction } from '~/actions/authActions';
 import { EPath } from '~/common/enums';
 import { StyleContainer, StyleLink } from '~/components/auth/styles';
 import { sendMailResolver } from '~/resolvers';
+import { authService } from '~/services';
 import { sendMailFormData } from '~/types/form.data';
+import { logger, parseError } from '~/utils';
 
 function ForgotPasswordPage() {
     const {
@@ -19,19 +19,13 @@ function ForgotPasswordPage() {
         resolver: sendMailResolver,
         defaultValues: { email: '' },
     });
-    const router = useRouter();
     const [disabled, setDisabled] = useState<boolean>(false);
 
     const handleOnSubmit: SubmitHandler<sendMailFormData> = async (data) => {
         setDisabled(true);
-
-        const result = await sendEmailResetPasswordAction(data.email);
-
-        if (result?.success) {
-            router.push(EPath.AUTH_NOTIFY_SEND_MAIL.concat('?variant=reset-password'));
-            return;
-        }
-
+        const result = await authService.sendEmailResetPassword(data.email);
+        if (!result) return;
+        logger({ error: parseError(result) });
         setDisabled(false);
     };
 

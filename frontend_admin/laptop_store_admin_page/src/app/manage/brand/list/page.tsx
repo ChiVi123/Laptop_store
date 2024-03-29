@@ -7,10 +7,14 @@ import Link from 'next/link';
 import { Fragment } from 'react';
 import { EPath } from '~/common/enums';
 import BrandList from '~/components/manage/brand/brand.list';
-import { findAllBrand } from '~/services/find.all';
+import { findAllService } from '~/services';
+import { logger, parseError } from '~/utils';
 
 async function BrandListPage() {
-    const result = await findAllBrand();
+    const result = await findAllService.brand();
+    if ('error' in result) {
+        logger({ error: parseError(result) });
+    }
 
     return (
         <Fragment>
@@ -29,7 +33,7 @@ async function BrandListPage() {
                 </Typography>
             </Box>
 
-            <BrandList rows={'data' in result ? result.data : []} />
+            <BrandList rows={Array.isArray(result) ? result : []} />
         </Fragment>
     );
 }

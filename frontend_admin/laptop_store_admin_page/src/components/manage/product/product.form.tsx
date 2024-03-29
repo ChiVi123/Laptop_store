@@ -4,21 +4,20 @@ import { Box, Button, FormControlLabel, FormHelperText, Paper, Switch, TextField
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { addProductAction, editProductAction, removeImageProductAction } from '~/actions/productActions';
-import { uploadMultiImageAction } from '~/actions/uploadActions';
-import { EKeys, EPath, EStatus, EText } from '~/common/enums';
+import { EKeys, EPath, EStatus, EText, HttpStatus } from '~/common/enums';
 import { productDefaultValues } from '~/common/values';
 import { productResolver } from '~/resolvers';
+import { productService, uploadFileService } from '~/services';
 import { productFormData } from '~/types/form.data';
 import { IBrand, ICategory, IImage, IProduct } from '~/types/models';
-import { logger } from '~/utils';
-import FormLabel from '../../form.label';
-import CategorySelectField from '../category.select.field';
-import EditorField from '../editor.field';
-import ImageField from '../image.field';
-import NumberField from '../number.field';
-import SelectField from '../select.field';
-import { StyleBackgroundFormGroup } from '../styles';
+import { logger, parseError } from '~/utils';
+import FormLabel from '../form.label';
+import CategorySelectField from './category.select.field';
+import EditorField from './editor.field';
+import ImageField from './image.field';
+import NumberField from './number.field';
+import SelectField from './select.field';
+import { StyleBackgroundFormGroup } from './styles';
 
 interface IProps {
     product?: IProduct;
@@ -45,53 +44,37 @@ function ProductForm({ product, categories, brands }: IProps) {
 
     async function handleRemoveImage(value: IImage) {
         if (product && value.id) {
-            const result = await removeImageProductAction(product.id, value.id);
-            logger({ result });
+            const result = await productService.removeImage(product.id, value.id);
+            logger({ result: 'error' in result ? parseError(result) : result });
         }
     }
 
-    const handleOnSubmit: SubmitHandler<productFormData> = async (data, event) => {
+    const handleOnSubmit: SubmitHandler<productFormData> = async (data, _) => {
         setLoading(true);
 
         data.status = status ? EStatus.ENABLED : EStatus.DISABLED;
-
         if (data.images && data.images.length) {
             const formData = new FormData();
-
             data.images.forEach((image) => {
                 if (image && image instanceof File) {
                     formData.append(EKeys.IMAGE, image);
                 }
             });
 
-            const resultImages = await uploadMultiImageAction(formData);
-            data.images = resultImages.map(
-                (image) =>
-                    ({
-                        publicId: image.public_id,
-                        width: image.width,
-                        height: image.height,
-                        bytes: image.bytes,
-                        folder: image?.folder,
-                        secureUrl: image.secure_url,
-                    } as IImage),
-            );
+            data.images = await uploadFileService.multiple(EKeys.IMAGE, formData);
         }
-        let result;
 
-        if (product) {
-            result = await editProductAction(product.id, data);
+        const result = product ? await productService.edit(product.id, data) : await productService.create(data);
+
+        if ('error' in result) {
+            const error = parseError(result);
+            if (error.httpCode === HttpStatus.CONFLICT) {
+                setError('name', { message: error.payload.message || 'error' });
+            }
+            logger({ error });
         } else {
-            result = await addProductAction(data);
+            router.push(EPath.MANAGE_PRODUCT_EDIT.concat(result.slug));
         }
-
-        if (result?.success) {
-            router.push(EPath.MANAGE_PRODUCT_EDIT.concat(result.data.slug));
-        } else if (result?.code === 409) {
-            setError('name', { type: result?.code.toString(), message: result?.error?.message || 'error' });
-        }
-
-        logger({ data }, { result });
 
         setLoading(false);
     };

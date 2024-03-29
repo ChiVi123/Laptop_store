@@ -11,9 +11,10 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { Fragment } from 'react';
-import { EPath } from '~/common/enums';
+import { EPath, HttpStatus } from '~/common/enums';
 import { ProductList, TabsWrap } from '~/components/manage/product/list';
-import { findAllProduct } from '~/services/find.all';
+import { findAllService } from '~/services';
+import { logger, parseError } from '~/utils';
 
 export const metadata: Metadata = {
     title: 'List product | Laptop store',
@@ -21,10 +22,13 @@ export const metadata: Metadata = {
 };
 
 async function ProductListPage() {
-    const result = (await findAllProduct()) || { data: [] };
-
-    if ('code' in result && result.code === 401) {
-        redirect(EPath.AUTH_LOGIN);
+    const result = await findAllService.product();
+    if ('error' in result) {
+        const error = parseError(result);
+        if (error.httpCode === HttpStatus.UNAUTHORIZED) {
+            redirect(EPath.AUTH_LOGIN);
+        }
+        logger({ result });
     }
 
     return (
@@ -74,7 +78,7 @@ async function ProductListPage() {
                 </Button>
             </Box>
 
-            <ProductList rows={'data' in result ? result.data : []} />
+            <ProductList rows={Array.isArray(result) ? result : []} />
         </Fragment>
     );
 }

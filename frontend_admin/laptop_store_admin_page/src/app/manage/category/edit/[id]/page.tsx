@@ -8,24 +8,24 @@ import { Fragment } from 'react';
 import { EPath, EText } from '~/common/enums';
 import CategoryBar from '~/components/manage/category/category.bar';
 import CategoryTreeView from '~/components/manage/category/category.tree.view';
-import { findAllCategoryRoot } from '~/services/find.all';
-import { findCategoryById } from '~/services/find.one';
+import { findAllService, findOneService } from '~/services';
 import { ICategory } from '~/types/models';
+import { logger, parseError } from '~/utils';
 
 interface IProps {
     params: { id: string };
 }
 
-export async function generateMetadata({ params: { id } }: IProps): Promise<Metadata> {
-    const result = await findCategoryById(Number(id));
-    const category: ICategory = result.data;
-
-    return { title: `${category?.name || ''} (ID: ${category?.id || ''}) | Laptop Store` };
-}
-
 async function EditCategoryPage({ params: { id } }: IProps) {
-    const resultTreeView = await findAllCategoryRoot();
-    const resultCategory = await findCategoryById(Number(id));
+    const resultTreeView = await findAllService.rootCategory();
+    const resultCategory = await findOneService.categoryById(Number(id));
+
+    if ('error' in resultTreeView) {
+        logger({ error: parseError(resultTreeView) });
+    }
+    if ('error' in resultCategory) {
+        logger({ error: parseError(resultCategory) });
+    }
 
     return (
         <Fragment>
@@ -42,13 +42,21 @@ async function EditCategoryPage({ params: { id } }: IProps) {
                     {EText.EDIT}
                 </Typography>
             </Box>
-            <CategoryBar category={resultCategory.data} />
+            {!('error' in resultCategory) && <CategoryBar category={resultCategory} />}
 
             <Box px={3} py={2}>
-                <CategoryTreeView categoryTree={resultTreeView.data} category={resultCategory.data} />
+                <CategoryTreeView
+                    categoryTree={Array.isArray(resultTreeView) ? resultTreeView : []}
+                    category={'error' in resultCategory ? undefined : resultCategory}
+                />
             </Box>
         </Fragment>
     );
 }
 
+export async function generateMetadata({ params: { id } }: IProps): Promise<Metadata> {
+    const result = await findOneService.categoryById(Number(id));
+    const category: ICategory | undefined = 'error' in result ? undefined : result;
+    return { title: `${category?.name || ''} (ID: ${category?.id || ''}) | Laptop Store` };
+}
 export default EditCategoryPage;

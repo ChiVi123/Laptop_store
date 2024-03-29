@@ -3,10 +3,10 @@
 import { Box, Button, Modal, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { deleteCategoryAction } from '~/actions/categoryActions';
-import { EPath, EText } from '~/common/enums';
+import { EText } from '~/common/enums';
+import { categoryService } from '~/services';
 import { ICategory } from '~/types/models';
-import { logger } from '~/utils';
+import { logger, parseError } from '~/utils';
 
 interface IProps {
     category: ICategory;
@@ -34,11 +34,8 @@ function CategoryBar({ category }: IProps) {
         setOpen(false);
     }
     async function handleDeleteItem() {
-        const result = await deleteCategoryAction(category.id);
-        if (result.success) {
-            router.push(EPath.MANAGE_CATEGORY_EDIT.concat(result.data.id.toString()));
-        }
-        logger({ result });
+        const result = await categoryService.destroy(category.id);
+        logger({ error: typeof result === 'string' ? result : parseError(result) });
     }
 
     return (

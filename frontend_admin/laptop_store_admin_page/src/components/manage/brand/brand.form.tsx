@@ -4,13 +4,12 @@ import { Box, Button, FormControlLabel, FormHelperText, Paper, Switch, TextField
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { createBrandAction, editBrandAction, removeLogoBrandAction } from '~/actions/brandActions';
-import { uploadSingleImageAction } from '~/actions/uploadActions';
 import { EKeys, EPath, EStatus } from '~/common/enums';
 import { brandResolver } from '~/resolvers';
+import { brandService, uploadFileService } from '~/services';
 import { brandFormData } from '~/types/form.data';
-import { IBrand, IImage } from '~/types/models';
-import { logger } from '~/utils';
+import { IBrand } from '~/types/models';
+import { logger, parseError } from '~/utils';
 import FormLabel from '../form.label';
 import SingleImageField, { imageType } from '../single.image.field';
 
@@ -28,13 +27,13 @@ function BrandForm({ brand }: IProps) {
         defaultValues: { name: brand?.name || '', logo: brand?.logo },
     });
     const [loading, setLoading] = useState<boolean>(false);
-    const [status, setStatus] = useState<boolean>(brand?.status === EStatus.ENABLED);
+    const [status, setStatus] = useState<boolean>(brand ? brand.status === EStatus.ENABLED : true);
     const router = useRouter();
 
     async function handleRemoveImage(value: imageType) {
         if (brand && !(value instanceof File)) {
             setLoading(true);
-            await removeLogoBrandAction(brand.id);
+            await brandService.removeLogo(brand.id);
             setLoading(false);
         }
         setValue('logo', undefined);
@@ -42,54 +41,24 @@ function BrandForm({ brand }: IProps) {
 
     const handleOnSubmit: SubmitHandler<brandFormData> = async (data) => {
         setLoading(true);
-        logger({ data });
 
         if (data.logo && data.logo instanceof File) {
             const formData = new FormData();
-
             formData.set(EKeys.LOGO, data.logo);
-            const resultLogo = await uploadSingleImageAction(EKeys.LOGO, formData);
-
-            if (resultLogo) {
-                const logo: IImage = {
-                    publicId: resultLogo.public_id,
-                    width: resultLogo.width,
-                    height: resultLogo.height,
-                    bytes: resultLogo.bytes,
-                    folder: resultLogo?.folder,
-                    secureUrl: resultLogo.secure_url,
-                };
-                data.logo = logo;
-            }
+            data.logo = await uploadFileService.single(EKeys.LOGO, formData);
         }
 
         data.status = status ? EStatus.ENABLED : EStatus.DISABLED;
-        let result;
+        const result = brand ? await brandService.edit(brand.id, data) : await brandService.create(data);
 
-        if (brand?.id) {
-            result = await editBrandAction(brand.id, data);
-            if (result.success) {
-                setValue('name', result.data.name);
-                setValue('logo.publicId', result.data.logo.publicId);
-                setValue('logo.width', result.data.logo.width);
-                setValue('logo.height', result.data.logo.height);
-                setValue('logo.bytes', result.data.logo.bytes);
-                setValue('logo.folder', result.data.logo.folder);
-                setValue('logo.secureUrl', result.data.logo.secureUrl);
-                setValue('status', result.data.status);
-            }
+        if ('error' in result) {
+            logger({ error: parseError(result) });
         } else {
-            result = await createBrandAction(data);
-            if (result.success) {
-                router.push(EPath.MANAGE_BRAND_EDIT.concat(result.data.id.toString()));
-            }
+            router.push(EPath.MANAGE_BRAND_EDIT.concat(result.id.toString()));
         }
 
-        logger({ result });
         setLoading(false);
     };
-
-    logger({ logo: brand?.logo });
 
     return (
         <Paper

@@ -14,11 +14,11 @@ import {
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Fragment, useMemo, useState } from 'react';
-import { deleteBrandActon } from '~/actions/brandActions';
 import { EPath, EStatus } from '~/common/enums';
 import { mapStatus } from '~/common/maps';
+import { brandService } from '~/services';
 import { IBrand, IImage } from '~/types/models';
-import { logger } from '~/utils';
+import { logger, parseError } from '~/utils';
 import '~/utils/extends';
 import DeleteBrandAction from './delete.brand.action';
 
@@ -31,8 +31,8 @@ function BrandList({ rows }: IProps) {
     const router = useRouter();
 
     async function handleDelete(id: GridRowId) {
-        const resultDeleteBrand = await deleteBrandActon(Number(id));
-        logger({ resultDeleteBrand });
+        const result = await brandService.destroy(Number(id));
+        logger({ result: typeof result === 'string' ? result : parseError(result) });
     }
 
     const columns = useMemo<GridColDef[]>(

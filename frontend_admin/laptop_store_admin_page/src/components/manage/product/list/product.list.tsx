@@ -13,11 +13,11 @@ import {
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
-import { deleteProductAction } from '~/actions/productActions';
 import { EPath, EStatus, EText } from '~/common/enums';
 import { mapStatus } from '~/common/maps';
+import { productService } from '~/services';
 import { IImage, IProduct } from '~/types/models';
-import { logger } from '~/utils';
+import { logger, parseError } from '~/utils';
 import '~/utils/extends';
 import DeleteActionCell from './delete.action.cell';
 
@@ -30,8 +30,8 @@ function ProductList({ rows }: IProps) {
     const router = useRouter();
 
     async function handleDeleteItem(id: number) {
-        const result = await deleteProductAction(id);
-        logger({ result });
+        const result = await productService.destroy(id);
+        logger({ result: typeof result === 'string' ? result : parseError(result) });
     }
 
     const columns = useMemo<GridColDef<(typeof rows)[number]>[]>(

@@ -4,16 +4,16 @@ import { Google as Google_icon } from '@mui/icons-material';
 import { Box, TextField, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { loginAction } from '~/actions/authActions';
 import { EPath } from '~/common/enums';
 import { loginDefaultValues } from '~/common/values';
 import PasswordField from '~/components/auth/password.field';
 import { StyleButtonLoginWithGoogle, StyleContainer, StyleLine, StyleLink } from '~/components/auth/styles';
 import { loginResolver } from '~/resolvers';
+import { authService } from '~/services';
 import { loginFormData } from '~/types/form.data';
+import { logger, parseError } from '~/utils';
 
 function LoginPage() {
     const {
@@ -22,24 +22,12 @@ function LoginPage() {
         handleSubmit,
     } = useForm<loginFormData>({ resolver: loginResolver, defaultValues: loginDefaultValues });
     const [disabled, setDisabled] = useState<boolean>(false);
-    const router = useRouter();
 
     const handleOnSubmit: SubmitHandler<loginFormData> = async (data) => {
         setDisabled(true);
-        const result = await loginAction(data);
-
-        if (result?.success) {
-            router.push(EPath.MANAGE_PRODUCT_LIST);
-            return;
-        }
-
-        if (result?.error?.message) {
-            const { message } = result.error;
-            if (message.includes('is not verified')) {
-                router.push(EPath.AUTH_SEND_MAIL_VERIFY);
-            }
-        }
-
+        const result = await authService.login(data);
+        if (!result) return;
+        logger({ error: parseError(result) });
         setDisabled(false);
     };
 

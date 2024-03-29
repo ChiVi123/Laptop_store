@@ -7,24 +7,24 @@ import Link from 'next/link';
 import { Fragment } from 'react';
 import { EPath } from '~/common/enums';
 import CategoryTreeView from '~/components/manage/category/category.tree.view';
-import { findAllCategoryRoot } from '~/services/find.all';
-import { findCategoryById } from '~/services/find.one';
+import { findAllService, findOneService } from '~/services';
 import { ICategory } from '~/types/models';
+import { logger, parseError } from '~/utils';
 
 interface IProps {
     params: { parentId: string };
 }
 
-export async function generateMetadata({ params: { parentId } }: IProps): Promise<Metadata> {
-    const result = await findCategoryById(Number(parentId));
-    const category: ICategory = result.data;
-
-    return { title: `${category?.name || ''} (ID: ${category?.id || ''}) | Laptop Store` };
-}
-
 async function AddSubCategoryPage({ params: { parentId } }: IProps) {
-    const resultTreeView = await findAllCategoryRoot();
-    const resultCategory = await findCategoryById(Number(parentId));
+    const resultTreeView = await findAllService.rootCategory();
+    const resultCategory = await findOneService.categoryById(Number(parentId));
+
+    if ('error' in resultTreeView) {
+        logger({ error: parseError(resultTreeView) });
+    }
+    if ('error' in resultCategory) {
+        logger({ error: parseError(resultCategory) });
+    }
 
     return (
         <Fragment>
@@ -40,10 +40,18 @@ async function AddSubCategoryPage({ params: { parentId } }: IProps) {
             </Box>
 
             <Box px={3} py={2}>
-                <CategoryTreeView categoryTree={resultTreeView.data} categoryParent={resultCategory.data} />
+                <CategoryTreeView
+                    categoryTree={Array.isArray(resultTreeView) ? resultTreeView : []}
+                    categoryParent={'error' in resultCategory ? undefined : resultCategory}
+                />
             </Box>
         </Fragment>
     );
 }
 
+export async function generateMetadata({ params: { parentId } }: IProps): Promise<Metadata> {
+    const result = await findOneService.categoryById(Number(parentId));
+    const category: ICategory | undefined = 'error' in result ? undefined : result;
+    return { title: `${category?.name || ''} (ID: ${category?.id || ''}) | Laptop Store` };
+}
 export default AddSubCategoryPage;

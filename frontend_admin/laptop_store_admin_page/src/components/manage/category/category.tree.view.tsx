@@ -8,12 +8,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { DragEvent, SyntheticEvent, useCallback, useMemo, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { createCategoryAction, moveCategoryAction, updateCategoryAction } from '~/actions/categoryActions';
 import { ELabel, EPath, EStatus, EText } from '~/common/enums';
 import { categoryResolver } from '~/resolvers';
+import { categoryService } from '~/services';
 import { categoryFormData } from '~/types/form.data';
 import { ICategory } from '~/types/models';
-import { logger } from '~/utils';
+import { logger, parseError } from '~/utils';
 import FormLabel from '../form.label';
 import CustomTreeItem from './custom.tree.item';
 
@@ -57,14 +57,13 @@ function CategoryTreeView({ categoryTree, category, categoryParent }: IProps) {
     const {
         control,
         formState: { errors },
-        setValue,
         handleSubmit,
     } = useForm({
         resolver: categoryResolver,
         defaultValues: { name: category?.name || '', path: category?.path || '' },
     });
     const [dragAndDrop, setDragAndDrop] = useState(initDragAndDrop);
-    const [status, setStatus] = useState<boolean>(() => Boolean(category?.status === EStatus.ENABLED));
+    const [status, setStatus] = useState<boolean>(() => Boolean(category ? category.status === EStatus.ENABLED : true));
     const [disabled, setDisabled] = useState<boolean>(false);
     const router = useRouter();
     const defaultExpanded = useMemo(() => {
@@ -98,30 +97,25 @@ function CategoryTreeView({ categoryTree, category, categoryParent }: IProps) {
     async function handleDragEnd() {
         const { dragFrom, dropTo } = dragAndDrop;
         if (dragFrom !== null && dropTo !== null && dragFrom !== dropTo) {
-            const result = await moveCategoryAction(dragFrom, dropTo);
-            logger({ result });
+            const result = await categoryService.move(dragFrom, dropTo);
+            logger({ error: typeof result === 'string' ? result : parseError(result) });
         }
         setDragAndDrop(initDragAndDrop());
     }
 
     const handleOnSubmit: SubmitHandler<categoryFormData> = async (data) => {
         setDisabled(true);
+
         data.parentId = categoryParent?.id;
         data.status = status ? EStatus.ENABLED : EStatus.DISABLED;
 
-        if (category) {
-            const result = await updateCategoryAction(category.id, data);
-            if (result.success) {
-                setValue('name', result.data.name);
-                setValue('path', result.data.path);
-                setStatus(Boolean(result.data.status === EStatus.ENABLED));
-            }
+        const result = category ? await categoryService.edit(category.id, data) : await categoryService.create(data);
+        if ('error' in result) {
+            logger({ error: parseError(result) });
         } else {
-            const result = await createCategoryAction(data);
-            if (result.success) {
-                router.push(EPath.MANAGE_CATEGORY_EDIT.concat(result.data.id.toString()));
-            }
+            router.push(EPath.MANAGE_CATEGORY_EDIT.concat(result.id.toString()));
         }
+
         setDisabled(false);
     };
 

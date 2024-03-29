@@ -1,14 +1,14 @@
 package chivi.laptopstore.services;
 
-import chivi.laptopstore.common.EAccountRole;
-import chivi.laptopstore.common.EAccountStatus;
+import chivi.laptopstore.common.AccountRole;
+import chivi.laptopstore.common.AccountStatus;
+import chivi.laptopstore.exception.ConflictException;
+import chivi.laptopstore.exception.CustomNotFoundException;
 import chivi.laptopstore.models.entities.AccountEntity;
 import chivi.laptopstore.models.entities.VerificationTokenEntity;
-import chivi.laptopstore.models.exceptions.ConflictException;
-import chivi.laptopstore.models.exceptions.CustomNotFoundException;
 import chivi.laptopstore.models.requests.RegisterRequest;
-import chivi.laptopstore.repositories.entities.IAccountRepository;
-import chivi.laptopstore.repositories.entities.IVerificationTokenRepository;
+import chivi.laptopstore.repositories.IAccountRepository;
+import chivi.laptopstore.repositories.IVerificationTokenRepository;
 import chivi.laptopstore.security.account.AccountDetails;
 import chivi.laptopstore.security.jwt.JwtUtils;
 import lombok.AllArgsConstructor;
@@ -37,18 +37,15 @@ public class AuthenticationService {
         return verificationTokenRepository.findByToken(token).orElseThrow(() -> new CustomNotFoundException("token", token));
     }
 
-    public String getJwtToken(String email, String password) {
+    public AccountEntity getByEmailAndPassword(String email, String password) {
         try {
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
             Authentication authentication = authenticationManager.authenticate(authenticationToken);
-
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
             AccountDetails accountDetails = (AccountDetails) authentication.getPrincipal();
-
-            return jwtUtils.createTokenFromAccount(accountDetails.getAccount());
-        } catch (BadCredentialsException badCredentialsException) {
-            throw new BadCredentialsException(badCredentialsException.getMessage());
+            return accountDetails.getAccount();
+        } catch (BadCredentialsException exception) {
+            throw new BadCredentialsException(exception.getMessage());
         }
     }
 
@@ -58,19 +55,19 @@ public class AuthenticationService {
         }
     }
 
-    public AccountEntity createAccount(RegisterRequest request, EAccountRole role) {
+    public AccountEntity createAccount(RegisterRequest request, AccountRole role) {
         String encoded = passwordEncoder.encode(request.getPassword());
         AccountEntity account = new AccountEntity();
         account.setFullName(request.getFullName());
         account.setEmail(request.getEmail());
         account.setPassword(encoded);
         account.setRole(role);
-        account.setStatus(EAccountStatus.NOT_VERIFIED);
+        account.setStatus(AccountStatus.NOT_VERIFIED);
         return accountRepository.save(account);
     }
 
     public AccountEntity activeAccount(AccountEntity account) {
-        account.setStatus(EAccountStatus.ACTIVE);
+        account.setStatus(AccountStatus.ACTIVE);
         return accountRepository.save(account);
     }
 

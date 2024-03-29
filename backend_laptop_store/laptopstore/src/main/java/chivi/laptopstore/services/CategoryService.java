@@ -1,10 +1,10 @@
 package chivi.laptopstore.services;
 
+import chivi.laptopstore.exception.ConflictException;
+import chivi.laptopstore.exception.CustomNotFoundException;
 import chivi.laptopstore.models.entities.CategoryEntity;
-import chivi.laptopstore.models.exceptions.ConflictException;
-import chivi.laptopstore.models.exceptions.CustomNotFoundException;
 import chivi.laptopstore.models.requests.CategoryRequest;
-import chivi.laptopstore.repositories.entities.ICategoryRepository;
+import chivi.laptopstore.repositories.ICategoryRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

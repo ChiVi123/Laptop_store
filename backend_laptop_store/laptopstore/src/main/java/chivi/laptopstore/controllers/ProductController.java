@@ -57,7 +57,6 @@ public class ProductController {
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse createProduct(@Valid @RequestBody ProductRequest request) {
         productService.checkConflictByName(request.getName());
-
         CategoryEntity category = categoryService.getById(request.getCategoryId());
         BrandEntity brand = brandService.getById(request.getBrandId());
         return new SuccessResponse(ResponseMessage.CREATE_SUCCESS, productService.create(category, brand, request));

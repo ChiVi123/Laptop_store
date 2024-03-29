@@ -1,13 +1,13 @@
 package chivi.laptopstore.controllers;
 
-import chivi.laptopstore.common.EAccountRole;
-import chivi.laptopstore.common.EAccountStatus;
+import chivi.laptopstore.common.AccountRole;
+import chivi.laptopstore.common.AccountStatus;
 import chivi.laptopstore.common.RequestMaps;
 import chivi.laptopstore.events.OnRegistrationEvent;
 import chivi.laptopstore.events.OnResetPasswordEvent;
+import chivi.laptopstore.exception.BaseException;
 import chivi.laptopstore.models.entities.AccountEntity;
 import chivi.laptopstore.models.entities.VerificationTokenEntity;
-import chivi.laptopstore.models.exceptions.BaseException;
 import chivi.laptopstore.models.requests.LoginRequest;
 import chivi.laptopstore.models.requests.RegisterRequest;
 import chivi.laptopstore.models.requests.SendEmailRequest;
@@ -44,7 +44,7 @@ public class AuthenticationController {
             throw new BaseException(HttpStatus.UNAUTHORIZED.value(), "Token's " + account.getEmail() + " is expired");
         }
 
-        if (account.getStatus() != EAccountStatus.NOT_VERIFIED) {
+        if (account.getStatus() != AccountStatus.NOT_VERIFIED) {
             throw new BaseException(HttpStatus.UNAUTHORIZED.value(), "Email: " + account.getEmail() + " is verified");
         }
 
@@ -58,7 +58,8 @@ public class AuthenticationController {
     public SuccessResponse login(@Valid @RequestBody LoginRequest loginRequest) {
         String email = loginRequest.getEmail();
         String password = loginRequest.getPassword();
-        String token = authenticationService.getJwtToken(email, password);
+        AccountEntity account = authenticationService.getByEmailAndPassword(email, password);
+        String token = jwtUtils.createTokenFromAccount(account);
         return new SuccessResponse("Login success", token);
     }
 
@@ -66,10 +67,8 @@ public class AuthenticationController {
     @ResponseStatus(HttpStatus.CREATED)
     public SuccessResponse registerAdmin(@RequestParam("app_url") String appURL, @Valid @RequestBody RegisterRequest request) {
         authenticationService.checkConflictAccountByEmail(request.getEmail());
-
-        AccountEntity account = authenticationService.createAccount(request, EAccountRole.ADMIN);
+        AccountEntity account = authenticationService.createAccount(request, AccountRole.ADMIN);
         OnRegistrationEvent event = new OnRegistrationEvent(account, appURL);
-
         applicationEventPublisher.publishEvent(event);
         return new SuccessResponse("Register success", account);
     }
@@ -78,10 +77,8 @@ public class AuthenticationController {
     @ResponseStatus(HttpStatus.CREATED)
     public SuccessResponse registerCustomer(@RequestParam("app_url") String appURL, @Valid @RequestBody RegisterRequest request) {
         authenticationService.checkConflictAccountByEmail(request.getEmail());
-
-        AccountEntity account = authenticationService.createAccount(request, EAccountRole.CUSTOMER);
+        AccountEntity account = authenticationService.createAccount(request, AccountRole.CUSTOMER);
         OnRegistrationEvent event = new OnRegistrationEvent(account, appURL);
-
         applicationEventPublisher.publishEvent(event);
         return new SuccessResponse("Register success", account);
     }

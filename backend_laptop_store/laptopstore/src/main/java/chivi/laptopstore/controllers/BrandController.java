@@ -49,10 +49,11 @@ public class BrandController {
         return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, brandService.editInfo(brand, request));
     }
 
-    @PutMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "{id}/remove-logo")
+    @DeleteMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "{id}/remove-logo")
     public SuccessResponse removeBrandLogo(@PathVariable Long id) {
         BrandEntity brand = brandService.getById(id);
-        return new SuccessResponse(ResponseMessage.DELETE_SUCCESS, brandService.removeLogo(brand));
+        brandService.removeLogo(brand);
+        return new SuccessResponse(ResponseMessage.DELETE_SUCCESS);
     }
 
     @DeleteMapping(RequestMaps.BRAND_PATHNAME_ADMIN + "{id}/delete")

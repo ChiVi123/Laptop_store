@@ -1,11 +1,11 @@
 package chivi.laptopstore.services;
 
 import chivi.laptopstore.configurations.CloudinaryConfig;
+import chivi.laptopstore.exception.ConflictException;
+import chivi.laptopstore.exception.CustomNotFoundException;
 import chivi.laptopstore.models.entities.BrandEntity;
-import chivi.laptopstore.models.exceptions.ConflictException;
-import chivi.laptopstore.models.exceptions.CustomNotFoundException;
 import chivi.laptopstore.models.requests.BrandRequest;
-import chivi.laptopstore.repositories.entities.IBrandRepository;
+import chivi.laptopstore.repositories.IBrandRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -50,10 +50,10 @@ public class BrandService {
         return repository.save(brand);
     }
 
-    public BrandEntity removeLogo(BrandEntity brand) {
+    public void removeLogo(BrandEntity brand) {
         cloudinaryConfig.deleteImage(brand.getLogo().getPublicId());
         brand.setLogo(null);
-        return repository.save(brand);
+        repository.save(brand);
     }
 
     public void delete(BrandEntity brand) {

@@ -1,11 +1,11 @@
 package chivi.laptopstore.services;
 
 import chivi.laptopstore.common.ResponseMessage;
+import chivi.laptopstore.exception.CustomNotFoundException;
 import chivi.laptopstore.models.entities.AccountEntity;
-import chivi.laptopstore.models.exceptions.CustomNotFoundException;
 import chivi.laptopstore.models.requests.AccountRequest;
 import chivi.laptopstore.models.responses.SuccessResponse;
-import chivi.laptopstore.repositories.entities.IAccountRepository;
+import chivi.laptopstore.repositories.IAccountRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

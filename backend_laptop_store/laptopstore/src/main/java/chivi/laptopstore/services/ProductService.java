@@ -1,16 +1,16 @@
 package chivi.laptopstore.services;
 
 import chivi.laptopstore.configurations.CloudinaryConfig;
+import chivi.laptopstore.exception.ConflictException;
+import chivi.laptopstore.exception.CustomBadRequestException;
+import chivi.laptopstore.exception.CustomNotFoundException;
 import chivi.laptopstore.models.entities.BrandEntity;
 import chivi.laptopstore.models.entities.CategoryEntity;
 import chivi.laptopstore.models.entities.ImageEntity;
 import chivi.laptopstore.models.entities.ProductEntity;
-import chivi.laptopstore.models.exceptions.ConflictException;
-import chivi.laptopstore.models.exceptions.CustomBadRequestException;
-import chivi.laptopstore.models.exceptions.CustomNotFoundException;
 import chivi.laptopstore.models.requests.DiscountRequest;
 import chivi.laptopstore.models.requests.ProductRequest;
-import chivi.laptopstore.repositories.entities.IProductRepository;
+import chivi.laptopstore.repositories.IProductRepository;
 import chivi.laptopstore.utils.CustomString;
 import chivi.laptopstore.utils.PriceHandler;
 import lombok.AllArgsConstructor;
@@ -103,14 +103,15 @@ public class ProductService {
         return repository.save(product);
     }
 
-    public ProductEntity removeImage(ProductEntity product, Long publicId) {
+    public List<ImageEntity> removeImage(ProductEntity product, Long publicId) {
         Optional<ImageEntity> imageOptional = product.getImages().stream().filter(entity -> entity.getId().equals(publicId)).findFirst();
         if (imageOptional.isPresent()) {
             ImageEntity image = imageOptional.get();
             cloudinaryConfig.deleteImage(image.getPublicId());
             product.removeImage(image);
         }
-        return repository.save(product);
+        ProductEntity result = repository.save(product);
+        return result.getImages();
     }
 
     public void delete(ProductEntity product) {

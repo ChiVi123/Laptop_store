@@ -7,18 +7,21 @@ import Link from 'next/link';
 import { Fragment } from 'react';
 import { EPath } from '~/common/enums';
 import ProductForm from '~/components/manage/product/product.form';
-import { findAllService } from '~/services';
+import { findAllService, findOneService } from '~/services';
 import { logger, parseError } from '~/utils';
 
 async function AddProductPage() {
-    const [brandResult, categoryResult] = await Promise.all([findAllService.brand(), findAllService.rootCategory()]);
+    const [brandResult, categoryResult] = await Promise.all([findAllService.brand(), findOneService.rootCategory()]);
 
     if (brandResult && 'error' in brandResult) {
-        logger({ brand: parseError(brandResult) });
+        const error = parseError(brandResult);
+        logger({ brand: error });
+        throw new Error(error.payload.message);
     }
-
     if (categoryResult && 'error' in categoryResult) {
-        logger({ brand: parseError(categoryResult) });
+        const error = parseError(categoryResult);
+        logger({ brand: error });
+        throw new Error(error.payload.message);
     }
 
     return (
@@ -38,10 +41,7 @@ async function AddProductPage() {
                 </Typography>
             </Box>
 
-            <ProductForm
-                brands={Array.isArray(brandResult) ? brandResult : []}
-                categories={Array.isArray(categoryResult) ? categoryResult : []}
-            />
+            <ProductForm brands={brandResult} categories={categoryResult.children} />
         </Fragment>
     );
 }

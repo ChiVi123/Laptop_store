@@ -16,18 +16,23 @@ interface IProps {
 
 async function EditProductPage({ params: { slug } }: IProps) {
     const productResult = await findOneService.productBySlug(slug);
-    const [brandResult, categoryResult] = await Promise.all([findAllService.brand(), findAllService.rootCategory()]);
+    const [brandResult, categoryResult] = await Promise.all([findAllService.brand(), findOneService.rootCategory()]);
 
     if (brandResult && 'error' in brandResult) {
-        logger({ brand: parseError(brandResult) });
+        const error = parseError(brandResult);
+        logger({ brand: error });
+        throw new Error(error.payload.message);
     }
-
     if (categoryResult && 'error' in categoryResult) {
-        logger({ brand: parseError(categoryResult) });
+        const error = parseError(categoryResult);
+        logger({ brand: error });
+        throw new Error(error.payload.message);
     }
 
     if ('error' in productResult) {
-        logger({ product: parseError(productResult) });
+        const error = parseError(productResult);
+        logger({ product: error });
+        throw new Error(error.payload.message);
     }
 
     return (
@@ -47,11 +52,7 @@ async function EditProductPage({ params: { slug } }: IProps) {
                 </Typography>
             </Box>
 
-            <ProductForm
-                product={'error' in productResult ? undefined : productResult}
-                brands={Array.isArray(brandResult) ? brandResult : []}
-                categories={Array.isArray(categoryResult) ? categoryResult : []}
-            />
+            <ProductForm product={productResult} brands={brandResult} categories={categoryResult.children} />
         </Fragment>
     );
 }

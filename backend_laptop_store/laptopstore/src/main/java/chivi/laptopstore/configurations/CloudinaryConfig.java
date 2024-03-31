@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -33,9 +32,8 @@ public class CloudinaryConfig {
         ));
     }
 
-    public void deleteImage(String publicId) {
+    public void deleteImage(List<String> publicIds) {
         Map<?, ?> options = ObjectUtils.asMap("type", "upload", "resource_type", "image");
-        List<String> publicIds = Collections.singletonList(publicId);
         try {
             ApiResponse apiResponse = cloudinary().api().deleteResources(publicIds, options);
             log.info("Cloudinary delete resources: {}", apiResponse);

@@ -10,8 +10,9 @@ export const registerDefaultValues: registerFormData = {
     password: '123456789',
     passwordConfirm: '123456789',
 };
-export const productDefaultValues: Omit<productFormData, 'categoryId' | 'brandId'> = {
+export const productDefaultValues: productFormData = {
     name: '',
+    categories: [],
     description: '',
     price: 10000,
     quantityStock: 10,

@@ -51,13 +51,13 @@ public class BrandService {
     }
 
     public void removeLogo(BrandEntity brand) {
-        cloudinaryConfig.deleteImage(brand.getLogo().getPublicId());
+        cloudinaryConfig.deleteImage(List.of(brand.getLogo().getPublicId()));
         brand.setLogo(null);
         repository.save(brand);
     }
 
     public void delete(BrandEntity brand) {
-        cloudinaryConfig.deleteImage(brand.getLogo().getPublicId());
+        cloudinaryConfig.deleteImage(List.of(brand.getLogo().getPublicId()));
         repository.delete(brand);
     }
 }

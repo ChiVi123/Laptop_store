@@ -1,80 +1,52 @@
 'use client';
 
-import { TextField } from '@mui/material';
+import { AutocompleteChangeReason, TextField } from '@mui/material';
 import TreeSelect from 'mui-tree-select';
 import { useCallback, useMemo } from 'react';
-import { EStatus } from '~/common/enums';
 import { ICategory } from '~/types/models';
 
 class Node {
-    private value: ICategory;
+    private _value: ICategory;
 
     constructor(value: ICategory) {
-        this.value = value;
+        this._value = value;
     }
 
-    get id(): number {
-        return this.value.id;
+    get value(): ICategory {
+        return this._value;
     }
 
     get director(): string {
-        return this.value.director;
+        return this._value.director;
     }
 
     get children(): Node[] | null {
-        const children = this.value.children;
+        const children = this._value.children;
         return Boolean(children.length) ? children.map((item) => new Node(item)) : null;
     }
 
     isBranch(): boolean {
-        return Boolean(this.value.children.length);
+        return Boolean(this._value.children.length);
     }
 
     isEqual(node: Node): boolean {
-        return this.value.id === node.value.id;
+        return this._value.id === node.value.id;
     }
 
     toString(): string {
-        return this.value.name;
+        return this._value.name;
     }
 }
 interface IProps {
     id: string;
-    value?: number;
+    value?: ICategory[];
     tree: ICategory[];
-    onChange(value: number): void;
+    onChange(value: ICategory[]): void;
 }
 
 function CategorySelectField({ id, value, tree, onChange }: IProps) {
     const data = useMemo(() => tree.map((item) => new Node(item)), [tree]);
-    const nodeValue = useMemo(() => {
-        const stack: ICategory[] = [];
-        let category: ICategory | undefined = {
-            id: 0,
-            name: '',
-            path: '',
-            level: -1,
-            director: '-1',
-            children: tree,
-            createdDate: '',
-            lastModifiedDate: '',
-            status: EStatus.ENABLED,
-        };
-
-        stack.push(category);
-
-        while (stack.length > 0) {
-            category = stack.pop();
-
-            if (category?.id === value) {
-                return category ? new Node(category) : null;
-            } else if (category?.children.length) {
-                category.children.forEach((child) => stack.push(child));
-            }
-        }
-
-        return null;
-    }, [tree, value]);
+    const nodeValue = useMemo(() => (value === undefined ? [] : value.map((item) => new Node(item))), [value]);
 
     const handleGetParent = useCallback(
         (node: Node): Node | null => {
@@ -98,9 +70,18 @@ function CategorySelectField({ id, value, tree, onChange }: IProps) {
         [tree],
     );
 
-    function handleOnChange(_: any, value: Node | null, reason: any, detail: any) {
-        if (value && reason === 'selectOption' && onChange) {
-            onChange(value.id);
+    function handleOnChange(_: any, nodes: Node[] | null, reason: AutocompleteChangeReason, __: any) {
+        if (nodes === null) {
+            return;
+        }
+        switch (reason) {
+            case 'selectOption':
+            case 'removeOption':
+                onChange(nodes.map((item) => item.value));
+                break;
+
+            default:
+                break;
         }
     }
 
@@ -108,6 +89,7 @@ function CategorySelectField({ id, value, tree, onChange }: IProps) {
         <TreeSelect
             id={'select-' + id}
             size='small'
+            multiple
             value={nodeValue}
             getChildren={(node) => (node ? node.children : data)}
             getParent={handleGetParent}

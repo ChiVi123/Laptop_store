@@ -17,10 +17,10 @@ import java.util.List;
 @Getter
 @Setter
 public class ProductEntity extends EntityStandard {
-    @Column(name = EntityNames.COLUMN_PRODUCT_NAME, unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     private String name;
 
-    @Column(name = EntityNames.COLUMN_PRODUCT_SLUG, unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     private String slug;
 
     @ManyToMany(cascade = CascadeType.ALL)
@@ -66,10 +66,6 @@ public class ProductEntity extends EntityStandard {
 
     public void addAllCategory(List<CategoryEntity> categories) {
         this.categories.addAll(categories);
-    }
-
-    public void removeCategory(CategoryEntity category) {
-        this.categories.remove(category);
     }
 
     public void clearAllCategory() {

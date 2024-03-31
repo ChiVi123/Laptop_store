@@ -2,44 +2,36 @@
 
 import { Box, Button, FormControlLabel, FormHelperText, Paper, Switch, TextField, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { EKeys, EPath, EStatus, EText, HttpStatus } from '~/common/enums';
 import { productDefaultValues } from '~/common/values';
 import { productResolver } from '~/resolvers';
 import { productService, uploadFileService } from '~/services';
 import { productFormData } from '~/types/form.data';
-import { IBrand, ICategory, IImage, IProduct } from '~/types/models';
+import { ICategory, IImage, IProduct } from '~/types/models';
 import { logger, parseError } from '~/utils';
 import FormLabel from '../form.label';
 import CategorySelectField from './category.select.field';
 import EditorField from './editor.field';
 import ImageField from './image.field';
 import NumberField from './number.field';
-import SelectField from './select.field';
 import { StyleBackgroundFormGroup } from './styles';
 
 interface IProps {
     product?: IProduct;
     categories: ICategory[];
-    brands: IBrand[];
 }
 
-function ProductForm({ product, categories, brands }: IProps) {
-    const defaultValues = useMemo(() => {
-        if (!product) return productDefaultValues;
-
-        const { brand, category } = product;
-        return { ...product, brandId: brand.id, categoryId: category.id } as productFormData;
-    }, [product]);
+function ProductForm({ product, categories }: IProps) {
     const {
         control,
         formState: { errors },
         setError,
         handleSubmit,
-    } = useForm<productFormData>({ resolver: productResolver, defaultValues });
+    } = useForm<productFormData>({ resolver: productResolver, defaultValues: product || productDefaultValues });
     const [loading, setLoading] = useState<boolean>(false);
-    const [status, setStatus] = useState<boolean>(product?.status === EStatus.ENABLED);
+    const [status, setStatus] = useState<boolean>(product ? product.status === EStatus.ENABLED : true);
     const router = useRouter();
 
     async function handleRemoveImage(value: IImage) {
@@ -51,7 +43,7 @@ function ProductForm({ product, categories, brands }: IProps) {
 
     const handleOnSubmit: SubmitHandler<productFormData> = async (data, _) => {
         setLoading(true);
-
+        data.categoryIds = data.categories.map((item) => item.id);
         data.status = status ? EStatus.ENABLED : EStatus.DISABLED;
         if (data.images && data.images.length) {
             const formData = new FormData();
@@ -60,12 +52,10 @@ function ProductForm({ product, categories, brands }: IProps) {
                     formData.append(EKeys.IMAGE, image);
                 }
             });
-
             data.images = await uploadFileService.multiple(EKeys.IMAGE, formData);
         }
 
         const result = product ? await productService.edit(product.id, data) : await productService.create(data);
-
         if ('error' in result) {
             const error = parseError(result);
             if (error.httpCode === HttpStatus.CONFLICT) {
@@ -75,7 +65,6 @@ function ProductForm({ product, categories, brands }: IProps) {
         } else {
             router.push(EPath.MANAGE_PRODUCT_EDIT.concat(result.slug));
         }
-
         setLoading(false);
     };
 
@@ -141,7 +130,7 @@ function ProductForm({ product, categories, brands }: IProps) {
                                 Danh mục
                             </FormLabel>
                             <Controller
-                                name='categoryId'
+                                name='categories'
                                 control={control}
                                 render={({ field: { value, onChange } }) => (
                                     <CategorySelectField
@@ -149,28 +138,6 @@ function ProductForm({ product, categories, brands }: IProps) {
                                         value={value}
                                         tree={categories}
                                         onChange={onChange}
-                                    />
-                                )}
-                            />
-                        </div>
-                        <div>
-                            <FormLabel id='input-brand' required>
-                                Thương hiệu
-                            </FormLabel>
-                            <Controller
-                                name='brandId'
-                                control={control}
-                                render={({ field: { value, onChange } }) => (
-                                    <SelectField
-                                        id='input-brand'
-                                        placeholder='Thương hiệu'
-                                        items={brands}
-                                        value={value ? value.toString() : undefined}
-                                        optionKeyValue='id'
-                                        optionKeyLabel='name'
-                                        error={Boolean(errors.brandId?.message)}
-                                        helperText={errors.brandId?.message || ''}
-                                        onChange={(newValue) => onChange(parseInt(newValue))}
                                     />
                                 )}
                             />

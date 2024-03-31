@@ -38,10 +38,6 @@ public class CategoryEntity extends EntityStandard {
     @JsonManagedReference
     private List<CategoryEntity> children = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "categories")
-    @JsonBackReference
-    private List<ProductEntity> products;
-
     private EntityStatus status;
 
     public void addChild(CategoryEntity child) {

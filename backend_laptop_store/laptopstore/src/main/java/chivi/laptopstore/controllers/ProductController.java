@@ -2,14 +2,12 @@ package chivi.laptopstore.controllers;
 
 import chivi.laptopstore.common.RequestMaps;
 import chivi.laptopstore.common.ResponseMessage;
-import chivi.laptopstore.models.entities.BrandEntity;
 import chivi.laptopstore.models.entities.CategoryEntity;
 import chivi.laptopstore.models.entities.ProductEntity;
 import chivi.laptopstore.models.payloads.PagePayload;
 import chivi.laptopstore.models.requests.DiscountRequest;
 import chivi.laptopstore.models.requests.ProductRequest;
 import chivi.laptopstore.models.responses.SuccessResponse;
-import chivi.laptopstore.services.BrandService;
 import chivi.laptopstore.services.CategoryService;
 import chivi.laptopstore.services.ProductService;
 import jakarta.validation.Valid;
@@ -20,13 +18,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping(RequestMaps.API_V1)
 @AllArgsConstructor
 public class ProductController {
     private final ProductService productService;
-    private final BrandService brandService;
     private final CategoryService categoryService;
 
     @GetMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "all")
@@ -57,18 +56,16 @@ public class ProductController {
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse createProduct(@Valid @RequestBody ProductRequest request) {
         productService.checkConflictByName(request.getName());
-        CategoryEntity category = categoryService.getById(request.getCategoryId());
-        BrandEntity brand = brandService.getById(request.getBrandId());
-        return new SuccessResponse(ResponseMessage.CREATE_SUCCESS, productService.create(category, brand, request));
+        List<CategoryEntity> categories = categoryService.getAllByIds(request.getCategoryIds());
+        return new SuccessResponse(ResponseMessage.CREATE_SUCCESS, productService.create(categories, request));
     }
 
     @PutMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "{id}/edit")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse updateProduct(@PathVariable Long id, @Valid @RequestBody ProductRequest request) {
         ProductEntity product = productService.getById(id);
-        CategoryEntity category = categoryService.getById(request.getCategoryId());
-        BrandEntity brand = brandService.getById(request.getBrandId());
-        ProductEntity result = productService.editInfo(product, category, brand, request);
+        List<CategoryEntity> categories = categoryService.getAllByIds(request.getCategoryIds());
+        ProductEntity result = productService.editInfo(product, categories, request);
         return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, result);
     }
 

@@ -4,7 +4,6 @@ import chivi.laptopstore.configurations.CloudinaryConfig;
 import chivi.laptopstore.exception.ConflictException;
 import chivi.laptopstore.exception.CustomBadRequestException;
 import chivi.laptopstore.exception.CustomNotFoundException;
-import chivi.laptopstore.models.entities.BrandEntity;
 import chivi.laptopstore.models.entities.CategoryEntity;
 import chivi.laptopstore.models.entities.ImageEntity;
 import chivi.laptopstore.models.entities.ProductEntity;
@@ -53,12 +52,11 @@ public class ProductService {
         }
     }
 
-    public ProductEntity create(CategoryEntity category, BrandEntity brand, ProductRequest request) {
+    public ProductEntity create(List<CategoryEntity> categories, ProductRequest request) {
         ProductEntity product = new ProductEntity();
         product.setName(request.getName());
         product.setSlug(request.getSlug());
-        product.setCategory(category);
-        product.setBrand(brand);
+        product.setCategories(categories);
         product.setDescription(request.getDescription());
         product.setPrice(request.getPrice());
         product.setQuantityStock(request.getQuantityStock());
@@ -67,20 +65,18 @@ public class ProductService {
         return repository.save(product);
     }
 
-    public ProductEntity editInfo(ProductEntity product, CategoryEntity category, BrandEntity brand, ProductRequest request) {
+    public ProductEntity editInfo(ProductEntity product, List<CategoryEntity> categories, ProductRequest request) {
         if (!product.getName().equals(request.getName())) {
             this.checkConflictByName(request.getName());
             String slug = CustomString.toSlug(request.getName());
             product.setName(request.getName());
             product.setSlug(slug);
         }
-
-        product.setCategory(category);
-        product.setBrand(brand);
         product.setPrice(request.getPrice());
         product.setDescription(request.getDescription());
         product.setStatus(request.getStatus());
-
+        product.clearAllCategory();
+        product.addAllCategory(categories);
         request.getImages().forEach(product::addImage);
 
         return repository.save(product);
@@ -90,13 +86,10 @@ public class ProductService {
         BigDecimal price = product.getPrice();
         BigDecimal discount = discountRequest.getDiscount();
         MathContext mathContext = new MathContext(4);
-
         if (price.compareTo(discount) < 0) {
             throw new CustomBadRequestException("Discount invalid");
         }
-
         BigDecimal rate = PriceHandler.discountRating(price, discount);
-
         product.setPrice(price);
         product.setDiscount(discount);
         product.setDiscountRate(rate.round(mathContext).floatValue());

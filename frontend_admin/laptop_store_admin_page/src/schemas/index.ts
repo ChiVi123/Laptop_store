@@ -2,7 +2,7 @@
 
 import * as yup from 'yup';
 import { EInvalid, EStatus } from '~/common/enums';
-import { IImage } from '~/types/models';
+import { ICategory, IImage } from '~/types/models';
 
 function yupString() {
     return yup.string().trim();
@@ -23,8 +23,8 @@ export const registerSchema = yup.object({
 export const sendMailSchema = yup.object({ email });
 export const productSchema = yup.object({
     name: yupString().required(),
-    categoryId: yup.number().integer().positive().required(),
-    brandId: yup.number().integer().positive().required(),
+    categories: yup.array(yup.mixed<ICategory>().required()).required(),
+    categoryIds: yup.array(yup.number().required()),
     description: yupString().required(),
     price: yup.number().positive().required(),
     quantityStock: yup.number().min(0).required(),

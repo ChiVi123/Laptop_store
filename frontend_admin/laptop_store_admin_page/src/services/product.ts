@@ -15,6 +15,7 @@ export async function create(data: productFormData) {
     const path = pathHandler.getPath('create');
     try {
         const response = await httpRequest.post<IProductResponse>(path, data, { auth });
+        revalidateTag(EKeys.PRODUCT_LIST);
         return response.payload;
     } catch (error) {
         return stringifyError(error);
@@ -25,6 +26,7 @@ export async function edit(id: number, data: productFormData) {
     const path = pathHandler.getPath(id, 'edit');
     try {
         const response = await httpRequest.put<IProductResponse>(path, data, { auth });
+        revalidateTag(EKeys.PRODUCT_LIST);
         return response.payload;
     } catch (error) {
         return stringifyError(error);

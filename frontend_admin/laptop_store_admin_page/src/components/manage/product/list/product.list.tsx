@@ -12,7 +12,7 @@ import {
 } from '@mui/x-data-grid';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import { EPath, EStatus, EText } from '~/common/enums';
 import { mapStatus } from '~/common/maps';
 import { productService } from '~/services';
@@ -44,14 +44,20 @@ function ProductList({ rows }: IProps) {
                 sortable: false,
                 filterable: false,
                 renderCell: (params: GridRenderCellParams<any, IImage[]>) => (
-                    <Image
-                        src={params.value ? params.value[0].secureUrl : ''}
-                        alt={params.value ? params.value[0].publicId : ''}
-                        width={100}
-                        height={100}
-                        priority
-                        style={{ objectFit: 'contain' }}
-                    />
+                    <Fragment>
+                        {params.value?.length ? (
+                            <Image
+                                src={params.value ? params.value[0].secureUrl : ''}
+                                alt={params.value ? params.value[0].publicId : ''}
+                                width={100}
+                                height={100}
+                                priority
+                                style={{ objectFit: 'contain' }}
+                            />
+                        ) : (
+                            <Box width={100} height={100}></Box>
+                        )}
+                    </Fragment>
                 ),
             },
             { field: 'name', headerName: 'Tên sản phẩm', minWidth: 420 },

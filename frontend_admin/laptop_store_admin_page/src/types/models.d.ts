@@ -44,8 +44,7 @@ export interface IBrand extends IEntity, IEntityStatus, IEntityDateTime {
 export interface IProduct extends IEntity, IEntityStatus, IEntityDateTime {
     name: string;
     slug: string;
-    brand: IBrand;
-    category: ICategory;
+    categories: ICategory[];
     description: string;
     discount: number | null;
     discountRate: number;

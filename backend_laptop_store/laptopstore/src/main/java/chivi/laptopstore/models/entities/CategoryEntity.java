@@ -19,13 +19,13 @@ import java.util.List;
 @Getter
 @Setter
 public class CategoryEntity extends EntityStandard {
-    private int level;
-
-    @Column(name = EntityNames.COLUMN_CATEGORY_NAME, unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     private String name;
 
-    @Column(name = EntityNames.COLUMN_CATEGORY_PATH, unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     private String path;
+
+    private int level;
 
     private String director;
 
@@ -37,6 +37,10 @@ public class CategoryEntity extends EntityStandard {
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<CategoryEntity> children = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "categories")
+    @JsonBackReference
+    private List<ProductEntity> products;
 
     private EntityStatus status;
 

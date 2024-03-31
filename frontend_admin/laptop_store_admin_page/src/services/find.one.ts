@@ -9,6 +9,14 @@ export async function productBySlug(slug: string) {
         return stringifyError(error);
     }
 }
+export async function rootCategory() {
+    try {
+        const response = await httpRequest.get<ICategoryResponse>('public/categories/root', { cache: 'no-cache' });
+        return response.payload;
+    } catch (error) {
+        return stringifyError(error);
+    }
+}
 export async function categoryById(id: number) {
     try {
         const response = await httpRequest.get<ICategoryResponse>(`public/categories/${id}`, { cache: 'no-cache' });

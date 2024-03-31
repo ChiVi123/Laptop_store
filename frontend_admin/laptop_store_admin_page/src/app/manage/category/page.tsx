@@ -7,16 +7,16 @@ import Link from 'next/link';
 import { Fragment } from 'react';
 import { EPath } from '~/common/enums';
 import CategoryTreeView from '~/components/manage/category/category.tree.view';
-import { findAllService } from '~/services';
-import { ICategory } from '~/types/models';
+import { findOneService } from '~/services';
 import { logger, parseError } from '~/utils';
 
 async function CategoryPage() {
-    const result = await findAllService.rootCategory();
+    const result = await findOneService.rootCategory();
     if ('error' in result) {
-        logger({ error: parseError(result) });
+        const error = parseError(result);
+        logger({ error });
+        throw new Error(error.payload.message);
     }
-    const categoryRoot: ICategory | undefined = Array.isArray(result) ? result[0] : undefined;
 
     return (
         <Fragment>
@@ -29,22 +29,22 @@ async function CategoryPage() {
                         Danh mục
                     </Typography>
                 </Breadcrumbs>
-
-                <Typography variant='h2' mt={2}>
-                    {categoryRoot && categoryRoot.name}
-                </Typography>
             </Box>
 
             <Box px={3} py={2}>
-                <CategoryTreeView categoryTree={Array.isArray(result) ? result : []} category={categoryRoot} />
+                <CategoryTreeView categoryTree={result.children} parentCategory={result} />
             </Box>
         </Fragment>
     );
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-    const result = await findAllService.rootCategory();
-    const categoryRoot: ICategory | undefined = Array.isArray(result) ? result[0] : undefined;
-    return { title: `${categoryRoot?.name || ''} (ID: ${categoryRoot?.id || ''}) | Laptop Store` };
+    const result = await findOneService.rootCategory();
+    if ('error' in result) {
+        const error = parseError(result);
+        logger({ error });
+        throw new Error(error.payload.message);
+    }
+    return { title: 'Category | Laptop Store' };
 }
 export default CategoryPage;

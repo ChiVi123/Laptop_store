@@ -1,7 +1,6 @@
 'use client';
 
 import { Box, Button, Modal, Typography } from '@mui/material';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { EText } from '~/common/enums';
 import { categoryService } from '~/services';
@@ -24,7 +23,6 @@ const styleModal = {
 };
 
 function CategoryBar({ category }: IProps) {
-    const router = useRouter();
     const [open, setOpen] = useState<boolean>(false);
 
     function handleOpen() {
@@ -35,7 +33,9 @@ function CategoryBar({ category }: IProps) {
     }
     async function handleDeleteItem() {
         const result = await categoryService.destroy(category.id);
-        logger({ error: typeof result === 'string' ? result : parseError(result) });
+        if (result) {
+            logger({ error: parseError(result) });
+        }
     }
 
     return (

@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { Fragment } from 'react';
 import { EPath } from '~/common/enums';
 import CategoryTreeView from '~/components/manage/category/category.tree.view';
-import { findAllService, findOneService } from '~/services';
+import { findOneService } from '~/services';
 import { ICategory } from '~/types/models';
 import { logger, parseError } from '~/utils';
 
@@ -16,14 +16,18 @@ interface IProps {
 }
 
 async function AddSubCategoryPage({ params: { parentId } }: IProps) {
-    const resultTreeView = await findAllService.rootCategory();
+    const resultRootCategory = await findOneService.rootCategory();
     const resultCategory = await findOneService.categoryById(Number(parentId));
 
-    if ('error' in resultTreeView) {
-        logger({ error: parseError(resultTreeView) });
+    if ('error' in resultRootCategory) {
+        const error = parseError(resultRootCategory);
+        logger({ error });
+        throw new Error(error.payload.message);
     }
     if ('error' in resultCategory) {
-        logger({ error: parseError(resultCategory) });
+        const error = parseError(resultCategory);
+        logger({ error });
+        throw new Error(error.payload.message);
     }
 
     return (
@@ -40,10 +44,7 @@ async function AddSubCategoryPage({ params: { parentId } }: IProps) {
             </Box>
 
             <Box px={3} py={2}>
-                <CategoryTreeView
-                    categoryTree={Array.isArray(resultTreeView) ? resultTreeView : []}
-                    categoryParent={'error' in resultCategory ? undefined : resultCategory}
-                />
+                <CategoryTreeView categoryTree={resultRootCategory.children} parentCategory={resultCategory} />
             </Box>
         </Fragment>
     );

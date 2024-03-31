@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.*;
 public class CategoryController {
     private final CategoryService categoryService;
 
-    @GetMapping(RequestMaps.CATEGORY_PATHNAME_PUBLIC + "all-root")
+    @GetMapping(RequestMaps.CATEGORY_PATHNAME_PUBLIC + "root")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse findAllCategory() {
-        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, categoryService.getAllRoot());
+    public SuccessResponse findRootCategory() {
+        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, categoryService.getRoot());
     }
 
     @GetMapping(RequestMaps.CATEGORY_PATHNAME_PUBLIC + "{id}")
@@ -29,19 +29,12 @@ public class CategoryController {
         return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, categoryService.getById(id));
     }
 
-    @PostMapping(RequestMaps.CATEGORY_PATHNAME_ADMIN + "create-root")
-    @ResponseStatus(HttpStatus.CREATED)
-    public SuccessResponse createCategoryRoot(@Valid @RequestBody CategoryRequest request) {
-        categoryService.checkConflictByName(request.getName());
-        return new SuccessResponse(ResponseMessage.CREATE_SUCCESS, categoryService.createRoot(request));
-    }
-
-    @PostMapping(RequestMaps.CATEGORY_PATHNAME_ADMIN + "create-sub")
+    @PostMapping(RequestMaps.CATEGORY_PATHNAME_ADMIN + "create")
     @ResponseStatus(HttpStatus.CREATED)
     public SuccessResponse createCategory(@Valid @RequestBody CategoryRequest request) {
         categoryService.checkConflictByName(request.getName());
         CategoryEntity parent = categoryService.getById(request.getParentId());
-        return new SuccessResponse(ResponseMessage.CREATE_SUCCESS, categoryService.createSub(parent, request));
+        return new SuccessResponse(ResponseMessage.CREATE_SUCCESS, categoryService.create(parent, request));
     }
 
     @PutMapping(RequestMaps.CATEGORY_PATHNAME_ADMIN + "{id}/edit")
@@ -67,7 +60,6 @@ public class CategoryController {
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse deleteCategory(@PathVariable Long id) {
         CategoryEntity category = categoryService.getById(id);
-        categoryService.delete(category);
-        return new SuccessResponse(ResponseMessage.DELETE_SUCCESS);
+        return new SuccessResponse(ResponseMessage.DELETE_SUCCESS, categoryService.deleteChild(category));
     }
 }

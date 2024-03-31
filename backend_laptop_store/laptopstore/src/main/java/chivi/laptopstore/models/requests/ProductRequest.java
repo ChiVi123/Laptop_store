@@ -21,10 +21,7 @@ public class ProductRequest {
     private String name;
 
     @NotNull(message = ValidationMessage.NOT_NULL)
-    private Long categoryId;
-
-    @NotNull(message = ValidationMessage.NOT_NULL)
-    private Long brandId;
+    private List<Long> categoryIds;
 
     @NotBlank(message = ValidationMessage.NOT_BLANK)
     private String description;
@@ -38,7 +35,6 @@ public class ProductRequest {
 
     private BigDecimal discount;
 
-    @NotNull(message = ValidationMessage.NOT_NULL)
     private List<ImageEntity> images;
 
     @NotNull(message = ValidationMessage.NOT_NULL)
@@ -52,35 +48,31 @@ public class ProductRequest {
         return CustomString.toSlug(this.name.trim());
     }
 
-    public Long getCategoryId() {
-        return categoryId;
-    }
-
-    public Long getBrandId() {
-        return brandId;
+    public List<Long> getCategoryIds() {
+        return this.categoryIds;
     }
 
     public String getDescription() {
-        return description.trim();
+        return this.description.trim();
     }
 
     public BigDecimal getPrice() {
-        return price;
+        return this.price;
     }
 
     public int getQuantityStock() {
-        return quantityStock;
+        return this.quantityStock;
     }
 
     public BigDecimal getDiscount() {
-        return discount;
+        return this.discount;
     }
 
     public List<ImageEntity> getImages() {
-        return images;
+        return this.images;
     }
 
     public EntityStatus getStatus() {
-        return status;
+        return this.status;
     }
 }

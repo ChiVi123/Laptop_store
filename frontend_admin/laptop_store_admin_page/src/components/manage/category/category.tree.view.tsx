@@ -31,7 +31,7 @@ interface IDragAndDropStatus {
 interface IProps {
     categoryTree: ICategory[];
     category?: ICategory;
-    categoryParent?: ICategory;
+    parentCategory?: ICategory;
 }
 
 const styleBefore = {
@@ -52,7 +52,7 @@ const styleBefore = {
     zIndex: 2,
 };
 
-function CategoryTreeView({ categoryTree, category, categoryParent }: IProps) {
+function CategoryTreeView({ categoryTree, category, parentCategory }: IProps) {
     const initDragAndDrop = useCallback(() => ({ type: '', dragFrom: null, dropTo: null } as IDragAndDropStatus), []);
     const {
         control,
@@ -67,16 +67,16 @@ function CategoryTreeView({ categoryTree, category, categoryParent }: IProps) {
     const [disabled, setDisabled] = useState<boolean>(false);
     const router = useRouter();
     const defaultExpanded = useMemo(() => {
-        const expanded = category?.director.split(',') || categoryParent?.director.split(',') || [];
+        const expanded = category?.director.split(',') || parentCategory?.director.split(',') || [];
         if (category) {
             expanded.push(category.id.toString());
         }
-        if (categoryParent) {
-            expanded.push(categoryParent.id.toString());
+        if (parentCategory) {
+            expanded.push(parentCategory.id.toString());
         }
         return expanded;
-    }, [category, categoryParent]);
-    const pathDefault = '0';
+    }, [category, parentCategory]);
+    const pathDefault = '1';
 
     function handleSetSelected(_: SyntheticEvent, nodeId: string) {
         router.push(EPath.MANAGE_CATEGORY_EDIT.concat(nodeId));
@@ -98,7 +98,9 @@ function CategoryTreeView({ categoryTree, category, categoryParent }: IProps) {
         const { dragFrom, dropTo } = dragAndDrop;
         if (dragFrom !== null && dropTo !== null && dragFrom !== dropTo) {
             const result = await categoryService.move(dragFrom, dropTo);
-            logger({ error: typeof result === 'string' ? result : parseError(result) });
+            if (!(typeof result === 'string')) {
+                logger({ error: parseError(result) });
+            }
         }
         setDragAndDrop(initDragAndDrop());
     }
@@ -106,16 +108,13 @@ function CategoryTreeView({ categoryTree, category, categoryParent }: IProps) {
     const handleOnSubmit: SubmitHandler<categoryFormData> = async (data) => {
         setDisabled(true);
 
-        data.parentId = categoryParent?.id;
+        data.parentId = parentCategory?.id;
         data.status = status ? EStatus.ENABLED : EStatus.DISABLED;
 
         const result = category ? await categoryService.edit(category.id, data) : await categoryService.create(data);
-        if ('error' in result) {
+        if (result && 'error' in result) {
             logger({ error: parseError(result) });
-        } else {
-            router.push(EPath.MANAGE_CATEGORY_EDIT.concat(result.id.toString()));
         }
-
         setDisabled(false);
     };
 
@@ -149,21 +148,21 @@ function CategoryTreeView({ categoryTree, category, categoryParent }: IProps) {
                     <Button
                         variant='outlined'
                         LinkComponent={Link}
-                        href={EPath.MANAGE_CATEGORY_ADD.concat(pathDefault)}
+                        href={`${EPath.MANAGE_CATEGORY_ADD}${parentCategory ? parentCategory.id : pathDefault}`}
                     >
                         {EText.ADD_ROOT_CATEGORY}
                     </Button>
                     <Button
                         variant='outlined'
                         LinkComponent={Link}
-                        href={EPath.MANAGE_CATEGORY_ADD.concat((category ? category.id : pathDefault).toString())}
+                        href={`${EPath.MANAGE_CATEGORY_ADD}${category ? category.id : pathDefault}`}
                     >
                         {EText.ADD_SUBCATEGORY}
                     </Button>
                 </Box>
                 <TreeView
                     aria-label='category tree'
-                    defaultSelected={category?.id.toString() || categoryParent?.id.toString()}
+                    defaultSelected={category?.id.toString() || parentCategory?.id.toString()}
                     defaultExpanded={defaultExpanded}
                     defaultCollapseIcon={<ExpandMoreIcon />}
                     defaultExpandIcon={<ChevronRightIcon />}

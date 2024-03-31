@@ -23,11 +23,13 @@ public class ProductEntity extends EntityStandard {
     @Column(name = EntityNames.COLUMN_PRODUCT_SLUG, unique = true, nullable = false)
     private String slug;
 
-    @ManyToOne
-    private CategoryEntity category;
-
-    @ManyToOne
-    private BrandEntity brand;
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = EntityNames.TABLE_PRODUCT_CATEGORY,
+            joinColumns = @JoinColumn(name = EntityNames.JOIN_COLUMN_PRODUCT_ID),
+            inverseJoinColumns = @JoinColumn(name = EntityNames.JOIN_COLUMN_CATEGORY_ID)
+    )
+    private List<CategoryEntity> categories = new ArrayList<>();
 
     @Column(columnDefinition = "longtext")
     private String description;
@@ -39,6 +41,11 @@ public class ProductEntity extends EntityStandard {
     private int quantityStock;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinTable(
+            name = EntityNames.TABLE_PRODUCT_IMAGE,
+            joinColumns = @JoinColumn(name = EntityNames.JOIN_COLUMN_PRODUCT_ID),
+            inverseJoinColumns = @JoinColumn(name = EntityNames.JOIN_COLUMN_IMAGE_ID)
+    )
     private List<ImageEntity> images = new ArrayList<>();
 
     private BigDecimal discount;
@@ -56,6 +63,18 @@ public class ProductEntity extends EntityStandard {
     private int reviewCount;
 
     private EntityStatus status;
+
+    public void addAllCategory(List<CategoryEntity> categories) {
+        this.categories.addAll(categories);
+    }
+
+    public void removeCategory(CategoryEntity category) {
+        this.categories.remove(category);
+    }
+
+    public void clearAllCategory() {
+        this.categories.clear();
+    }
 
     public void addImage(ImageEntity images) {
         this.images.add(images);

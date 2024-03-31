@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 public class ImageEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = EntityNames.COLUMN_IMAGE_ID)
     private Long id;
 
     @Column(name = EntityNames.COLUMN_IMAGE_PUBLIC_ID, unique = true, nullable = false)

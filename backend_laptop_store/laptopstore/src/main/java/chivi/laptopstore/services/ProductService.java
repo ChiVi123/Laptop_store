@@ -100,7 +100,7 @@ public class ProductService {
         Optional<ImageEntity> imageOptional = product.getImages().stream().filter(entity -> entity.getId().equals(publicId)).findFirst();
         if (imageOptional.isPresent()) {
             ImageEntity image = imageOptional.get();
-            cloudinaryConfig.deleteImage(image.getPublicId());
+            cloudinaryConfig.deleteImage(List.of(image.getPublicId()));
             product.removeImage(image);
         }
         ProductEntity result = repository.save(product);
@@ -108,9 +108,9 @@ public class ProductService {
     }
 
     public void delete(ProductEntity product) {
-        product.getImages().forEach(image -> {
-            cloudinaryConfig.deleteImage(image.getPublicId());
-        });
+        List<String> publicIds = product.getImages().stream().map(ImageEntity::getPublicId).toList();
+        cloudinaryConfig.deleteImage(publicIds);
+        product.clearAllCategory();
         repository.delete(product);
     }
 }

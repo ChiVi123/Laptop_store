@@ -3,7 +3,6 @@ package chivi.laptopstore.common;
 public class EntityNames {
     // Table name
     public static final String TABLE_ACCOUNT = "account";
-    public static final String TABLE_BRAND = "brand";
     public static final String TABLE_CATEGORY = "category";
     public static final String TABLE_PRODUCT = "product";
     public static final String TABLE_IMAGE = "image";
@@ -15,12 +14,6 @@ public class EntityNames {
     public static final String COLUMN_ACCOUNT_ID = "account_id";
     public static final String COLUMN_ACCOUNT_FULL_NAME = "full_name";
     public static final String COLUMN_ACCOUNT_ROLE = "role";
-
-    public static final String COLUMN_BRAND_NAME = "brand_name";
-    public static final String COLUMN_BRAND_SLUG = "brand_slug";
-
-    public static final String COLUMN_PRODUCT_NAME = "product_name";
-    public static final String COLUMN_PRODUCT_SLUG = "product_slug";
 
     public static final String COLUMN_DISCOUNT_RATE = "discount_rate";
     public static final String COLUMN_QUANTITY_STOCK = "quantity_stock";

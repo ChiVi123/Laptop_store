@@ -9,5 +9,4 @@ public class ResponseMessage {
     public static final String UPDATE_SUCCESS = "Updated successfully";
 
     public static final String DELETE_SUCCESS = "Deleted successfully";
-    public static final String DELETE_ALL_SUCCESS = "Deleted all successfully";
 }

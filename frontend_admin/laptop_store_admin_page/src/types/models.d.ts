@@ -36,11 +36,6 @@ export interface ICategory extends IEntity, IEntityStatus, IEntityDateTime {
     path: string;
     children: ICategory[];
 }
-export interface IBrand extends IEntity, IEntityStatus, IEntityDateTime {
-    name: string;
-    slug: string;
-    logo: IImage;
-}
 export interface IProduct extends IEntity, IEntityStatus, IEntityDateTime {
     name: string;
     slug: string;

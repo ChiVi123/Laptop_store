@@ -1,7 +1,7 @@
 'use client';
 
 import * as yup from 'yup';
-import { EInvalid, EStatus } from '~/common/enums';
+import { EInvalid } from '~/common/enums';
 import { ICategory, IImage } from '~/types/models';
 
 function yupString() {
@@ -36,15 +36,4 @@ export const categorySchema = yup.object({
     name: yupString().required(),
     path: yupString(),
     status: yupString(),
-});
-export const brandSchema = yup.object({
-    name: yupString().required(),
-    logo: yup
-        .mixed<File | FormData | IImage>()
-        .test('required', 'Them logo cho thuong hieu nay', (value) => Boolean(value))
-        .test('fileSize', 'Kich thuoc file qua lon', (value) => {
-            if (value instanceof File) return value.size <= 1048576;
-            else return true;
-        }),
-    status: yup.string<EStatus>(),
 });

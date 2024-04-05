@@ -7,20 +7,15 @@ import Link from 'next/link';
 import { Fragment } from 'react';
 import { EPath } from '~/common/enums';
 import ProductForm from '~/components/manage/product/product.form';
-import { findAllService, findOneService } from '~/services';
+import { findOneService } from '~/services';
 import { logger, parseError } from '~/utils';
 
 async function AddProductPage() {
-    const [brandResult, categoryResult] = await Promise.all([findAllService.brand(), findOneService.rootCategory()]);
+    const categoryResult = await findOneService.rootCategory();
 
-    if (brandResult && 'error' in brandResult) {
-        const error = parseError(brandResult);
-        logger({ brand: error });
-        throw new Error(error.payload.message);
-    }
     if (categoryResult && 'error' in categoryResult) {
         const error = parseError(categoryResult);
-        logger({ brand: error });
+        logger({ category: error });
         throw new Error(error.payload.message);
     }
 
@@ -41,7 +36,7 @@ async function AddProductPage() {
                 </Typography>
             </Box>
 
-            <ProductForm brands={brandResult} categories={categoryResult.children} />
+            <ProductForm categories={categoryResult.children} />
         </Fragment>
     );
 }

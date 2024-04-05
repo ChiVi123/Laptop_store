@@ -12,7 +12,6 @@ export enum EKeys {
     LOGO = 'logo',
     CATEGORY_TREE_VIEW = 'category-tree-view',
     PRODUCT_LIST = 'product-list',
-    BRAND_LIST = 'brand-list',
 }
 export enum EInvalid {
     FULL_NAME_REQUIRED = 'Hãy nhập họ tên',
@@ -39,9 +38,6 @@ export enum EPath {
     AUTH_NOTIFY_SEND_MAIL = '/auth/notify-send-mail',
     AUTH_REGISTRATION_CONFIRM = 'auth/registration-confirm',
     MANAGE_HOME = '/manage/home',
-    MANAGE_BRAND_ADD = '/manage/brand/add',
-    MANAGE_BRAND_EDIT = '/manage/brand/edit/',
-    MANAGE_BRAND_LIST = '/manage/brand/list',
     MANAGE_CATEGORY = '/manage/category',
     MANAGE_CATEGORY_ADD = '/manage/category/add/',
     MANAGE_CATEGORY_EDIT = '/manage/category/edit/',

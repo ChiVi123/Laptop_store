@@ -19,12 +19,12 @@ function DeleteActionCell({ onDelete, ...props }: GridActionsCellItemProps & { o
             <Dialog
                 open={open}
                 onClose={() => setOpen(false)}
-                aria-labelledby='alert-brand-title'
-                aria-describedby='alert-brand-description'
+                aria-labelledby='alert-product-title'
+                aria-describedby='alert-product-description'
             >
-                <DialogTitle id='alert-brand-title'>Xoa san pham nay?</DialogTitle>
+                <DialogTitle id='alert-product-title'>Xoa san pham nay?</DialogTitle>
                 <DialogContent>
-                    <DialogContentText id='alert-brand-description'>Luu y khong the hoan tac.</DialogContentText>
+                    <DialogContentText id='alert-product-description'>Luu y khong the hoan tac.</DialogContentText>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpen(false)}>{EText.CANCEL}</Button>

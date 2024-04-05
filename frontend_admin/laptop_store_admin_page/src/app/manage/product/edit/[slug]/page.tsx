@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { Fragment } from 'react';
 import { EPath } from '~/common/enums';
 import ProductForm from '~/components/manage/product/product.form';
-import { findAllService, findOneService } from '~/services';
+import { findOneService } from '~/services';
 import { logger, parseError } from '~/utils';
 
 interface IProps {
@@ -16,16 +16,11 @@ interface IProps {
 
 async function EditProductPage({ params: { slug } }: IProps) {
     const productResult = await findOneService.productBySlug(slug);
-    const [brandResult, categoryResult] = await Promise.all([findAllService.brand(), findOneService.rootCategory()]);
+    const categoryResult = await findOneService.rootCategory();
 
-    if (brandResult && 'error' in brandResult) {
-        const error = parseError(brandResult);
-        logger({ brand: error });
-        throw new Error(error.payload.message);
-    }
-    if (categoryResult && 'error' in categoryResult) {
+    if ('error' in categoryResult) {
         const error = parseError(categoryResult);
-        logger({ brand: error });
+        logger({ category: error });
         throw new Error(error.payload.message);
     }
 
@@ -52,7 +47,7 @@ async function EditProductPage({ params: { slug } }: IProps) {
                 </Typography>
             </Box>
 
-            <ProductForm product={productResult} brands={brandResult} categories={categoryResult.children} />
+            <ProductForm product={productResult} categories={categoryResult.children} />
         </Fragment>
     );
 }

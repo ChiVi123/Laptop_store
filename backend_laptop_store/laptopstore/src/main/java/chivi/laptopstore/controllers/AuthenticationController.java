@@ -41,11 +41,11 @@ public class AuthenticationController {
         AccountEntity account = verificationToken.getAccount();
 
         if (LocalDateTime.now().isAfter(verificationToken.getExpired())) {
-            throw new BaseException(HttpStatus.UNAUTHORIZED.value(), "Token's " + account.getEmail() + " is expired");
+            throw new BaseException(HttpStatus.UNAUTHORIZED.value(), "Token's " + account.getEmail() + " expired");
         }
 
         if (account.getStatus() != AccountStatus.NOT_VERIFIED) {
-            throw new BaseException(HttpStatus.UNAUTHORIZED.value(), "Email: " + account.getEmail() + " is verified");
+            throw new BaseException(HttpStatus.UNAUTHORIZED.value(), "Email: " + account.getEmail() + " verified");
         }
 
         AccountEntity result = authenticationService.activeAccount(account);
@@ -88,7 +88,7 @@ public class AuthenticationController {
     public SuccessResponse sendVerificationToken(@Valid @RequestBody SendEmailRequest sendEmailRequest) {
         String email = sendEmailRequest.getEmail();
         String appURL = sendEmailRequest.getAppURL();
-        AccountEntity account = accountService.getByEmail(email);
+        AccountEntity account = accountService.getByEmailAndStatus(email, AccountStatus.NOT_VERIFIED);
         OnRegistrationEvent event = new OnRegistrationEvent(account, appURL);
         applicationEventPublisher.publishEvent(event);
         return new SuccessResponse("Resend verification token successfully");

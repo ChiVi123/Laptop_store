@@ -14,5 +14,7 @@ public interface IAccountRepository extends JpaRepository<AccountEntity, Long> {
 
     Optional<AccountEntity> findByEmailAndStatusIn(String email, Collection<AccountStatus> status);
 
+    Optional<AccountEntity> findByEmailAndStatus(String email, AccountStatus status);
+
     boolean existsByEmail(String email);
 }

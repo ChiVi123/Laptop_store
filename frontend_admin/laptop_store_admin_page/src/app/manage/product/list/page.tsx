@@ -9,7 +9,6 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
 import { Fragment } from 'react';
 import { EPath, HttpStatus } from '~/common/enums';
 import { ProductList, TabsWrap } from '~/components/manage/product/list';
@@ -26,9 +25,9 @@ async function ProductListPage() {
     if ('error' in result) {
         const error = parseError(result);
         if (error.httpCode === HttpStatus.UNAUTHORIZED) {
-            redirect(EPath.AUTH_LOGIN);
+            throw new Error(error.payload.message);
         }
-        logger({ result });
+        logger({ error });
     }
 
     return (

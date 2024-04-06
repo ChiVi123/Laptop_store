@@ -1,21 +1,16 @@
 'use client';
 
 import { KeyboardArrowDown as KeyboardArrowDownIcon, Notifications as NotificationsIcon } from '@mui/icons-material';
-import {
-    AppBar,
-    Avatar,
-    Badge,
-    Button,
-    Divider,
-    IconButton,
-    Link as LinkMUI,
-    Menu,
-    MenuItem,
-    Toolbar,
-} from '@mui/material';
-import Link from 'next/link';
+import { AppBar, Avatar, Badge, Button, Divider, IconButton, Menu, MenuItem, Toolbar } from '@mui/material';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { EPath } from '~/common/enums';
+import httpRequest from '~/libs/http.request';
+
+type responseType = {
+    message: string;
+    path: EPath;
+};
 
 function stringToColor(string: string) {
     let hash = 0;
@@ -36,7 +31,6 @@ function stringToColor(string: string) {
 
     return color;
 }
-
 function stringAvatar(name: string) {
     return {
         sx: {
@@ -51,12 +45,17 @@ function stringAvatar(name: string) {
 
 function Header({ width }: { width: number }) {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const router = useRouter();
 
     function handleOpenMenu(event: React.MouseEvent<HTMLElement>) {
         setAnchorEl(event.currentTarget);
     }
     function handleCloseMenu() {
         setAnchorEl(null);
+    }
+    async function handleLogout() {
+        const result = await httpRequest.get<responseType>('/api/auth/logout', { baseUrl: '' });
+        router.push(result.path);
     }
 
     return (
@@ -96,11 +95,7 @@ function Header({ width }: { width: number }) {
                     <MenuItem onClick={handleCloseMenu}>Profile</MenuItem>
                     <MenuItem onClick={handleCloseMenu}>Profile</MenuItem>
                     <Divider />
-                    <MenuItem>
-                        <LinkMUI underline='none' color='inherit' component={Link} href={EPath.AUTH_LOGIN}>
-                            Dang xuat
-                        </LinkMUI>
-                    </MenuItem>
+                    <MenuItem onClick={handleLogout}>Dang xuat</MenuItem>
                 </Menu>
             </Toolbar>
         </AppBar>

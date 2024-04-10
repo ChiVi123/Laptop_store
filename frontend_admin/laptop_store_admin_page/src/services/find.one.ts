@@ -1,4 +1,4 @@
-import httpRequest, { stringifyError } from '~/libs/http.request';
+import httpRequest, { handleError } from '~/libs/http.request';
 import { ICategoryResponse, IProductResponse } from '~/types/response';
 
 export async function productBySlug(slug: string) {
@@ -6,7 +6,7 @@ export async function productBySlug(slug: string) {
         const response = await httpRequest.get<IProductResponse>(`public/products/${slug}`, { cache: 'no-cache' });
         return response.payload;
     } catch (error) {
-        return stringifyError(error);
+        return handleError(error);
     }
 }
 export async function rootCategory() {
@@ -14,7 +14,7 @@ export async function rootCategory() {
         const response = await httpRequest.get<ICategoryResponse>('public/categories/root', { cache: 'no-cache' });
         return response.payload;
     } catch (error) {
-        return stringifyError(error);
+        return handleError(error);
     }
 }
 export async function categoryById(id: number) {
@@ -22,6 +22,6 @@ export async function categoryById(id: number) {
         const response = await httpRequest.get<ICategoryResponse>(`public/categories/${id}`, { cache: 'no-cache' });
         return response.payload;
     } catch (error) {
-        return stringifyError(error);
+        return handleError(error);
     }
 }

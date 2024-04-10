@@ -3,37 +3,51 @@
 import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { EKeys, EPath } from '~/common/enums';
-import httpRequest, { stringifyError } from '~/libs/http.request';
+import httpRequest, { handleError } from '~/libs/http.request';
 import { categoryFormData } from '~/types/form.data';
 import { ICategoryResponse, IResponse } from '~/types/response';
 import { PathHandler } from '~/utils';
-import getSessionToken from '~/utils/token';
+import { getSessionToken, handleRefreshToken, setCookieJwt } from '~/utils/token';
 
 const pathHandler = new PathHandler('admin/categories');
 
 export async function create(data: categoryFormData) {
     const auth = getSessionToken();
     const path = pathHandler.getPath('create');
-    let response: ICategoryResponse;
+    let categoryId: number;
     try {
-        response = await httpRequest.post<ICategoryResponse>(path, data, { auth });
+        categoryId = (await httpRequest.post<ICategoryResponse>(path, data, { auth })).payload.id;
         revalidateTag(EKeys.CATEGORY_TREE_VIEW);
     } catch (error) {
-        return stringifyError(error);
+        const refreshTokenData = await handleRefreshToken(error);
+        if (refreshTokenData === undefined) {
+            return handleError(error);
+        } else {
+            const { bodyJson, token } = refreshTokenData;
+            setCookieJwt(EKeys.ACCESS_TOKEN, token);
+            categoryId = ((await bodyJson) as ICategoryResponse).payload.id;
+        }
     }
-    redirect(`${EPath.MANAGE_CATEGORY_EDIT}${response.payload.id}`);
+    redirect(`${EPath.MANAGE_CATEGORY_EDIT}${categoryId}`);
 }
 export async function edit(id: number, data: categoryFormData) {
     const auth = getSessionToken();
     const path = pathHandler.getPath(id, 'edit');
-    let response: ICategoryResponse;
+    let categoryId: number;
     try {
-        response = await httpRequest.put<ICategoryResponse>(path, data, { auth });
+        categoryId = (await httpRequest.put<ICategoryResponse>(path, data, { auth })).payload.id;
         revalidateTag(EKeys.CATEGORY_TREE_VIEW);
     } catch (error) {
-        return stringifyError(error);
+        const refreshTokenData = await handleRefreshToken(error);
+        if (refreshTokenData === undefined) {
+            return handleError(error);
+        } else {
+            const { bodyJson, token } = refreshTokenData;
+            setCookieJwt(EKeys.ACCESS_TOKEN, token);
+            categoryId = ((await bodyJson) as ICategoryResponse).payload.id;
+        }
     }
-    redirect(`${EPath.MANAGE_CATEGORY_EDIT}${response.payload.id}`);
+    redirect(`${EPath.MANAGE_CATEGORY_EDIT}${categoryId}`);
 }
 export async function move(fromId: number, toId: number) {
     const auth = getSessionToken();
@@ -43,18 +57,32 @@ export async function move(fromId: number, toId: number) {
         revalidateTag(EKeys.CATEGORY_TREE_VIEW);
         return response.payload;
     } catch (error) {
-        return stringifyError(error);
+        const refreshTokenData = await handleRefreshToken(error);
+        if (refreshTokenData === undefined) {
+            return handleError(error);
+        } else {
+            const { bodyJson, token } = refreshTokenData;
+            setCookieJwt(EKeys.ACCESS_TOKEN, token);
+            return ((await bodyJson) as IResponse).payload;
+        }
     }
 }
 export async function destroy(id: number) {
     const auth = getSessionToken();
     const path = pathHandler.getPath(id, 'delete');
-    let response: ICategoryResponse;
+    let categoryId: number;
     try {
-        response = await httpRequest.delete<ICategoryResponse>(path, { auth });
+        categoryId = (await httpRequest.delete<ICategoryResponse>(path, { auth })).payload.id;
         revalidateTag(EKeys.CATEGORY_TREE_VIEW);
     } catch (error) {
-        return stringifyError(error);
+        const refreshTokenData = await handleRefreshToken(error);
+        if (refreshTokenData === undefined) {
+            return handleError(error);
+        } else {
+            const { bodyJson, token } = refreshTokenData;
+            setCookieJwt(EKeys.ACCESS_TOKEN, token);
+            categoryId = ((await bodyJson) as ICategoryResponse).payload.id;
+        }
     }
-    redirect(`${EPath.MANAGE_CATEGORY_EDIT}${response.payload.id}`);
+    redirect(`${EPath.MANAGE_CATEGORY_EDIT}${categoryId}`);
 }

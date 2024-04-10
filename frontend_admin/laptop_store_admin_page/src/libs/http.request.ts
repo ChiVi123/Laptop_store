@@ -1,3 +1,4 @@
+import { HttpStatus } from '~/common/enums';
 import { IErrorResponse } from '~/types/response';
 import { formatFullUrl, formatPath } from '~/utils';
 
@@ -8,16 +9,24 @@ interface ICustomOptions extends Omit<RequestInit, 'method'> {
 }
 type httpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
-function joinKeyValue(item: [string, unknown]) {
-    return item.join('=');
-}
 function createSearchParams(params: Record<string, unknown> = {}) {
     const entries = Object.entries(params);
-    const joinAllParam = entries.map(joinKeyValue).join('&');
+    const joinAllParam = entries.map((item) => item.join('=')).join('&');
     return joinAllParam ? `?${joinAllParam}` : '';
 }
 
-export class ErrorResponse extends Error {
+export class UnauthorizedError extends Error {
+    public url: string;
+    public options: RequestInit;
+
+    constructor(url: string, options: RequestInit) {
+        super('UnauthorizedError');
+        this.url = url;
+        this.options = options;
+    }
+}
+
+export class ErrorBodyResponse extends Error {
     public httpCode: number;
     public payload: IErrorResponse;
 
@@ -34,12 +43,12 @@ class RequestWrap {
         this.baseUrl = baseUrl;
     }
 
-    public async request<Res>(method: httpMethod, url: string, options?: ICustomOptions) {
-        const baseUrl = options?.baseUrl === undefined ? this.baseUrl : options.baseUrl;
-        const searchParams = createSearchParams(options?.params);
-        const baseHeaders = { ...options?.headers };
+    public async request<BodyResponse>(method: httpMethod, url: string, options?: ICustomOptions) {
+        const baseUrl = options?.baseUrl ?? this.baseUrl;
         const formatUrl = formatPath(url);
+        const searchParams = createSearchParams(options?.params);
         const fullUrl = formatFullUrl(baseUrl, `${formatUrl}${searchParams}`);
+        const baseHeaders = { ...options?.headers };
 
         if (options?.auth) {
             Object.assign(baseHeaders, { Authorization: options.auth });
@@ -51,15 +60,20 @@ class RequestWrap {
 
         const newOptions = { ...options, headers: { ...baseHeaders, ...options?.headers }, method };
         const response = await fetch(fullUrl, newOptions);
+
+        if (response.status === HttpStatus.UNAUTHORIZED) {
+            throw new UnauthorizedError(fullUrl, newOptions);
+        }
+
         const body = await response.json();
         if (!response.ok) {
-            throw new ErrorResponse(response.status, body);
+            throw new ErrorBodyResponse(response.status, body);
         }
-        return body as Res;
+        return body as BodyResponse;
     }
 }
 
-const instance = new RequestWrap(process.env.REACT_API_SERVER || '');
+const instance = new RequestWrap(process.env.REACT_API_SERVER ?? '');
 const httpRequest = {
     async get<Res>(url: string, options?: Omit<ICustomOptions, 'body'>) {
         return await instance.request<Res>('GET', url, options);
@@ -79,7 +93,7 @@ const httpRequest = {
 };
 
 export default httpRequest;
-export function stringifyError(error: unknown) {
-    if (error instanceof ErrorResponse) return { error: JSON.stringify(error) };
+export function handleError(error: unknown) {
+    if (error instanceof ErrorBodyResponse) return { error: JSON.stringify(error) };
     else return { error: 'Something went wrong!' };
 }

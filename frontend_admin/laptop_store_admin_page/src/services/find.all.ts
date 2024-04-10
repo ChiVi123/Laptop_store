@@ -1,9 +1,9 @@
 'use server';
 
 import { EKeys } from '~/common/enums';
-import httpRequest, { stringifyError } from '~/libs/http.request';
+import httpRequest, { handleError } from '~/libs/http.request';
 import { IListCategoryResponse, IListProductResponse } from '~/types/response';
-import getSessionToken from '~/utils/token';
+import { getSessionToken, handleRefreshToken, setCookieJwt } from '~/utils/token';
 
 export async function product() {
     const auth = getSessionToken();
@@ -15,7 +15,14 @@ export async function product() {
         });
         return response.payload;
     } catch (error) {
-        return stringifyError(error);
+        const refreshTokenData = await handleRefreshToken(error);
+        if (refreshTokenData === undefined) {
+            return handleError(error);
+        } else {
+            const { bodyJson, token } = refreshTokenData;
+            setCookieJwt(EKeys.ACCESS_TOKEN, token);
+            return ((await bodyJson) as IListProductResponse).payload;
+        }
     }
 }
 export async function rootCategory() {
@@ -26,6 +33,6 @@ export async function rootCategory() {
         });
         return response.payload;
     } catch (error) {
-        return stringifyError(error);
+        return handleError(error);
     }
 }

@@ -2,11 +2,11 @@
 
 import { revalidateTag } from 'next/cache';
 import { EKeys } from '~/common/enums';
-import httpRequest, { stringifyError } from '~/libs/http.request';
+import httpRequest, { handleError } from '~/libs/http.request';
 import { productFormData } from '~/types/form.data';
 import { IListImageResponse, IProductResponse, IResponse } from '~/types/response';
 import { PathHandler } from '~/utils';
-import getSessionToken from '~/utils/token';
+import { getSessionToken, handleRefreshToken, setCookieJwt } from '~/utils/token';
 
 const pathHandler = new PathHandler('admin/products');
 
@@ -18,7 +18,14 @@ export async function create(data: productFormData) {
         revalidateTag(EKeys.PRODUCT_LIST);
         return response.payload;
     } catch (error) {
-        return stringifyError(error);
+        const refreshTokenData = await handleRefreshToken(error);
+        if (refreshTokenData === undefined) {
+            return handleError(error);
+        } else {
+            const { bodyJson, token } = refreshTokenData;
+            setCookieJwt(EKeys.ACCESS_TOKEN, token);
+            return ((await bodyJson) as IProductResponse).payload;
+        }
     }
 }
 export async function edit(id: number, data: productFormData) {
@@ -29,7 +36,14 @@ export async function edit(id: number, data: productFormData) {
         revalidateTag(EKeys.PRODUCT_LIST);
         return response.payload;
     } catch (error) {
-        return stringifyError(error);
+        const refreshTokenData = await handleRefreshToken(error);
+        if (refreshTokenData === undefined) {
+            return handleError(error);
+        } else {
+            const { bodyJson, token } = refreshTokenData;
+            setCookieJwt(EKeys.ACCESS_TOKEN, token);
+            return ((await bodyJson) as IProductResponse).payload;
+        }
     }
 }
 export async function removeImage(productId: number, imageId: number) {
@@ -39,7 +53,14 @@ export async function removeImage(productId: number, imageId: number) {
         const response = await httpRequest.delete<IListImageResponse>(path, { auth });
         return response.payload;
     } catch (error) {
-        return stringifyError(error);
+        const refreshTokenData = await handleRefreshToken(error);
+        if (refreshTokenData === undefined) {
+            return handleError(error);
+        } else {
+            const { bodyJson, token } = refreshTokenData;
+            setCookieJwt(EKeys.ACCESS_TOKEN, token);
+            return ((await bodyJson) as IListImageResponse).payload;
+        }
     }
 }
 export async function destroy(id: number) {
@@ -50,6 +71,13 @@ export async function destroy(id: number) {
         revalidateTag(EKeys.PRODUCT_LIST);
         return response.payload;
     } catch (error) {
-        return stringifyError(error);
+        const refreshTokenData = await handleRefreshToken(error);
+        if (refreshTokenData === undefined) {
+            return handleError(error);
+        } else {
+            const { bodyJson, token } = refreshTokenData;
+            setCookieJwt(EKeys.ACCESS_TOKEN, token);
+            return ((await bodyJson) as IResponse).payload;
+        }
     }
 }

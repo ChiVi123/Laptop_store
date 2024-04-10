@@ -7,7 +7,8 @@ export enum HttpStatus {
     INTERNAL_SERVER_ERROR = 500,
 }
 export enum EKeys {
-    TOKEN = 'token',
+    ACCESS_TOKEN = 'access_token',
+    REFRESH_TOKEN = 'refresh_token',
     IMAGE = 'image',
     LOGO = 'logo',
     CATEGORY_TREE_VIEW = 'category-tree-view',

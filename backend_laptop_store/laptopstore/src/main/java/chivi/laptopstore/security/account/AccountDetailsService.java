@@ -24,8 +24,10 @@ public class AccountDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         List<AccountStatus> specifiesStatus = List.of(AccountStatus.ACTIVE, AccountStatus.NOT_VERIFIED);
-        UsernameNotFoundException usernameNotFoundException = new UsernameNotFoundException("Can't found account with email: " + email);
-        AccountEntity account = accountRepository.findByEmailAndStatusIn(email, specifiesStatus).orElseThrow(() -> usernameNotFoundException);
+        AccountEntity account = accountRepository
+                .findByEmailAndStatusIn(email, specifiesStatus)
+                .orElseThrow(() -> new UsernameNotFoundException("Can't found account with email: " + email));
+
         if (account.getStatus() == AccountStatus.NOT_VERIFIED) {
             throw new UnauthorizedException("Email " + email + " is not verified");
         }

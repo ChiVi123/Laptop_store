@@ -3,18 +3,22 @@ package chivi.laptopstore.controllers;
 import chivi.laptopstore.common.AccountRole;
 import chivi.laptopstore.common.AccountStatus;
 import chivi.laptopstore.common.RequestMaps;
+import chivi.laptopstore.communication.payload.LoginPayload;
 import chivi.laptopstore.events.OnRegistrationEvent;
 import chivi.laptopstore.events.OnResetPasswordEvent;
 import chivi.laptopstore.exception.BaseException;
 import chivi.laptopstore.models.entities.AccountEntity;
+import chivi.laptopstore.models.entities.RefreshTokenEntity;
 import chivi.laptopstore.models.entities.VerificationTokenEntity;
 import chivi.laptopstore.models.requests.LoginRequest;
+import chivi.laptopstore.models.requests.RefreshTokenRequest;
 import chivi.laptopstore.models.requests.RegisterRequest;
 import chivi.laptopstore.models.requests.SendEmailRequest;
 import chivi.laptopstore.models.responses.SuccessResponse;
 import chivi.laptopstore.security.jwt.JwtUtils;
 import chivi.laptopstore.services.AccountService;
 import chivi.laptopstore.services.AuthenticationService;
+import chivi.laptopstore.services.RefreshTokenService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +35,7 @@ import java.time.LocalDateTime;
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
     private final AccountService accountService;
+    private final RefreshTokenService refreshTokenService;
     private final JwtUtils jwtUtils;
     private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -49,8 +54,9 @@ public class AuthenticationController {
         }
 
         AccountEntity result = authenticationService.activeAccount(account);
-        String jwtToken = jwtUtils.createTokenFromAccount(result);
-        return new SuccessResponse("Verify successfully", jwtToken);
+        String accessToken = jwtUtils.createTokenFromAccount(result);
+        RefreshTokenEntity refreshToken = refreshTokenService.create(account);
+        return new SuccessResponse("Verify successfully", new LoginPayload(accessToken, refreshToken));
     }
 
     @PostMapping(RequestMaps.AUTH_PATHNAME + "login")
@@ -59,8 +65,18 @@ public class AuthenticationController {
         String email = loginRequest.getEmail();
         String password = loginRequest.getPassword();
         AccountEntity account = authenticationService.getByEmailAndPassword(email, password);
-        String token = jwtUtils.createTokenFromAccount(account);
-        return new SuccessResponse("Login success", token);
+        String accessToken = jwtUtils.createTokenFromAccount(account);
+        RefreshTokenEntity refreshToken = refreshTokenService.create(account);
+        return new SuccessResponse("Login success", new LoginPayload(accessToken, refreshToken));
+    }
+
+    @PostMapping(RequestMaps.AUTH_PATHNAME + "refresh-token")
+    @ResponseStatus(HttpStatus.OK)
+    public SuccessResponse renewToken(@Valid @RequestBody RefreshTokenRequest request) {
+        RefreshTokenEntity refreshToken = refreshTokenService.getByToken(request.getToken());
+        AccountEntity account = refreshToken.getAccount();
+        String accessToken = jwtUtils.createTokenFromAccount(account);
+        return new SuccessResponse("Renew access token", accessToken);
     }
 
     @PostMapping(RequestMaps.AUTH_PATHNAME + "register-admin")
@@ -101,5 +117,13 @@ public class AuthenticationController {
         OnResetPasswordEvent event = new OnResetPasswordEvent(email);
         applicationEventPublisher.publishEvent(event);
         return new SuccessResponse("Reset password successfully");
+    }
+
+    @DeleteMapping(RequestMaps.AUTH_PATHNAME + "logout")
+    @ResponseStatus(HttpStatus.OK)
+    public SuccessResponse logout(@RequestParam(name = "token") String token) {
+        RefreshTokenEntity refreshToken = refreshTokenService.getByToken(token);
+        refreshTokenService.destroy(refreshToken);
+        return new SuccessResponse("Logout successfully");
     }
 }

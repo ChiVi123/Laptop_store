@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Fragment } from 'react';
-import { EPath, HttpStatus } from '~/common/enums';
+import { EPath } from '~/common/enums';
 import { ProductList, TabsWrap } from '~/components/manage/product/list';
 import { findAllService } from '~/services';
 import { logger, parseError } from '~/utils';
@@ -24,9 +24,6 @@ async function ProductListPage() {
     const result = await findAllService.product();
     if ('error' in result) {
         const error = parseError(result);
-        if (error.httpCode === HttpStatus.UNAUTHORIZED) {
-            throw new Error(error.payload.message);
-        }
         logger({ error });
     }
 

@@ -13,6 +13,7 @@ public class LoginRequest {
     @Email(message = ValidationMessage.INVALID)
     private String email;
 
-    @NotNull(message = ValidationMessage.NOT_BLANK)
+    @NotNull(message = ValidationMessage.NOT_NULL)
+    @NotBlank(message = ValidationMessage.NOT_BLANK)
     private String password;
 }

@@ -2,18 +2,24 @@ import { IAccount, ICategory, IImage, IProduct } from './models';
 
 export interface IResponse {
     message: string;
-    payload: '';
+    payload: string;
 }
 export interface IErrorResponse {
     message: string;
     errors?: Record<string, unknown>[];
+    path: string;
+    timestamp: string;
 }
 export interface IErrorData {
     httpCode: number;
     payload: IErrorResponse;
 }
 export interface ILoginResponse extends IResponse {
-    payload: string;
+    payload: {
+        accessToken: string;
+        refreshToken: string;
+        expiration: number;
+    };
 }
 export interface IAccountResponse extends IResponse {
     payload: IAccount;

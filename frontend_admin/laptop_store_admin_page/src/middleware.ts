@@ -1,23 +1,47 @@
 import { cookies } from 'next/headers';
-import type { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { EKeys, EPath } from './common/enums';
+import httpRequest from './libs/http.request';
+import { IResponse } from './types/response';
+import { decodeJwt } from './utils/token';
 
-export function middleware(request: NextRequest) {
-    const isStoreToken = Boolean(cookies().get(EKeys.TOKEN));
+const MILLISECOND = 1000;
+function setCookie(name: EKeys, value: string, expiration: number) {
+    const expires = new Date(expiration * MILLISECOND).toUTCString();
+    return `${name}=${value}; expires=${expires}; path=/; httpOnly=true; secure=true;`;
+}
+
+export async function middleware(request: NextRequest) {
+    const refreshToken = cookies().get(EKeys.REFRESH_TOKEN)?.value;
     const { pathname } = request.nextUrl;
+    let accessToken = cookies().get(EKeys.ACCESS_TOKEN)?.value;
+    let headers;
 
-    if (pathname.startsWith('/auth') && isStoreToken) {
-        return NextResponse.redirect(new URL(EPath.MANAGE_PRODUCT_LIST, request.url));
+    if (!accessToken && refreshToken) {
+        try {
+            const { payload } = await httpRequest.post<IResponse>('auth/refresh-token', { token: refreshToken });
+            const { exp } = decodeJwt<{ exp: number }>(payload);
+
+            headers = { 'set-cookie': setCookie(EKeys.ACCESS_TOKEN, payload, exp) };
+            accessToken = payload;
+        } catch (error) {
+            console.log('middleware error::', error);
+        }
     }
-    if (pathname.startsWith('/manage') && !isStoreToken) {
+    if (pathname.startsWith('/auth') && accessToken) {
+        return NextResponse.redirect(new URL(EPath.MANAGE_PRODUCT_LIST, request.url), { headers });
+    }
+    if (pathname.startsWith('/manage') && !accessToken) {
         return NextResponse.redirect(new URL(EPath.AUTH_LOGIN, request.url));
     }
     if (pathname === '/') {
-        const url = isStoreToken ? EPath.MANAGE_PRODUCT_LIST : EPath.AUTH_LOGIN;
-        return NextResponse.redirect(new URL(url, request.url));
+        if (accessToken) {
+            return NextResponse.redirect(new URL(EPath.MANAGE_PRODUCT_LIST, request.url), { headers });
+        } else {
+            return NextResponse.redirect(new URL(EPath.AUTH_LOGIN, request.url));
+        }
     }
-    return NextResponse.next();
+    return NextResponse.next({ headers });
 }
 export const config = {
     matcher: ['/', '/auth/:path*', '/manage/:path*'],

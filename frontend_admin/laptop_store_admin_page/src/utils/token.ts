@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
-import { EKeys } from '~/common/enums';
+import { redirect } from 'next/navigation';
+import { EKeys, EPath } from '~/common/enums';
 import httpRequest, { UnauthorizedError } from '~/libs/http.request';
 import { IResponse } from '~/types/response';
 
@@ -28,12 +29,16 @@ export function getSessionToken() {
     return accessToken ? `Bearer ${accessToken}` : '';
 }
 export async function handleRefreshToken(error: unknown) {
-    const refreshToken = cookies().get(EKeys.REFRESH_TOKEN)?.value;
-    if (refreshToken && error instanceof UnauthorizedError) {
-        const { url, options } = error;
-        const { payload } = await httpRequest.post<IResponse>('auth/refresh-token', { token: refreshToken });
-        const newOptions = { ...options, headers: { ...options.headers, Authorization: `Bearer ${payload}` } };
-        const bodyJson = (await fetch(url, newOptions)).json();
-        return { bodyJson, token: payload };
+    if (error instanceof UnauthorizedError) {
+        const refreshToken = cookies().get(EKeys.REFRESH_TOKEN)?.value;
+        if (refreshToken) {
+            const { url, options } = error;
+            const { payload } = await httpRequest.post<IResponse>('auth/refresh-token', { token: refreshToken });
+            const newOptions = { ...options, headers: { ...options.headers, Authorization: `Bearer ${payload}` } };
+            const bodyJson = (await fetch(url, newOptions)).json();
+            return { bodyJson, token: payload };
+        } else {
+            redirect(EPath.AUTH_LOGIN);
+        }
     }
 }

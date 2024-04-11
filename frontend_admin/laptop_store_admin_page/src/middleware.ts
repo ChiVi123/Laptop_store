@@ -41,7 +41,7 @@ export async function middleware(request: NextRequest) {
             return NextResponse.redirect(new URL(EPath.AUTH_LOGIN, request.url));
         }
     }
-    return NextResponse.next({ headers });
+    return NextResponse.next();
 }
 export const config = {
     matcher: ['/', '/auth/:path*', '/manage/:path*'],

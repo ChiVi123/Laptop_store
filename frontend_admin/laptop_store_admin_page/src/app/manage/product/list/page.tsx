@@ -12,19 +12,18 @@ import Link from 'next/link';
 import { Fragment } from 'react';
 import { EPath } from '~/common/enums';
 import { ProductList, TabsWrap } from '~/components/manage/product/list';
+import logResultError from '~/libs/log.result.error';
 import { findAllService } from '~/services';
-import { logger, parseError } from '~/utils';
 
 export const metadata: Metadata = {
     title: 'List product | Laptop store',
-    description: 'Management page',
+    description: 'List product page',
 };
 
 async function ProductListPage() {
     const result = await findAllService.product();
     if ('error' in result) {
-        const error = parseError(result);
-        logger({ error });
+        logResultError('List product page error::', result);
     }
 
     return (

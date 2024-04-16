@@ -2,8 +2,8 @@
 
 import { useEffect, useRef } from 'react';
 import { StyleContainer } from '~/components/auth/styles';
+import logResultError from '~/libs/log.result.error';
 import { authService } from '~/services';
-import { logger, parseError } from '~/utils';
 
 interface IProps {
     searchParams: { [key: string]: string | undefined };
@@ -15,8 +15,8 @@ function RegistrationConfirmPage({ searchParams }: IProps) {
     useEffect(() => {
         async function fetchApi(token: string) {
             const result = await authService.verifyByToken(token);
-            if (result) {
-                logger({ error: parseError(result) });
+            if ('error' in result) {
+                logResultError('Registration error::', result);
             }
         }
 

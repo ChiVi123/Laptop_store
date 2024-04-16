@@ -1,5 +1,7 @@
 import { loginFormData, productFormData, registerFormData } from '~/types/form.data';
 
+export const prefixFormatLog = ['\x1b[36m%s\x1b[0m', ' ✓'];
+export const prefixFormatError = ['\x1b[31m%s\x1b[0m', ' X'];
 export const loginDefaultValues: loginFormData = {
     email: '',
     password: '123456789',

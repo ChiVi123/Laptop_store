@@ -4,13 +4,13 @@ import { Box, Button, FormControlLabel, FormHelperText, Paper, Switch, TextField
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { EKeys, EPath, EStatus, EText, HttpStatus } from '~/common/enums';
+import { EKeys, EStatus, EText } from '~/common/enums';
 import { productDefaultValues } from '~/common/values';
+import logResultError from '~/libs/log.result.error';
 import { productResolver } from '~/resolvers';
 import { productService, uploadFileService } from '~/services';
 import { productFormData } from '~/types/form.data';
 import { ICategory, IImage, IProduct } from '~/types/models';
-import { logger, parseError } from '~/utils';
 import FormLabel from '../form.label';
 import CategorySelectField from './category.select.field';
 import EditorField from './editor.field';
@@ -37,7 +37,9 @@ function ProductForm({ product, categories }: IProps) {
     async function handleRemoveImage(value: IImage) {
         if (product && value.id) {
             const result = await productService.removeImage(product.id, value.id);
-            logger({ result: 'error' in result ? parseError(result) : result });
+            if ('error' in result) {
+                logResultError('Product remove image error::', result);
+            }
         }
     }
 
@@ -56,14 +58,8 @@ function ProductForm({ product, categories }: IProps) {
         }
 
         const result = product ? await productService.edit(product.id, data) : await productService.create(data);
-        if ('error' in result) {
-            const error = parseError(result);
-            if (error.httpCode === HttpStatus.CONFLICT) {
-                setError('name', { message: error.payload.message || 'error' });
-            }
-            logger({ error });
-        } else {
-            router.push(EPath.MANAGE_PRODUCT_EDIT.concat(result.slug));
+        if (result && 'error' in result) {
+            logResultError('Product add/edit error::', result);
         }
         setLoading(false);
     };

@@ -8,27 +8,27 @@ import { Fragment } from 'react';
 import { EPath, EText } from '~/common/enums';
 import CategoryBar from '~/components/manage/category/category.bar';
 import CategoryTreeView from '~/components/manage/category/category.tree.view';
+import logResultError from '~/libs/log.result.error';
 import { findOneService } from '~/services';
 import { ICategory } from '~/types/models';
-import { logger, parseError } from '~/utils';
 
 interface IProps {
     params: { id: string };
 }
 
 async function EditCategoryPage({ params: { id } }: IProps) {
-    const resultRootCategory = await findOneService.rootCategory();
-    const resultCategory = await findOneService.categoryById(Number(id));
+    const [rootCategoryResult, categoryResult] = await Promise.all([
+        findOneService.rootCategory(),
+        findOneService.categoryById(Number(id)),
+    ]);
 
-    if ('error' in resultRootCategory) {
-        const error = parseError(resultRootCategory);
-        logger({ error });
-        throw new Error(error.payload.message);
+    if ('error' in rootCategoryResult) {
+        logResultError('Root category error::', rootCategoryResult);
+        throw new Error(rootCategoryResult.error);
     }
-    if ('error' in resultCategory) {
-        const error = parseError(resultCategory);
-        logger({ error });
-        throw new Error(error.payload.message);
+    if ('error' in categoryResult) {
+        logResultError('Category detail error::', categoryResult);
+        throw new Error(categoryResult.error);
     }
 
     return (
@@ -46,10 +46,10 @@ async function EditCategoryPage({ params: { id } }: IProps) {
                     {EText.EDIT}
                 </Typography>
             </Box>
-            {!('error' in resultCategory) && <CategoryBar category={resultCategory} />}
+            <CategoryBar category={categoryResult} />
 
             <Box px={3} py={2}>
-                <CategoryTreeView categoryTree={resultRootCategory.children} category={resultCategory} />
+                <CategoryTreeView categoryTree={rootCategoryResult.children} category={categoryResult} />
             </Box>
         </Fragment>
     );

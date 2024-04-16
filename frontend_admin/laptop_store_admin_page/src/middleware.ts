@@ -1,47 +1,58 @@
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { EKeys, EPath } from './common/enums';
+import { prefixFormatError, prefixFormatLog } from './common/values';
 import httpRequest from './libs/http.request';
 import { IResponse } from './types/response';
-import { decodeJwt } from './utils/token';
+import { decodeJwt, jwtType, setCookieJwtHeader } from './utils/token';
 
-const MILLISECOND = 1000;
-function setCookie(name: EKeys, value: string, expiration: number) {
-    const expires = new Date(expiration * MILLISECOND).toUTCString();
-    return `${name}=${value}; expires=${expires}; path=/; httpOnly=true; secure=true;`;
+function redirectProductList(url: string, headers: Headers): NextResponse<unknown> {
+    return NextResponse.redirect(new URL(EPath.MANAGE_PRODUCT_LIST, url), { headers });
+}
+function redirectLogin(url: string): NextResponse<unknown> {
+    return NextResponse.redirect(new URL(EPath.AUTH_LOGIN, url));
 }
 
 export async function middleware(request: NextRequest) {
-    const refreshToken = cookies().get(EKeys.REFRESH_TOKEN)?.value;
     const { pathname } = request.nextUrl;
-    let accessToken = cookies().get(EKeys.ACCESS_TOKEN)?.value;
-    let headers;
+    const cookieStore = cookies();
+    const refreshToken = cookieStore.get(EKeys.REFRESH_TOKEN)?.value;
+    let accessToken = cookieStore.get(EKeys.ACCESS_TOKEN)?.value;
+    const responseNext = NextResponse.next();
+
+    console.log(...prefixFormatLog, 'middle pathname::', pathname);
 
     if (!accessToken && refreshToken) {
         try {
-            const { payload } = await httpRequest.post<IResponse>('auth/refresh-token', { token: refreshToken });
-            const { exp } = decodeJwt<{ exp: number }>(payload);
-
-            headers = { 'set-cookie': setCookie(EKeys.ACCESS_TOKEN, payload, exp) };
+            const MILLISECOND = 1000;
+            const { payload } = await httpRequest.post<IResponse>('auth/refresh-token', { refreshToken });
+            request.headers.set('set-cookie', setCookieJwtHeader(EKeys.ACCESS_TOKEN, payload));
             accessToken = payload;
+
+            const jwt = decodeJwt<jwtType>(payload);
+            responseNext.cookies.set({
+                name: EKeys.ACCESS_TOKEN,
+                value: accessToken,
+                expires: jwt.exp * MILLISECOND,
+                httpOnly: true,
+                secure: true,
+            });
+            console.info(...prefixFormatLog, 'middleware call refresh');
         } catch (error) {
-            console.log('middleware error::', error);
+            console.error(...prefixFormatError, 'middleware error::', error);
         }
     }
     if (pathname.startsWith('/auth') && accessToken) {
-        return NextResponse.redirect(new URL(EPath.MANAGE_PRODUCT_LIST, request.url), { headers });
+        return redirectProductList(request.url, request.headers);
     }
     if (pathname.startsWith('/manage') && !accessToken) {
-        return NextResponse.redirect(new URL(EPath.AUTH_LOGIN, request.url));
+        return redirectLogin(request.url);
     }
     if (pathname === '/') {
-        if (accessToken) {
-            return NextResponse.redirect(new URL(EPath.MANAGE_PRODUCT_LIST, request.url), { headers });
-        } else {
-            return NextResponse.redirect(new URL(EPath.AUTH_LOGIN, request.url));
-        }
+        return accessToken ? redirectProductList(request.url, request.headers) : redirectLogin(request.url);
     }
-    return NextResponse.next();
+
+    return responseNext;
 }
 export const config = {
     matcher: ['/', '/auth/:path*', '/manage/:path*'],

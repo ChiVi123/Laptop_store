@@ -7,8 +7,8 @@ import Link from 'next/link';
 import { Fragment } from 'react';
 import { EPath } from '~/common/enums';
 import ProductForm from '~/components/manage/product/product.form';
+import logResultError from '~/libs/log.result.error';
 import { findOneService } from '~/services';
-import { logger, parseError } from '~/utils';
 
 interface IProps {
     params: { slug: string };
@@ -19,15 +19,12 @@ async function EditProductPage({ params: { slug } }: IProps) {
     const categoryResult = await findOneService.rootCategory();
 
     if ('error' in categoryResult) {
-        const error = parseError(categoryResult);
-        logger({ category: error });
-        throw new Error(error.payload.message);
+        logResultError('Root category error::', categoryResult);
+        throw new Error(categoryResult.error);
     }
-
     if ('error' in productResult) {
-        const error = parseError(productResult);
-        logger({ product: error });
-        throw new Error(error.payload.message);
+        logResultError('Product detail error::', productResult);
+        throw new Error(productResult.error);
     }
 
     return (

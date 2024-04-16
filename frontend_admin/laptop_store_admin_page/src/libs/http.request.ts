@@ -1,32 +1,31 @@
-import { HttpStatus } from '~/common/enums';
 import { IErrorResponse } from '~/types/response';
 import { formatFullUrl, formatPath } from '~/utils';
 
+type httpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 interface ICustomOptions extends Omit<RequestInit, 'method'> {
     baseUrl?: string;
     auth?: string;
     params?: Record<string, unknown>;
 }
-type httpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
-
 function createSearchParams(params: Record<string, unknown> = {}) {
     const entries = Object.entries(params);
     const joinAllParam = entries.map((item) => item.join('=')).join('&');
     return joinAllParam ? `?${joinAllParam}` : '';
 }
-
-export class UnauthorizedError extends Error {
+export class FetchError extends Error {
+    public httpCode: number;
+    public body: IErrorResponse;
     public url: string;
     public options: RequestInit;
-
-    constructor(url: string, options: RequestInit) {
-        super('UnauthorizedError');
+    constructor(httpCode: number, body: any, url: string, options: RequestInit) {
+        super('Fetch error');
+        this.httpCode = httpCode;
+        this.body = body;
         this.url = url;
         this.options = options;
     }
 }
-
-export class ErrorBodyResponse extends Error {
+export class ReasonError extends Error {
     public httpCode: number;
     public payload: IErrorResponse;
 
@@ -60,15 +59,12 @@ class RequestWrap {
 
         const newOptions = { ...options, headers: { ...baseHeaders, ...options?.headers }, method };
         const response = await fetch(fullUrl, newOptions);
-
-        if (response.status === HttpStatus.UNAUTHORIZED) {
-            throw new UnauthorizedError(fullUrl, newOptions);
-        }
-
         const body = await response.json();
+
         if (!response.ok) {
-            throw new ErrorBodyResponse(response.status, body);
+            throw new FetchError(response.status, body, fullUrl, newOptions);
         }
+
         return body as BodyResponse;
     }
 }
@@ -94,6 +90,6 @@ const httpRequest = {
 
 export default httpRequest;
 export function handleError(error: unknown) {
-    if (error instanceof ErrorBodyResponse) return { error: JSON.stringify(error) };
+    if (error instanceof ReasonError) return { error: JSON.stringify(error) };
     else return { error: 'Something went wrong!' };
 }

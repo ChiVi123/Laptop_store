@@ -6,10 +6,10 @@ import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { EPath } from '~/common/enums';
 import { registerDefaultValues } from '~/common/values';
 import { StyleContainer, StyleField, StyleLabel, StyleLink } from '~/components/auth/styles';
+import logResultError from '~/libs/log.result.error';
 import { registerResolver } from '~/resolvers';
 import { authService } from '~/services';
 import { registerFormData } from '~/types/form.data';
-import { logger, parseError } from '~/utils';
 
 interface Field {
     id: string;
@@ -64,9 +64,10 @@ function RegisterPage() {
     const handleOnSubmit: SubmitHandler<registerFormData> = async (data) => {
         setDisabled(true);
         const result = await authService.register(data);
-        if (!result) return;
-        logger({ error: parseError(result) });
-        setDisabled(false);
+        if ('error' in result) {
+            logResultError('Register user error::', result);
+            setDisabled(false);
+        }
     };
 
     function renderField(field: Field): React.ReactNode {

@@ -7,16 +7,15 @@ import Link from 'next/link';
 import { Fragment } from 'react';
 import { EPath } from '~/common/enums';
 import ProductForm from '~/components/manage/product/product.form';
+import logResultError from '~/libs/log.result.error';
 import { findOneService } from '~/services';
-import { logger, parseError } from '~/utils';
 
 async function AddProductPage() {
-    const categoryResult = await findOneService.rootCategory();
+    const result = await findOneService.rootCategory();
 
-    if (categoryResult && 'error' in categoryResult) {
-        const error = parseError(categoryResult);
-        logger({ category: error });
-        throw new Error(error.payload.message);
+    if ('error' in result) {
+        logResultError('Root category error::', result);
+        throw new Error(result.error);
     }
 
     return (
@@ -36,7 +35,7 @@ async function AddProductPage() {
                 </Typography>
             </Box>
 
-            <ProductForm categories={categoryResult.children} />
+            <ProductForm categories={result.children} />
         </Fragment>
     );
 }

@@ -1,29 +1,37 @@
 'use server';
 
-import { EKeys } from '~/common/enums';
-import httpRequest, { handleError } from '~/libs/http.request';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { EKeys, EPath, HttpStatus } from '~/common/enums';
+import { handleRefetch, handleRefreshToken } from '~/libs/handle.error';
+import httpRequest, { FetchError, handleError } from '~/libs/http.request';
 import { IListCategoryResponse, IListProductResponse } from '~/types/response';
-import { getSessionToken, handleRefreshToken, setCookieJwt } from '~/utils/token';
+import { getSessionToken } from '~/utils/token';
 
 export async function product() {
     const auth = getSessionToken();
-    try {
-        const response = await httpRequest.get<IListProductResponse>('admin/products/all', {
-            auth,
-            cache: 'no-cache',
-            next: { tags: [EKeys.PRODUCT_LIST] },
+    const path = 'admin/products/all';
+
+    return httpRequest
+        .get<IListProductResponse>(path, { auth, next: { tags: [EKeys.PRODUCT_LIST] } })
+        .then(({ payload }) => payload)
+        .catch(async (error) => {
+            if (error instanceof FetchError) {
+                if (error.httpCode === HttpStatus.UNAUTHORIZED) {
+                    const refreshToken = cookies().get(EKeys.REFRESH_TOKEN)?.value;
+                    if (refreshToken) {
+                        const accessToken = await handleRefreshToken(refreshToken);
+                        return (await handleRefetch<IListProductResponse>(error, accessToken)).payload;
+                    } else {
+                        redirect(EPath.AUTH_LOGIN);
+                    }
+                } else {
+                    return { error: error.body.message };
+                }
+            } else {
+                return { error: 'Something went wrong!!!' };
+            }
         });
-        return response.payload;
-    } catch (error) {
-        const refreshTokenData = await handleRefreshToken(error);
-        if (refreshTokenData === undefined) {
-            return handleError(error);
-        } else {
-            const { bodyJson, token } = refreshTokenData;
-            setCookieJwt(EKeys.ACCESS_TOKEN, token);
-            return ((await bodyJson) as IListProductResponse).payload;
-        }
-    }
 }
 export async function rootCategory() {
     try {

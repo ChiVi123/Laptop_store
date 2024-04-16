@@ -9,11 +9,11 @@ import { useRouter } from 'next/navigation';
 import { DragEvent, SyntheticEvent, useCallback, useMemo, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { ELabel, EPath, EStatus, EText } from '~/common/enums';
+import logResultError from '~/libs/log.result.error';
 import { categoryResolver } from '~/resolvers';
 import { categoryService } from '~/services';
 import { categoryFormData } from '~/types/form.data';
 import { ICategory } from '~/types/models';
-import { logger, parseError } from '~/utils';
 import FormLabel from '../form.label';
 import CustomTreeItem from './custom.tree.item';
 
@@ -57,10 +57,11 @@ function CategoryTreeView({ categoryTree, category, parentCategory }: IProps) {
     const {
         control,
         formState: { errors },
+        setValue,
         handleSubmit,
     } = useForm({
         resolver: categoryResolver,
-        defaultValues: { name: category?.name || '', path: category?.path || '' },
+        defaultValues: { name: category?.name ?? '', path: category?.path ?? '' },
     });
     const [dragAndDrop, setDragAndDrop] = useState(initDragAndDrop);
     const [status, setStatus] = useState<boolean>(() => Boolean(category ? category.status === EStatus.ENABLED : true));
@@ -78,32 +79,32 @@ function CategoryTreeView({ categoryTree, category, parentCategory }: IProps) {
     }, [category, parentCategory]);
     const pathDefault = '1';
 
-    function handleSetSelected(_: SyntheticEvent, nodeId: string) {
+    const handleSetSelected = (_: SyntheticEvent, nodeId: string) => {
         router.push(EPath.MANAGE_CATEGORY_EDIT.concat(nodeId));
-    }
-    function handleDragStart(event: DragEvent<HTMLElement>) {
+    };
+    const handleDragStart = (event: DragEvent<HTMLElement>) => {
         event.stopPropagation();
         const dragFrom = Number(event.currentTarget.dataset.id);
         setDragAndDrop({ ...dragAndDrop, type: 'handleDragStart', dragFrom });
-    }
-    function handleDragOver(event: DragEvent<HTMLElement>) {
+    };
+    const handleDragOver = (event: DragEvent<HTMLElement>) => {
         event.preventDefault();
-    }
-    function handleDragEnter(event: DragEvent<HTMLElement>) {
+    };
+    const handleDragEnter = (event: DragEvent<HTMLElement>) => {
         event.stopPropagation();
         const dropTo = Number(event.currentTarget.dataset.id);
         setDragAndDrop({ ...dragAndDrop, type: 'handleDragEnter', dropTo });
-    }
-    async function handleDragEnd() {
+    };
+    const handleDragEnd = async () => {
         const { dragFrom, dropTo } = dragAndDrop;
         if (dragFrom !== null && dropTo !== null && dragFrom !== dropTo) {
             const result = await categoryService.move(dragFrom, dropTo);
-            if (!(typeof result === 'string')) {
-                logger({ error: parseError(result) });
+            if (typeof result !== 'string') {
+                logResultError('Move category error::', result);
             }
         }
         setDragAndDrop(initDragAndDrop());
-    }
+    };
 
     const handleOnSubmit: SubmitHandler<categoryFormData> = async (data) => {
         setDisabled(true);
@@ -112,34 +113,37 @@ function CategoryTreeView({ categoryTree, category, parentCategory }: IProps) {
         data.status = status ? EStatus.ENABLED : EStatus.DISABLED;
 
         const result = category ? await categoryService.edit(category.id, data) : await categoryService.create(data);
-        if (result && 'error' in result) {
-            logger({ error: parseError(result) });
+        if ('error' in result) {
+            logResultError('Category add/edit error::', result);
+        } else {
+            setValue('name', result.name);
+            setValue('path', result.path);
+            setValue('status', result.status);
+            setStatus(result.status === EStatus.ENABLED);
         }
         setDisabled(false);
     };
 
-    function renderTreeItem(node: ICategory) {
-        return (
-            <CustomTreeItem
-                key={node.id}
-                id={`parent-${node.id}`}
-                nodeId={node.id.toString()}
-                label={node.name.concat(` (ID: ${node.id})`)}
-                data-id={node.id}
-                draggable
-                onDragStart={handleDragStart}
-                onDragOver={handleDragOver}
-                onDragEnter={handleDragEnter}
-                onDragEnd={handleDragEnd}
-                sx={{
-                    position: 'relative',
-                    '& > .MuiTreeItem-content::before': dragAndDrop.dropTo === node.id ? styleBefore : {},
-                }}
-            >
-                {node.children.map((child) => renderTreeItem(child))}
-            </CustomTreeItem>
-        );
-    }
+    const renderTreeItem = (node: ICategory) => (
+        <CustomTreeItem
+            key={node.id}
+            id={`parent-${node.id}`}
+            nodeId={node.id.toString()}
+            label={node.name.concat(` (ID: ${node.id})`)}
+            data-id={node.id}
+            draggable
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragEnter={handleDragEnter}
+            onDragEnd={handleDragEnd}
+            sx={{
+                position: 'relative',
+                '& > .MuiTreeItem-content::before': dragAndDrop.dropTo === node.id ? styleBefore : {},
+            }}
+        >
+            {node.children.map((child) => renderTreeItem(child))}
+        </CustomTreeItem>
+    );
 
     return (
         <Box display='flex' gap={2} mt={2}>

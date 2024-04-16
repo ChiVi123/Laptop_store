@@ -3,9 +3,9 @@
 import { Box, Button, Modal, Typography } from '@mui/material';
 import { useState } from 'react';
 import { EText } from '~/common/enums';
+import logResultError from '~/libs/log.result.error';
 import { categoryService } from '~/services';
 import { ICategory } from '~/types/models';
-import { logger, parseError } from '~/utils';
 
 interface IProps {
     category: ICategory;
@@ -25,18 +25,18 @@ const styleModal = {
 function CategoryBar({ category }: IProps) {
     const [open, setOpen] = useState<boolean>(false);
 
-    function handleOpen() {
+    const handleOpen = () => {
         setOpen(true);
-    }
-    function handleClose() {
+    };
+    const handleClose = () => {
         setOpen(false);
-    }
-    async function handleDeleteItem() {
+    };
+    const handleDeleteItem = async () => {
         const result = await categoryService.destroy(category.id);
-        if (result) {
-            logger({ error: parseError(result) });
+        if (result && 'error' in result) {
+            logResultError('Delete category error::', result);
         }
-    }
+    };
 
     return (
         <Box display='flex' justifyContent='space-between' px={3} pb={2} bgcolor='white'>

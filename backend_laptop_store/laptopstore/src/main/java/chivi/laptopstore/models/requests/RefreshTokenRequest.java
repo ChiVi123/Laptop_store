@@ -7,5 +7,5 @@ import lombok.Data;
 @Data
 public class RefreshTokenRequest {
     @NotBlank(message = ValidationMessage.NOT_BLANK)
-    private String token;
+    private String refreshToken;
 }

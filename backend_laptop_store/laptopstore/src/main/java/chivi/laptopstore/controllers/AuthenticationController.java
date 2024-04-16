@@ -73,7 +73,7 @@ public class AuthenticationController {
     @PostMapping(RequestMaps.AUTH_PATHNAME + "refresh-token")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse renewToken(@Valid @RequestBody RefreshTokenRequest request) {
-        RefreshTokenEntity refreshToken = refreshTokenService.getByToken(request.getToken());
+        RefreshTokenEntity refreshToken = refreshTokenService.getByToken(request.getRefreshToken());
         AccountEntity account = refreshToken.getAccount();
         String accessToken = jwtUtils.createTokenFromAccount(account);
         return new SuccessResponse("Renew access token", accessToken);

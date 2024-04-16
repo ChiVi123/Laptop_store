@@ -6,6 +6,7 @@ public class EntityNames {
     public static final String TABLE_CATEGORY = "category";
     public static final String TABLE_PRODUCT = "product";
     public static final String TABLE_IMAGE = "image";
+    public static final String TABLE_REFRESH_TOKEN = "refresh_token";
     public static final String TABLE_VERIFICATION_TOKEN = "verification_token";
     public static final String TABLE_PRODUCT_CATEGORY = "product_category";
     public static final String TABLE_PRODUCT_IMAGE = "product_image";

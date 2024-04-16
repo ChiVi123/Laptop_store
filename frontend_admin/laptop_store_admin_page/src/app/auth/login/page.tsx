@@ -10,10 +10,10 @@ import { EPath } from '~/common/enums';
 import { loginDefaultValues } from '~/common/values';
 import PasswordField from '~/components/auth/password.field';
 import { StyleButtonLoginWithGoogle, StyleContainer, StyleLine, StyleLink } from '~/components/auth/styles';
+import logResultError from '~/libs/log.result.error';
 import { loginResolver } from '~/resolvers';
 import { authService } from '~/services';
 import { loginFormData } from '~/types/form.data';
-import { logger, parseError } from '~/utils';
 
 function LoginPage() {
     const {
@@ -26,9 +26,10 @@ function LoginPage() {
     const handleOnSubmit: SubmitHandler<loginFormData> = async (data) => {
         setDisabled(true);
         const result = await authService.login(data);
-        if (!result) return;
-        logger({ error: parseError(result) });
-        setDisabled(false);
+        if ('error' in result) {
+            logResultError('Login error::', result);
+            setDisabled(false);
+        }
     };
 
     return (

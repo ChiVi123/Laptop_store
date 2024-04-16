@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { StyleContainer } from '~/components/auth/styles';
+import logResultError from '~/libs/log.result.error';
 import { authService } from '~/services';
 
 interface IProps {
@@ -13,7 +14,10 @@ function RegistrationConfirmPage({ searchParams }: IProps) {
 
     useEffect(() => {
         async function fetchApi(token: string) {
-            await authService.verifyByToken(token);
+            const result = await authService.verifyByToken(token);
+            if ('error' in result) {
+                logResultError('Registration error::', result);
+            }
         }
 
         if (searchParams.token && ignoreRef.current) {

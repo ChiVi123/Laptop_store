@@ -7,27 +7,27 @@ import Link from 'next/link';
 import { Fragment } from 'react';
 import { EPath } from '~/common/enums';
 import CategoryTreeView from '~/components/manage/category/category.tree.view';
+import logResultError from '~/libs/log.result.error';
 import { findOneService } from '~/services';
 import { ICategory } from '~/types/models';
-import { logger, parseError } from '~/utils';
 
 interface IProps {
     params: { parentId: string };
 }
 
 async function AddSubCategoryPage({ params: { parentId } }: IProps) {
-    const resultRootCategory = await findOneService.rootCategory();
-    const resultCategory = await findOneService.categoryById(Number(parentId));
+    const [rootCategoryResult, categoryResult] = await Promise.all([
+        findOneService.rootCategory(),
+        findOneService.categoryById(Number(parentId)),
+    ]);
 
-    if ('error' in resultRootCategory) {
-        const error = parseError(resultRootCategory);
-        logger({ error });
-        throw new Error(error.payload.message);
+    if ('error' in rootCategoryResult) {
+        logResultError('Root category error::', rootCategoryResult);
+        throw new Error(rootCategoryResult.error);
     }
-    if ('error' in resultCategory) {
-        const error = parseError(resultCategory);
-        logger({ error });
-        throw new Error(error.payload.message);
+    if ('error' in categoryResult) {
+        logResultError('Parent category error::', categoryResult);
+        throw new Error(categoryResult.error);
     }
 
     return (
@@ -44,7 +44,7 @@ async function AddSubCategoryPage({ params: { parentId } }: IProps) {
             </Box>
 
             <Box px={3} py={2}>
-                <CategoryTreeView categoryTree={resultRootCategory.children} parentCategory={resultCategory} />
+                <CategoryTreeView categoryTree={rootCategoryResult.children} parentCategory={categoryResult} />
             </Box>
         </Fragment>
     );

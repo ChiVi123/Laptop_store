@@ -22,7 +22,7 @@ public class JwtUtils {
     @Value("${app.jwt.expired}")
     private long jwtExpiration;
     @Value("${app.jwt.issuer}")
-    private String ISSUER;
+    private String issuer;
 
     public String getTokenFromAuthorizationHeader(HttpServletRequest httpServletRequest) {
         String headerName = "Authorization";
@@ -46,7 +46,6 @@ public class JwtUtils {
         } catch (IllegalArgumentException illegalArgumentException) {
             log.error("JWT claims string is empty: {}", illegalArgumentException.getMessage());
         }
-
         return null;
     }
 
@@ -54,7 +53,7 @@ public class JwtUtils {
         return Jwts.builder()
                 .subject(account.getEmail())
                 .issuedAt(new Date())
-                .issuer(ISSUER)
+                .issuer(issuer)
                 .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
                 .signWith(SECRET_KEY)
                 .compact();

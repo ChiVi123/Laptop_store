@@ -6,7 +6,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,13 +18,15 @@ import java.io.IOException;
 
 @Slf4j
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtils jwtUtils;
     private final AccountDetailsService accountDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        log.info("getRequestURI:: {}", request.getRequestURI());
+
         String token = jwtUtils.getTokenFromAuthorizationHeader(request);
         if (token == null) {
             filterChain.doFilter(request, response);
@@ -37,16 +39,16 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        try {
-            AccountDetails accountDetails = (AccountDetails) accountDetailsService.loadUserByUsername(email);
-            UsernamePasswordAuthenticationToken authenticationToken;
+        AccountDetails accountDetails = (AccountDetails) accountDetailsService.loadUserByUsername(email);
 
+        try {
+            UsernamePasswordAuthenticationToken authenticationToken;
             authenticationToken = new UsernamePasswordAuthenticationToken(accountDetails, null, accountDetails.getAuthorities());
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         } catch (Exception exception) {
-            log.error("Can't set account authentication: {}", exception.getMessage());
+            log.error("Class name exception:: {}", exception.getClass().getName());
+            log.error("Can't set account authentication:: {}", exception.getMessage());
         }
 
         filterChain.doFilter(request, response);

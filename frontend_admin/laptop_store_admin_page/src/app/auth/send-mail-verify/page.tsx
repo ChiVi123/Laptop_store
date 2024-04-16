@@ -5,10 +5,10 @@ import { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { EPath } from '~/common/enums';
 import { StyleContainer, StyleLink } from '~/components/auth/styles';
+import logResultError from '~/libs/log.result.error';
 import { sendMailResolver } from '~/resolvers';
 import { authService } from '~/services';
 import { sendMailFormData } from '~/types/form.data';
-import { logger, parseError } from '~/utils';
 
 function SendEmailVerifyPage() {
     const {
@@ -24,9 +24,10 @@ function SendEmailVerifyPage() {
     const handleOnSubmit: SubmitHandler<sendMailFormData> = async (data) => {
         setDisabled(true);
         const result = await authService.sendEmailVerify(data.email);
-        if (!result) return;
-        logger({ error: parseError(result) });
-        setDisabled(false);
+        if ('error' in result) {
+            logResultError('Send mail verify error::', result);
+            setDisabled(false);
+        }
     };
 
     return (

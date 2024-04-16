@@ -1,12 +1,15 @@
 package chivi.laptopstore.services;
 
+import chivi.laptopstore.common.AccountStatus;
 import chivi.laptopstore.common.ResponseMessage;
+import chivi.laptopstore.exception.BaseException;
 import chivi.laptopstore.exception.CustomNotFoundException;
 import chivi.laptopstore.models.entities.AccountEntity;
 import chivi.laptopstore.models.requests.AccountRequest;
 import chivi.laptopstore.models.responses.SuccessResponse;
 import chivi.laptopstore.repositories.IAccountRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +25,11 @@ public class AccountService {
 
     public AccountEntity getByEmail(String email) {
         return repository.findByEmail(email).orElseThrow(() -> new CustomNotFoundException("account", email));
+    }
+
+    public AccountEntity getByEmailAndStatus(String email, AccountStatus status) {
+        String message = "Cannot find email: " + email + "with status " + status.name();
+        return repository.findByEmailAndStatus(email, status).orElseThrow(() -> new BaseException(HttpStatus.NOT_FOUND.value(), message));
     }
 
     public void resetPassword(AccountEntity account, String newPassword) {

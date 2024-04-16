@@ -7,15 +7,14 @@ import Link from 'next/link';
 import { Fragment } from 'react';
 import { EPath } from '~/common/enums';
 import CategoryTreeView from '~/components/manage/category/category.tree.view';
+import logResultError from '~/libs/log.result.error';
 import { findOneService } from '~/services';
-import { logger, parseError } from '~/utils';
 
 async function CategoryPage() {
     const result = await findOneService.rootCategory();
     if ('error' in result) {
-        const error = parseError(result);
-        logger({ error });
-        throw new Error(error.payload.message);
+        logResultError('Root category error::', result);
+        throw new Error(result.error);
     }
 
     return (
@@ -41,9 +40,8 @@ async function CategoryPage() {
 export async function generateMetadata(): Promise<Metadata> {
     const result = await findOneService.rootCategory();
     if ('error' in result) {
-        const error = parseError(result);
-        logger({ error });
-        throw new Error(error.payload.message);
+        logResultError('Root category error::', result);
+        throw new Error(result.error);
     }
     return { title: 'Category | Laptop Store' };
 }

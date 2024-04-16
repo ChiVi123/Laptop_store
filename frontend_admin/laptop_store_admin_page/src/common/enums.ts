@@ -1,3 +1,12 @@
+export enum CodeError {
+    ACCESS_TOKEN_EXPIRED_ERROR = 'AccessTokenExpiredError',
+    INTERNAL_SERVER_ERROR = 'InternalServerError',
+    REFRESH_TOKEN_ERROR = 'RefreshTokenError',
+    RETURN_ERROR = 'ReturnError',
+    RETURN_TO_CLIENT_ERROR = 'ReturnToClientError',
+    RETURN_TO_SERVER_ERROR = 'ReturnToServerError',
+    TOKEN_ERROR = 'TokenError',
+}
 export enum HttpStatus {
     BAD_REQUEST = 400,
     UNAUTHORIZED = 401,
@@ -7,7 +16,8 @@ export enum HttpStatus {
     INTERNAL_SERVER_ERROR = 500,
 }
 export enum EKeys {
-    TOKEN = 'token',
+    ACCESS_TOKEN = 'access_token',
+    REFRESH_TOKEN = 'refresh_token',
     IMAGE = 'image',
     LOGO = 'logo',
     CATEGORY_TREE_VIEW = 'category-tree-view',

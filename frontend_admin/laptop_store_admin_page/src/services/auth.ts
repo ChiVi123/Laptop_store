@@ -1,69 +1,98 @@
 'use server';
 
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { EKeys, EPath } from '~/common/enums';
-import httpRequest, { stringifyError } from '~/libs/http.request';
+import httpRequest, { FetchError } from '~/libs/http.request';
 import { loginFormData, registerFormData } from '~/types/form.data';
-import { ILoginResponse, IResponse } from '~/types/response';
+import { ILoginResponse } from '~/types/response';
+import { PathHandler } from '~/utils';
+import { setCookieJwt, setCookieRefreshToken } from '~/utils/token';
+
+const pathHandler = new PathHandler('auth');
 
 export async function login(data: loginFormData) {
-    try {
-        const response = await httpRequest.post<ILoginResponse>('auth/login', data, { cache: 'no-cache' });
-        cookies().set({
-            name: EKeys.TOKEN,
-            value: response.payload,
-            httpOnly: true,
-            secure: true,
+    const path = pathHandler.getPath('login');
+    return httpRequest
+        .post<ILoginResponse>(path, data, { cache: 'no-cache' })
+        .then(({ payload }) => {
+            setCookieJwt(EKeys.ACCESS_TOKEN, payload.accessToken);
+            setCookieRefreshToken(EKeys.REFRESH_TOKEN, payload.refreshToken, payload.expiration);
+            redirect(EPath.MANAGE_PRODUCT_LIST);
+        })
+        .catch((error) => {
+            if (error instanceof FetchError) {
+                return { error: error.body.message };
+            } else {
+                return { error: 'Something went wrong!!!' };
+            }
         });
-    } catch (error) {
-        return stringifyError(error);
-    }
-    redirect(EPath.MANAGE_PRODUCT_LIST);
 }
 export async function verifyByToken(token: string) {
-    let navigate = '';
-    try {
-        const response = await httpRequest.get<IResponse>('auth/registration-confirm', {
-            params: { token },
-            cache: 'no-cache',
+    const path = pathHandler.getPath('registration-confirm');
+
+    return httpRequest
+        .get<ILoginResponse>(path, { params: { token }, cache: 'no-cache' })
+        .then(({ payload }) => {
+            setCookieJwt(EKeys.ACCESS_TOKEN, payload.accessToken);
+            setCookieRefreshToken(EKeys.REFRESH_TOKEN, payload.refreshToken, payload.expiration);
+            redirect(EPath.MANAGE_PRODUCT_LIST);
+        })
+        .catch((error) => {
+            if (error instanceof FetchError) {
+                return { error: error.body.message };
+            } else {
+                return { error: 'Something went wrong!!!' };
+            }
         });
-        cookies().set({
-            name: EKeys.TOKEN,
-            value: response.payload,
-            httpOnly: true,
-            secure: true,
-        });
-        navigate = EPath.MANAGE_PRODUCT_LIST;
-    } catch (error) {
-        navigate = EPath.AUTH_SEND_MAIL_VERIFY;
-    }
-    redirect(navigate);
 }
 export async function register(data: registerFormData) {
+    const path = pathHandler.getPath('register-admin');
     const params = { app_url: EPath.AUTH_REGISTRATION_CONFIRM };
-    try {
-        await httpRequest.post('auth/register-admin', data, { params, cache: 'no-cache' });
-    } catch (error) {
-        return stringifyError(error);
-    }
-    redirect(EPath.AUTH_NOTIFY_SEND_MAIL.concat('?variant=verify'));
+
+    return httpRequest
+        .post(path, data, { params, cache: 'no-cache' })
+        .then(() => {
+            redirect(EPath.AUTH_NOTIFY_SEND_MAIL.concat('?variant=verify'));
+        })
+        .catch((error) => {
+            if (error instanceof FetchError) {
+                return { error: error.body.message };
+            } else {
+                return { error: 'Something went wrong!!!' };
+            }
+        });
 }
 export async function sendEmailVerify(email: string) {
+    const path = pathHandler.getPath('send-verification-token');
     const data = { email, appURL: EPath.AUTH_REGISTRATION_CONFIRM };
-    try {
-        await httpRequest.put('auth/send-verification-token', data, { cache: 'no-cache' });
-    } catch (error) {
-        return stringifyError(error);
-    }
-    redirect(EPath.AUTH_NOTIFY_SEND_MAIL.concat('?variant=verify'));
+
+    return httpRequest
+        .put(path, data, { cache: 'no-cache' })
+        .then(() => {
+            redirect(EPath.AUTH_NOTIFY_SEND_MAIL.concat('?variant=verify'));
+        })
+        .catch((error) => {
+            if (error instanceof FetchError) {
+                return { error: error.body.message };
+            } else {
+                return { error: 'Something went wrong!!!' };
+            }
+        });
 }
 export async function sendEmailResetPassword(email: string) {
+    const path = pathHandler.getPath('reset-password');
     const data = { email, appURL: EPath.AUTH_REGISTRATION_CONFIRM };
-    try {
-        await httpRequest.put('auth/reset-password', data, { cache: 'no-cache' });
-    } catch (error) {
-        return stringifyError(error);
-    }
-    redirect(EPath.AUTH_NOTIFY_SEND_MAIL.concat('?variant=reset-password'));
+
+    return httpRequest
+        .put(path, data, { cache: 'no-cache' })
+        .then(() => {
+            redirect(EPath.AUTH_NOTIFY_SEND_MAIL.concat('?variant=reset-password'));
+        })
+        .catch((error) => {
+            if (error instanceof FetchError) {
+                return { error: error.body.message };
+            } else {
+                return { error: 'Something went wrong!!!' };
+            }
+        });
 }

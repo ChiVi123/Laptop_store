@@ -10,7 +10,6 @@ import chivi.laptopstore.models.requests.RegisterRequest;
 import chivi.laptopstore.repositories.IAccountRepository;
 import chivi.laptopstore.repositories.IVerificationTokenRepository;
 import chivi.laptopstore.security.account.AccountDetails;
-import chivi.laptopstore.security.jwt.JwtUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,22 +30,17 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final IAccountRepository accountRepository;
     private final IVerificationTokenRepository verificationTokenRepository;
-    private final JwtUtils jwtUtils;
 
     public VerificationTokenEntity getVerificationToken(String token) {
         return verificationTokenRepository.findByToken(token).orElseThrow(() -> new CustomNotFoundException("token", token));
     }
 
-    public AccountEntity getByEmailAndPassword(String email, String password) {
-        try {
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
-            Authentication authentication = authenticationManager.authenticate(authenticationToken);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            AccountDetails accountDetails = (AccountDetails) authentication.getPrincipal();
-            return accountDetails.getAccount();
-        } catch (BadCredentialsException exception) {
-            throw new BadCredentialsException(exception.getMessage());
-        }
+    public AccountEntity getByEmailAndPassword(String email, String password) throws BadCredentialsException {
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
+        Authentication authentication = authenticationManager.authenticate(authenticationToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        AccountDetails accountDetails = (AccountDetails) authentication.getPrincipal();
+        return accountDetails.getAccount();
     }
 
     public void checkConflictAccountByEmail(String email) {
@@ -84,5 +78,4 @@ public class AuthenticationService {
         verificationToken.setNewExpired();
         verificationTokenRepository.save(verificationToken);
     }
-
 }

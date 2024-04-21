@@ -20,7 +20,7 @@ export enum EKeys {
     REFRESH_TOKEN = 'refresh_token',
     IMAGE = 'image',
     LOGO = 'logo',
-    CATEGORY_TREE_VIEW = 'category-tree-view',
+    ROOT_CATEGORY = 'root-category',
     PRODUCT_LIST = 'product-list',
 }
 export enum EInvalid {

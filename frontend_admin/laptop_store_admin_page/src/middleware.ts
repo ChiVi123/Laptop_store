@@ -1,8 +1,8 @@
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { EKeys, EPath } from './common/enums';
-import { prefixFormatError, prefixFormatLog } from './common/values';
-import httpRequest from './libs/http.request';
+import { apiRequest } from './libs';
+import { logAnger, logCoffee, logInfo } from './libs/logger';
 import { IResponse } from './types/response';
 import { decodeJwt, jwtType, setCookieJwtHeader } from './utils/token';
 
@@ -15,17 +15,18 @@ function redirectLogin(url: string): NextResponse<unknown> {
 
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
+    const responseNext = NextResponse.next();
     const cookieStore = cookies();
     const refreshToken = cookieStore.get(EKeys.REFRESH_TOKEN)?.value;
     let accessToken = cookieStore.get(EKeys.ACCESS_TOKEN)?.value;
-    const responseNext = NextResponse.next();
 
-    console.log(...prefixFormatLog, 'middle pathname::', pathname);
+    logCoffee('middleware request::', request.method, pathname);
 
     if (!accessToken && refreshToken) {
         try {
             const MILLISECOND = 1000;
-            const { payload } = await httpRequest.post<IResponse>('auth/refresh-token', { refreshToken });
+            const { payload } = await apiRequest.body({ refreshToken }).post('auth/refresh-token').json<IResponse>();
+
             request.headers.set('set-cookie', setCookieJwtHeader(EKeys.ACCESS_TOKEN, payload));
             accessToken = payload;
 
@@ -37,9 +38,9 @@ export async function middleware(request: NextRequest) {
                 httpOnly: true,
                 secure: true,
             });
-            console.info(...prefixFormatLog, 'middleware call refresh');
+            logInfo('middleware call refresh::', accessToken.split('.').pop());
         } catch (error) {
-            console.error(...prefixFormatError, 'middleware error::', error);
+            logAnger('middleware error::', error);
         }
     }
     if (pathname.startsWith('/auth') && accessToken) {

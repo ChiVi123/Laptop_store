@@ -10,10 +10,6 @@ export interface IErrorResponse {
     path: string;
     timestamp: string;
 }
-export interface IErrorData {
-    httpCode: number;
-    payload: IErrorResponse;
-}
 export interface ILoginResponse extends IResponse {
     payload: {
         accessToken: string;

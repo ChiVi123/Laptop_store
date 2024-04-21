@@ -1,14 +1,12 @@
 'use client';
 
 import { Box, Button, FormControlLabel, FormHelperText, Paper, Switch, TextField, Typography } from '@mui/material';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { productServerAction, uploadFileServerAction } from '~/actions';
 import { EKeys, EStatus, EText } from '~/common/enums';
 import { productDefaultValues } from '~/common/values';
-import logResultError from '~/libs/log.result.error';
 import { productResolver } from '~/resolvers';
-import { productService, uploadFileService } from '~/services';
 import { productFormData } from '~/types/form.data';
 import { ICategory, IImage, IProduct } from '~/types/models';
 import FormLabel from '../form.label';
@@ -27,24 +25,20 @@ function ProductForm({ product, categories }: IProps) {
     const {
         control,
         formState: { errors },
-        setError,
         handleSubmit,
     } = useForm<productFormData>({ resolver: productResolver, defaultValues: product || productDefaultValues });
     const [loading, setLoading] = useState<boolean>(false);
     const [status, setStatus] = useState<boolean>(product ? product.status === EStatus.ENABLED : true);
-    const router = useRouter();
 
-    async function handleRemoveImage(value: IImage) {
+    const handleRemoveImage = async (value: IImage) => {
         if (product && value.id) {
-            const result = await productService.removeImage(product.id, value.id);
-            if ('error' in result) {
-                logResultError('Product remove image error::', result);
-            }
+            await productServerAction.removeImage(product.id, value.id);
         }
-    }
+    };
 
-    const handleOnSubmit: SubmitHandler<productFormData> = async (data, _) => {
+    const handleOnSubmit: SubmitHandler<productFormData> = async (data) => {
         setLoading(true);
+
         data.categoryIds = data.categories.map((item) => item.id);
         data.status = status ? EStatus.ENABLED : EStatus.DISABLED;
         if (data.images && data.images.length) {
@@ -54,13 +48,10 @@ function ProductForm({ product, categories }: IProps) {
                     formData.append(EKeys.IMAGE, image);
                 }
             });
-            data.images = await uploadFileService.multiple(EKeys.IMAGE, formData);
+            data.images = await uploadFileServerAction.multiple(EKeys.IMAGE, formData);
         }
+        product ? await productServerAction.edit(product.id, data) : await productServerAction.create(data);
 
-        const result = product ? await productService.edit(product.id, data) : await productService.create(data);
-        if (result && 'error' in result) {
-            logResultError('Product add/edit error::', result);
-        }
         setLoading(false);
     };
 

@@ -2,9 +2,8 @@
 
 import { Box, Button, Modal, Typography } from '@mui/material';
 import { useState } from 'react';
+import { categoryServerAction } from '~/actions';
 import { EText } from '~/common/enums';
-import logResultError from '~/libs/log.result.error';
-import { categoryService } from '~/services';
 import { ICategory } from '~/types/models';
 
 interface IProps {
@@ -32,10 +31,7 @@ function CategoryBar({ category }: IProps) {
         setOpen(false);
     };
     const handleDeleteItem = async () => {
-        const result = await categoryService.destroy(category.id);
-        if (result && 'error' in result) {
-            logResultError('Delete category error::', result);
-        }
+        await categoryServerAction.destroy(category.id);
     };
 
     return (

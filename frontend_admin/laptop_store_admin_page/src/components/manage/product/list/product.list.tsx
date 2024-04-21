@@ -13,10 +13,9 @@ import {
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Fragment, useMemo, useState } from 'react';
+import { productServerAction } from '~/actions';
 import { EPath, EStatus, EText } from '~/common/enums';
 import { mapStatus } from '~/common/maps';
-import logResultError from '~/libs/log.result.error';
-import { productService } from '~/services';
 import { IImage, IProduct } from '~/types/models';
 import '~/utils/extends';
 import DeleteActionCell from './delete.action.cell';
@@ -29,12 +28,9 @@ function ProductList({ rows }: IProps) {
     const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>([]);
     const router = useRouter();
 
-    async function handleDeleteItem(id: number) {
-        const result = await productService.destroy(id);
-        if (typeof result !== 'string') {
-            logResultError('Product destroy error::', result);
-        }
-    }
+    const handleDeleteItem = async (id: number) => {
+        await productServerAction.destroy(id);
+    };
 
     const columns = useMemo<GridColDef<(typeof rows)[number]>[]>(
         () => [

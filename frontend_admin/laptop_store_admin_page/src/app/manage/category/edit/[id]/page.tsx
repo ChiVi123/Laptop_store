@@ -5,12 +5,10 @@ import Typography from '@mui/material/Typography';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Fragment } from 'react';
+import { categoryServerAction } from '~/actions';
 import { EPath, EText } from '~/common/enums';
 import CategoryBar from '~/components/manage/category/category.bar';
 import CategoryTreeView from '~/components/manage/category/category.tree.view';
-import logResultError from '~/libs/log.result.error';
-import { findOneService } from '~/services';
-import { ICategory } from '~/types/models';
 
 interface IProps {
     params: { id: string };
@@ -18,18 +16,9 @@ interface IProps {
 
 async function EditCategoryPage({ params: { id } }: IProps) {
     const [rootCategoryResult, categoryResult] = await Promise.all([
-        findOneService.rootCategory(),
-        findOneService.categoryById(Number(id)),
+        categoryServerAction.root(),
+        categoryServerAction.byId(Number(id)),
     ]);
-
-    if ('error' in rootCategoryResult) {
-        logResultError('Root category error::', rootCategoryResult);
-        throw new Error(rootCategoryResult.error);
-    }
-    if ('error' in categoryResult) {
-        logResultError('Category detail error::', categoryResult);
-        throw new Error(categoryResult.error);
-    }
 
     return (
         <Fragment>
@@ -46,7 +35,7 @@ async function EditCategoryPage({ params: { id } }: IProps) {
                     {EText.EDIT}
                 </Typography>
             </Box>
-            <CategoryBar category={categoryResult} />
+            {categoryResult.name && <CategoryBar category={categoryResult} />}
 
             <Box px={3} py={2}>
                 <CategoryTreeView categoryTree={rootCategoryResult.children} category={categoryResult} />
@@ -56,8 +45,7 @@ async function EditCategoryPage({ params: { id } }: IProps) {
 }
 
 export async function generateMetadata({ params: { id } }: IProps): Promise<Metadata> {
-    const result = await findOneService.categoryById(Number(id));
-    const category: ICategory | undefined = 'error' in result ? undefined : result;
-    return { title: `${category?.name || ''} (ID: ${category?.id || ''}) | Laptop Store` };
+    const result = await categoryServerAction.byId(Number(id));
+    return { title: `${result.name} (ID: ${result.id}) | Laptop Store` };
 }
 export default EditCategoryPage;

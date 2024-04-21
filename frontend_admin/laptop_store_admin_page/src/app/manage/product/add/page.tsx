@@ -5,18 +5,12 @@ import Typography from '@mui/material/Typography';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Fragment } from 'react';
+import { categoryServerAction } from '~/actions';
 import { EPath } from '~/common/enums';
 import ProductForm from '~/components/manage/product/product.form';
-import logResultError from '~/libs/log.result.error';
-import { findOneService } from '~/services';
 
 async function AddProductPage() {
-    const result = await findOneService.rootCategory();
-
-    if ('error' in result) {
-        logResultError('Root category error::', result);
-        throw new Error(result.error);
-    }
+    const result = await categoryServerAction.root();
 
     return (
         <Fragment>

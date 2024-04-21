@@ -5,27 +5,19 @@ import Typography from '@mui/material/Typography';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Fragment } from 'react';
+import { categoryServerAction, productServerAction } from '~/actions';
 import { EPath } from '~/common/enums';
 import ProductForm from '~/components/manage/product/product.form';
-import logResultError from '~/libs/log.result.error';
-import { findOneService } from '~/services';
 
 interface IProps {
     params: { slug: string };
 }
 
 async function EditProductPage({ params: { slug } }: IProps) {
-    const productResult = await findOneService.productBySlug(slug);
-    const categoryResult = await findOneService.rootCategory();
-
-    if ('error' in categoryResult) {
-        logResultError('Root category error::', categoryResult);
-        throw new Error(categoryResult.error);
-    }
-    if ('error' in productResult) {
-        logResultError('Product detail error::', productResult);
-        throw new Error(productResult.error);
-    }
+    const [productResult, categoryResult] = await Promise.all([
+        productServerAction.bySlug(slug),
+        categoryServerAction.root(),
+    ]);
 
     return (
         <Fragment>
@@ -50,7 +42,7 @@ async function EditProductPage({ params: { slug } }: IProps) {
 }
 
 export async function generateMetadata({ params: { slug } }: IProps): Promise<Metadata> {
-    const result = await findOneService.productBySlug(slug);
-    return { title: ''.concat('error' in result ? '' : result.name, ' | Laptop store') };
+    const result = await productServerAction.bySlug(slug);
+    return { title: ''.concat(result.name, ' | Laptop store') };
 }
 export default EditProductPage;

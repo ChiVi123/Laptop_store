@@ -10,10 +10,9 @@ import Typography from '@mui/material/Typography';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Fragment } from 'react';
+import { productServerAction } from '~/actions';
 import { EPath } from '~/common/enums';
 import { ProductList, TabsWrap } from '~/components/manage/product/list';
-import logResultError from '~/libs/log.result.error';
-import { findAllService } from '~/services';
 
 export const metadata: Metadata = {
     title: 'List product | Laptop store',
@@ -21,10 +20,7 @@ export const metadata: Metadata = {
 };
 
 async function ProductListPage() {
-    const result = await findAllService.product();
-    if ('error' in result) {
-        logResultError('List product page error::', result);
-    }
+    const result = await productServerAction.all();
 
     return (
         <Fragment>

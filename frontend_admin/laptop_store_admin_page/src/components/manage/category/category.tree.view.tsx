@@ -8,10 +8,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { DragEvent, SyntheticEvent, useCallback, useMemo, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { categoryServerAction } from '~/actions';
 import { ELabel, EPath, EStatus, EText } from '~/common/enums';
-import logResultError from '~/libs/log.result.error';
+import { logInfo } from '~/libs/logger';
 import { categoryResolver } from '~/resolvers';
-import { categoryService } from '~/services';
 import { categoryFormData } from '~/types/form.data';
 import { ICategory } from '~/types/models';
 import FormLabel from '../form.label';
@@ -98,10 +98,8 @@ function CategoryTreeView({ categoryTree, category, parentCategory }: IProps) {
     const handleDragEnd = async () => {
         const { dragFrom, dropTo } = dragAndDrop;
         if (dragFrom !== null && dropTo !== null && dragFrom !== dropTo) {
-            const result = await categoryService.move(dragFrom, dropTo);
-            if (typeof result !== 'string') {
-                logResultError('Move category error::', result);
-            }
+            const result = await categoryServerAction.move(dragFrom, dropTo);
+            logInfo('handle drag::', result);
         }
         setDragAndDrop(initDragAndDrop());
     };
@@ -112,15 +110,17 @@ function CategoryTreeView({ categoryTree, category, parentCategory }: IProps) {
         data.parentId = parentCategory?.id;
         data.status = status ? EStatus.ENABLED : EStatus.DISABLED;
 
-        const result = category ? await categoryService.edit(category.id, data) : await categoryService.create(data);
-        if ('error' in result) {
-            logResultError('Category add/edit error::', result);
-        } else {
+        const result = category
+            ? await categoryServerAction.edit(category.id, data)
+            : await categoryServerAction.create(data);
+
+        if (result) {
             setValue('name', result.name);
             setValue('path', result.path);
             setValue('status', result.status);
             setStatus(result.status === EStatus.ENABLED);
         }
+
         setDisabled(false);
     };
 

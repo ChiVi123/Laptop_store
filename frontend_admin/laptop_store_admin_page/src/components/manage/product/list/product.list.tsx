@@ -17,8 +17,9 @@ import { productServerAction } from '~/actions';
 import { EPath, EStatus, EText } from '~/common/enums';
 import { mapStatus } from '~/common/maps';
 import { IImage, IProduct } from '~/types/models';
-import '~/utils/extends';
 import DeleteActionCell from './delete.action.cell';
+
+import '~/libs/string.extensions';
 
 interface IProps {
     rows: IProduct[];

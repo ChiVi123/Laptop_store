@@ -1,20 +1,28 @@
 'use server';
 
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { EKeys, EPath } from '~/common/enums';
-import { apiRequest } from '~/libs';
+import { MILLISECOND } from '~/common/values';
+import { JwtType, apiRequest } from '~/libs';
 import { handleReturnError } from '~/libs/helper.request';
-import { setCookieToken } from '~/libs/helper.token';
+import { createResponseCookie, decodeJwt } from '~/libs/helper.token';
 import { loginFormData } from '~/types/form.data';
 import { ILoginResponse } from '~/types/response';
-import { setCookieJwt } from '~/utils/token';
 
 export async function login(data: loginFormData) {
+    const cookieStore = cookies();
+
     try {
         const result = await apiRequest.body(data).post('auth/login', { cache: 'no-store' }).json<ILoginResponse>();
         const { accessToken, refreshToken, expiration } = result.payload;
-        setCookieJwt(EKeys.ACCESS_TOKEN, accessToken);
-        setCookieToken(EKeys.REFRESH_TOKEN, refreshToken, expiration);
+
+        const jwt = decodeJwt<JwtType>(accessToken);
+        const cookieAccessToken = createResponseCookie(EKeys.ACCESS_TOKEN, accessToken, jwt.exp * MILLISECOND);
+        const cookieRefreshToken = createResponseCookie(EKeys.REFRESH_TOKEN, refreshToken, expiration);
+
+        cookieStore.set(cookieAccessToken);
+        cookieStore.set(cookieRefreshToken);
     } catch (error) {
         return handleReturnError(error);
     }

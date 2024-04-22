@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { authServerAction } from '~/actions';
 import { StyleContainer } from '~/components/auth/styles';
-import logResultError from '~/libs/log.result.error';
-import { authService } from '~/services';
+import { logInfo } from '~/libs/logger';
 
 interface IProps {
     searchParams: { [key: string]: string | undefined };
@@ -14,10 +14,8 @@ function RegistrationConfirmPage({ searchParams }: IProps) {
 
     useEffect(() => {
         async function fetchApi(token: string) {
-            const result = await authService.verifyByToken(token);
-            if ('error' in result) {
-                logResultError('Registration error::', result);
-            }
+            const result = await authServerAction.verifyByToken(token);
+            logInfo('registration confirm::', result);
         }
 
         if (searchParams.token && ignoreRef.current) {

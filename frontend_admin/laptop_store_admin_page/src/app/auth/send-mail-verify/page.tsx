@@ -3,11 +3,11 @@
 import { Box, Button, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { authServerAction } from '~/actions';
 import { EPath } from '~/common/enums';
 import { StyleContainer, StyleLink } from '~/components/auth/styles';
-import logResultError from '~/libs/log.result.error';
+import { logInfo } from '~/libs/logger';
 import { sendMailResolver } from '~/resolvers';
-import { authService } from '~/services';
 import { sendMailFormData } from '~/types/form.data';
 
 function SendEmailVerifyPage() {
@@ -23,11 +23,9 @@ function SendEmailVerifyPage() {
 
     const handleOnSubmit: SubmitHandler<sendMailFormData> = async (data) => {
         setDisabled(true);
-        const result = await authService.sendEmailVerify(data.email);
-        if ('error' in result) {
-            logResultError('Send mail verify error::', result);
-            setDisabled(false);
-        }
+        const result = await authServerAction.sendEmailVerify(data.email);
+        logInfo('send mail verify::', result);
+        setDisabled(false);
     };
 
     return (

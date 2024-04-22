@@ -3,11 +3,11 @@
 import { Box, Button, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { authServerAction } from '~/actions';
 import { EPath } from '~/common/enums';
 import { StyleContainer, StyleLink } from '~/components/auth/styles';
-import logResultError from '~/libs/log.result.error';
+import { logInfo } from '~/libs/logger';
 import { sendMailResolver } from '~/resolvers';
-import { authService } from '~/services';
 import { sendMailFormData } from '~/types/form.data';
 
 function ForgotPasswordPage() {
@@ -21,13 +21,11 @@ function ForgotPasswordPage() {
     });
     const [disabled, setDisabled] = useState<boolean>(false);
 
-    const handleOnSubmit: SubmitHandler<sendMailFormData> = async (data) => {
+    const handleOnSubmit: SubmitHandler<sendMailFormData> = async ({ email }) => {
         setDisabled(true);
-        const result = await authService.sendEmailResetPassword(data.email);
-        if ('error' in result) {
-            logResultError('Forgot password error::', result);
-            setDisabled(false);
-        }
+        const result = await authServerAction.sendEmailResetPassword(email);
+        logInfo('forgot password::', result);
+        setDisabled(false);
     };
 
     return (

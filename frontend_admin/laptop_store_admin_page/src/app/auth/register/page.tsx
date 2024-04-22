@@ -3,12 +3,12 @@
 import { Box, Button, FormHelperText, TextField, Typography } from '@mui/material';
 import React, { Fragment, HTMLInputTypeAttribute, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { authServerAction } from '~/actions';
 import { EPath } from '~/common/enums';
 import { registerDefaultValues } from '~/common/values';
 import { StyleContainer, StyleField, StyleLabel, StyleLink } from '~/components/auth/styles';
-import logResultError from '~/libs/log.result.error';
+import { logInfo } from '~/libs/logger';
 import { registerResolver } from '~/resolvers';
-import { authService } from '~/services';
 import { registerFormData } from '~/types/form.data';
 
 interface Field {
@@ -63,11 +63,9 @@ function RegisterPage() {
 
     const handleOnSubmit: SubmitHandler<registerFormData> = async (data) => {
         setDisabled(true);
-        const result = await authService.register(data);
-        if ('error' in result) {
-            logResultError('Register user error::', result);
-            setDisabled(false);
-        }
+        const result = await authServerAction.register(data);
+        logInfo('register::', result);
+        setDisabled(false);
     };
 
     function renderField(field: Field): React.ReactNode {

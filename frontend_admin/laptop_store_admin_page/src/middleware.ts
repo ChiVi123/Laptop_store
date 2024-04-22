@@ -4,7 +4,7 @@ import { EKeys, EPath } from './common/enums';
 import { MILLISECOND } from './common/values';
 import { JwtType, apiRequest } from './libs';
 import { createResponseCookie, decodeJwt } from './libs/helper.token';
-import { logAnger, logCoffee, logInfo } from './libs/logger';
+import logger from './libs/logger';
 import { IResponse } from './types/response';
 
 export async function middleware(request: NextRequest) {
@@ -19,7 +19,7 @@ export async function middleware(request: NextRequest) {
     const refreshToken = cookieStore.get(EKeys.REFRESH_TOKEN)?.value;
     let accessToken = cookieStore.get(EKeys.ACCESS_TOKEN)?.value;
 
-    logCoffee('middleware request::', method, pathname);
+    logger.coffee('middleware request::', method, pathname);
 
     if (!accessToken && refreshToken) {
         try {
@@ -30,9 +30,8 @@ export async function middleware(request: NextRequest) {
             responseNext.cookies.set(cookieAccessToken);
             responseRedirectProductList.cookies.set(cookieAccessToken);
             accessToken = payload;
-            logInfo('middleware call refresh::', accessToken.split('.').pop());
         } catch (error) {
-            logAnger('middleware error::', error);
+            logger.anger('middleware error::', error);
         }
     }
     if (pathname.startsWith('/auth') && accessToken) {

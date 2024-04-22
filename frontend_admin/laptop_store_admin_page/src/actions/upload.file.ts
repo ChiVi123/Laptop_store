@@ -1,7 +1,7 @@
 'use server';
 
 import { UploadApiOptions, UploadApiResponse, v2 as cloudinary } from 'cloudinary';
-import { logAnger } from '~/libs/logger';
+import logger from '~/libs/logger';
 import { IImage } from '~/types/models';
 
 cloudinary.config({
@@ -36,7 +36,7 @@ async function fetchUploadImage(file: File) {
                     const resultUpload: IImage = transformCloudinaryToImage(uploadSuccess);
                     return resolve(resultUpload);
                 } else {
-                    logAnger('upload image::', uploadError);
+                    logger.anger('upload image::', uploadError);
                 }
             })
             .end(buffer);

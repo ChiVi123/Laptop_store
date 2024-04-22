@@ -4,7 +4,6 @@ import { Google as Google_icon } from '@mui/icons-material';
 import { Box, TextField, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { authServerAction } from '~/actions';
@@ -12,7 +11,7 @@ import { EPath } from '~/common/enums';
 import { loginDefaultValues } from '~/common/values';
 import PasswordField from '~/components/auth/password.field';
 import { StyleButtonLoginWithGoogle, StyleContainer, StyleLine, StyleLink } from '~/components/auth/styles';
-import { logInfo } from '~/libs/logger';
+import logger from '~/libs/logger';
 import { loginResolver } from '~/resolvers';
 import { loginFormData } from '~/types/form.data';
 
@@ -23,12 +22,11 @@ function LoginPage() {
         handleSubmit,
     } = useForm<loginFormData>({ resolver: loginResolver, defaultValues: loginDefaultValues });
     const [disabled, setDisabled] = useState<boolean>(false);
-    const router = useRouter();
 
     const handleOnSubmit: SubmitHandler<loginFormData> = async (data) => {
         setDisabled(true);
         const result = await authServerAction.login(data);
-        logInfo('login::', result);
+        logger.info('login::', result);
         setDisabled(false);
     };
 

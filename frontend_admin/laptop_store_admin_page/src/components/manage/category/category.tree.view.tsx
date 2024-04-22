@@ -10,7 +10,7 @@ import { DragEvent, SyntheticEvent, useCallback, useMemo, useState } from 'react
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { categoryServerAction } from '~/actions';
 import { ELabel, EPath, EStatus, EText } from '~/common/enums';
-import { logInfo } from '~/libs/logger';
+import logger from '~/libs/logger';
 import { categoryResolver } from '~/resolvers';
 import { categoryFormData } from '~/types/form.data';
 import { ICategory } from '~/types/models';
@@ -99,7 +99,7 @@ function CategoryTreeView({ categoryTree, category, parentCategory }: IProps) {
         const { dragFrom, dropTo } = dragAndDrop;
         if (dragFrom !== null && dropTo !== null && dragFrom !== dropTo) {
             const result = await categoryServerAction.move(dragFrom, dropTo);
-            logInfo('handle drag::', result);
+            logger.info('handle drag::', result);
         }
         setDragAndDrop(initDragAndDrop());
     };

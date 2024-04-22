@@ -5,7 +5,7 @@ import { AppBar, Avatar, Badge, Button, Divider, IconButton, Menu, MenuItem, Too
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { EPath } from '~/common/enums';
-import httpRequest from '~/libs/http.request';
+import { apiRequest } from '~/libs';
 
 type responseType = {
     message: string;
@@ -47,16 +47,16 @@ function Header({ width }: { width: number }) {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const router = useRouter();
 
-    function handleOpenMenu(event: React.MouseEvent<HTMLElement>) {
+    const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
-    }
-    function handleCloseMenu() {
+    };
+    const handleCloseMenu = () => {
         setAnchorEl(null);
-    }
-    async function handleLogout() {
-        const result = await httpRequest.get<responseType>('/api/auth/logout', { baseUrl: '' });
+    };
+    const handleLogout = async () => {
+        const result = await apiRequest.get('api/auth/logout', { baseURL: '' }).json<responseType>();
         router.push(result.path);
-    }
+    };
 
     return (
         <AppBar sx={{ left: width, width: 'auto', backgroundColor: 'white' }}>

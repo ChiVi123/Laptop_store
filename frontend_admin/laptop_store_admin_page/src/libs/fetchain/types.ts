@@ -1,6 +1,8 @@
 import { IErrorResponse } from '~/types/response';
 import { HttpStatus } from './constants';
 
+type FetchainOptions = RequestInit & { baseURL?: string };
+
 export type HttpMethodsType = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 export type FetchainErrorHandler = (error: FetchainError, originalRequest: IFetchain) => any;
 
@@ -120,15 +122,13 @@ export interface IFetchainResponse {
 export interface IFetchain {
     baseURL: string;
     finalURL: string;
-    options: RequestInit;
+    options: FetchainOptions;
     catchers: Map<string | number | Symbol, (error: FetchainError, originalRequest: IFetchain) => any>;
     /**
      * Sets the request body with any data.
      *
      * ```js
      * fetchain("...").body("hello").put();
-     * // Note that calling put/post methods with a non-object argument is equivalent:
-     * fetchain("...").put("hello");
      * ```
      *
      * @category Body Types
@@ -137,10 +137,10 @@ export interface IFetchain {
     body(data: unknown): this;
     headers(header: Record<string, string>): this;
     /**
-     * Shortcut to set the "Authorization" header.
+     * Shortcut to set the "Authorization" header. Only set "Bearer token"
      *
      * ```js
-     * fetchain("...").auth("Basic d3JldGNoOnJvY2tz");
+     * fetchain("...").auth("d3JldGNoOnJvY2tz");
      * ```
      *
      * @category Helpers
@@ -176,7 +176,7 @@ export interface IFetchain {
      * @param url - Some url to append
      * @param options - New options.
      */
-    request(method: HttpMethodsType, url: string, options?: RequestInit): IFetchainResponse;
+    request(method: HttpMethodsType, url: string, options?: FetchainOptions): IFetchainResponse;
     /**
      * Recall request.
      *
@@ -196,9 +196,9 @@ export interface IFetchain {
      * @category HTTP
      */
     recall(): IFetchainResponse;
-    get(url: string, options?: RequestInit): IFetchainResponse;
-    post(url: string, options?: RequestInit): IFetchainResponse;
-    put(url: string, options?: RequestInit): IFetchainResponse;
-    patch(url: string, options?: RequestInit): IFetchainResponse;
-    delete(url: string, options?: RequestInit): IFetchainResponse;
+    get(url: string, options?: FetchainOptions): IFetchainResponse;
+    post(url: string, options?: FetchainOptions): IFetchainResponse;
+    put(url: string, options?: FetchainOptions): IFetchainResponse;
+    patch(url: string, options?: FetchainOptions): IFetchainResponse;
+    delete(url: string, options?: FetchainOptions): IFetchainResponse;
 }

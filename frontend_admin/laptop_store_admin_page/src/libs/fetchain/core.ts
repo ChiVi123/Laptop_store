@@ -36,9 +36,12 @@ const core: IFetchain = {
         return { ...this, finalURL: `?${requestParams}` };
     },
     request(method, url, options = {}) {
+        const baseURL = options.baseURL ?? this.baseURL;
         const base = { ...this, options: { ...this.options, ...options, method } };
+
         url = base.finalURL.startsWith('?') ? `${url}${base.finalURL}` : url;
-        base.finalURL = url.startsWith('/') ? this.baseURL.concat(url) : this.baseURL.concat('/', url);
+        base.finalURL = url.startsWith('/') ? baseURL.concat(url) : baseURL.concat('/', url);
+
         return resolver(base);
     },
     recall() {

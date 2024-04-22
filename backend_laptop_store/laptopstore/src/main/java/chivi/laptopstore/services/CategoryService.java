@@ -38,13 +38,12 @@ public class CategoryService {
     }
 
     public CategoryEntity create(CategoryEntity parent, CategoryRequest request) {
-        String parentPath = parent.getPath();
-        String childPath = request.getPath();
         int level = parent.getChildLevel();
+        String path = request.getPath();
         String director = parent.getNewDirector();
         CategoryEntity category = new CategoryEntity();
         category.setName(request.getName());
-        category.setPath(String.format("%1$s/%2$s", parentPath, childPath));
+        category.setPath(path);
         category.setLevel(level);
         category.setDirector(director);
         category.setStatus(request.getStatus());
@@ -55,14 +54,9 @@ public class CategoryService {
     }
 
     public CategoryEntity editInfo(CategoryEntity category, CategoryRequest request) {
-        CategoryEntity parent = category.getParent();
-        String childPath = request.getPath();
-        if (parent == null) {
-            category.setPath(childPath);
-        } else {
-            String parentPath = parent.getPath();
-            category.setPath(String.format("%1$s/%2$s", parentPath, childPath));
-        }
+        String path = request.getPath();
+
+        category.setPath(path);
         category.setName(request.getName());
         category.setStatus(request.getStatus());
         return repository.save(category);
@@ -75,11 +69,9 @@ public class CategoryService {
             repository.save(toCategory);
         } else {
             parentFrom.removeChild(fromCategory);
+            String path = fromCategory.getPath();
 
-            String parentPath = toCategory.getPath();
-            String childPath = fromCategory.getPath();
-
-            fromCategory.setPath(String.format("%1$s/%2$s", parentPath, childPath));
+            fromCategory.setPath(path);
             fromCategory.setLevel(toCategory.getChildLevel());
             fromCategory.setDirector(toCategory.getNewDirector());
             toCategory.addChild(fromCategory);

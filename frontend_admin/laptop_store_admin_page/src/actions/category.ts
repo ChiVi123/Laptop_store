@@ -4,8 +4,7 @@ import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { EKeys, EPath, EStatus } from '~/common/enums';
-import { apiRequest } from '~/libs';
-import { handleRefresh } from '~/libs/helper.request';
+import { apiRequest, handleRefetch } from '~/libs';
 import logger from '~/libs/logger';
 import { categoryFormData } from '~/types/form.data';
 import { ICategoryResponse, IResponse } from '~/types/response';
@@ -57,7 +56,7 @@ export async function create(data: categoryFormData) {
         .post('admin/categories/create')
         .unauthorized(async (error, request) => {
             logger.anger('create category::', error.status, error.json);
-            const resultRefresh = await handleRefresh(request);
+            const resultRefresh = await handleRefetch(request);
             return resultRefresh ?? ({ payload: { name: '', path: '', status: EStatus.ENABLED } } as ICategoryResponse);
         })
         .json<ICategoryResponse>();
@@ -73,7 +72,7 @@ export async function edit(id: number, data: categoryFormData) {
         .put(`admin/categories/${id}/edit`)
         .unauthorized(async (error, request) => {
             logger.anger('edit category::', error.status, error.json);
-            const resultRefresh = await handleRefresh(request);
+            const resultRefresh = await handleRefetch(request);
             return resultRefresh ?? ({ payload: { name: '', path: '', status: EStatus.ENABLED } } as ICategoryResponse);
         })
         .json<ICategoryResponse>();
@@ -88,7 +87,7 @@ export async function move(fromId: number, toId: number) {
         .put(`admin/categories/${fromId}/move/${toId}`)
         .unauthorized(async (error, request) => {
             logger.anger('move category::', error.status, error.json);
-            const resultRefresh = await handleRefresh(request);
+            const resultRefresh = await handleRefetch(request);
             return resultRefresh ?? ({ payload: '' } as IResponse);
         })
         .json<IResponse>();
@@ -105,7 +104,7 @@ export async function destroy(id: number) {
         .delete(`admin/categories/${id}/delete`)
         .unauthorized(async (error, request) => {
             logger.anger('destroy category::', error.status, error.json);
-            const resultRefresh = await handleRefresh(request);
+            const resultRefresh = await handleRefetch(request);
             return resultRefresh ?? ({ payload: { id: 1 } } as ICategoryResponse);
         })
         .json<ICategoryResponse>();

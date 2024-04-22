@@ -6,7 +6,7 @@ import { apiRequest } from '.';
 import { FetchainError, IFetchain } from './fetchain';
 import { HttpStatus } from './fetchain/constants';
 
-export const handleRefresh = async (request: IFetchain) => {
+export const handleRefetch = async (request: IFetchain) => {
     const refreshToken = cookies().get(EKeys.REFRESH_TOKEN)?.value;
     if (refreshToken) {
         const { payload } = await apiRequest.body({ refreshToken }).post('auth/refresh-token').json<IResponse>();

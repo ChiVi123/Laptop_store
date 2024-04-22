@@ -4,8 +4,7 @@ import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { EKeys, EPath, EStatus } from '~/common/enums';
-import { apiRequest } from '~/libs';
-import { handleRefresh } from '~/libs/helper.request';
+import { apiRequest, handleRefetch } from '~/libs';
 import logger from '~/libs/logger';
 import { productFormData } from '~/types/form.data';
 import { IListImageResponse, IListProductResponse, IProductResponse, IResponse } from '~/types/response';
@@ -18,7 +17,7 @@ export async function all() {
         .unauthorized(async (error, request) => {
             logger.anger('all product::', error.status, error.json);
 
-            const resultRefresh = await handleRefresh(request);
+            const resultRefresh = await handleRefetch(request);
             return resultRefresh ?? ({ payload: new Array() } as IListProductResponse);
         })
         .json<IListProductResponse>();
@@ -55,7 +54,7 @@ export async function create(data: productFormData) {
         .unauthorized(async (error, request) => {
             logger.anger('create product::', error.status, error.json);
 
-            const resultRefresh = await handleRefresh(request);
+            const resultRefresh = await handleRefetch(request);
             return resultRefresh ?? ({ payload: { slug: '' } } as IProductResponse);
         })
         .json<IProductResponse>();
@@ -73,7 +72,7 @@ export async function edit(id: number, data: productFormData) {
         .unauthorized(async (error, request) => {
             logger.anger('edit product::', error.status, error.json);
 
-            const resultRefresh = await handleRefresh(request);
+            const resultRefresh = await handleRefetch(request);
             return resultRefresh ?? ({ payload: { slug: '' } } as IProductResponse);
         })
         .json<IProductResponse>();
@@ -90,7 +89,7 @@ export async function removeImage(productId: number, imageId: number) {
         .unauthorized(async (error, request) => {
             logger.anger('remove image product::', error.status, error.json);
 
-            await handleRefresh(request);
+            await handleRefetch(request);
         })
         .json<IListImageResponse>();
 }
@@ -103,7 +102,7 @@ export async function destroy(id: number) {
         .unauthorized(async (error, request) => {
             logger.anger('destroy product::', error.status, error.json);
 
-            await handleRefresh(request);
+            await handleRefetch(request);
         })
         .json<IResponse>();
 

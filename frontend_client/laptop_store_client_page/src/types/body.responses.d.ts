@@ -35,3 +35,10 @@ export interface IListProductBodyResponse extends IBodyResponse {
 export interface IListCategoryBodyResponse extends IBodyResponse {
     payload: ICategory[];
 }
+export interface IPaginationBodyResponse<Type> extends IBodyResponse {
+    payload: {
+        pageNumber: number;
+        totalPage: number;
+        list: Type[];
+    };
+}

@@ -15,7 +15,7 @@ async function RootLayout({ children }: PropsWithChildren) {
             <body>
                 <DataProvider categories={rootCategory.children} account={undefined}>
                     <Header />
-                    <Container component='main' className='mt-[4.625rem]'>
+                    <Container component='main' className='py-[4.625rem] bg-cv-primary-background'>
                         {children}
                     </Container>
                 </DataProvider>

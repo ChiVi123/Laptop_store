@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,6 +49,20 @@ public class ProductController {
     ) {
         int currentPage = pageNumber - 1;
         Page<ProductEntity> productPage = productService.getAllLatest(PageRequest.of(currentPage, pageSize));
+        PagePayload<ProductEntity> payload = new PagePayload<>(currentPage, productPage);
+        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, payload);
+    }
+
+    @GetMapping(RequestMaps.PRODUCT_PATHNAME_PUBLIC + "collection")
+    @ResponseStatus(HttpStatus.OK)
+    public SuccessResponse findAllByCategory(
+            @RequestParam(name = "category_id", defaultValue = "1") long categoryId,
+            @RequestParam(name = "page_number", defaultValue = "1") int pageNumber,
+            @RequestParam(name = "page_size", defaultValue = "6") int pageSize
+    ) {
+        int currentPage = pageNumber - 1;
+        Pageable pageable = PageRequest.of(currentPage, pageSize);
+        Page<ProductEntity> productPage = productService.getAllByCategories(categoryId, pageable);
         PagePayload<ProductEntity> payload = new PagePayload<>(currentPage, productPage);
         return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, payload);
     }

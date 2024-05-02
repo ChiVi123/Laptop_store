@@ -3,8 +3,9 @@
 import { KeyboardArrowDown as KeyboardArrowDownIcon, Notifications as NotificationsIcon } from '@mui/icons-material';
 import { AppBar, Avatar, Badge, Button, Divider, IconButton, Menu, MenuItem, Toolbar } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { EPath } from '~/common/enums';
+import { AccountContext } from '~/config';
 import { apiRequest } from '~/libs';
 
 type responseType = {
@@ -39,12 +40,13 @@ function stringAvatar(name: string) {
             bgcolor: stringToColor(name),
             fontSize: '0.625rem !important',
         },
-        children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
+        children: name[0],
     };
 }
 
 function Header({ width }: { width: number }) {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const account = useContext(AccountContext);
     const router = useRouter();
 
     const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -52,6 +54,9 @@ function Header({ width }: { width: number }) {
     };
     const handleCloseMenu = () => {
         setAnchorEl(null);
+    };
+    const handleProfile = () => {
+        router.push(EPath.MANAGE_PROFILE);
     };
     const handleLogout = async () => {
         const result = await apiRequest.get('api/auth/logout', { baseURL: '' }).json<responseType>();
@@ -70,12 +75,12 @@ function Header({ width }: { width: number }) {
                     id='profile-menu-button'
                     variant='outlined'
                     disableRipple
-                    startIcon={<Avatar {...stringAvatar('I Love You')} />}
+                    startIcon={<Avatar {...stringAvatar(account?.fullName ?? '')} />}
                     endIcon={<KeyboardArrowDownIcon />}
                     sx={{ color: ({ palette }) => palette.grey[600], borderRadius: '999px' }}
                     onClick={handleOpenMenu}
                 >
-                    I love you
+                    {account?.fullName ?? ''}
                 </Button>
                 <Menu
                     id='profile-menu-content'
@@ -92,8 +97,7 @@ function Header({ width }: { width: number }) {
                     }}
                     sx={{ mt: 1.5, '& .MuiPaper-root': { minWidth: 180 } }}
                 >
-                    <MenuItem onClick={handleCloseMenu}>Profile</MenuItem>
-                    <MenuItem onClick={handleCloseMenu}>Profile</MenuItem>
+                    <MenuItem onClick={handleProfile}>Tai khoan</MenuItem>
                     <Divider />
                     <MenuItem onClick={handleLogout}>Dang xuat</MenuItem>
                 </Menu>

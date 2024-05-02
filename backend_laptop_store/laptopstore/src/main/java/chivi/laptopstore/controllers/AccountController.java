@@ -26,6 +26,14 @@ public class AccountController {
         return accountService.getAll();
     }
 
+    @GetMapping(RequestMaps.ACCOUNT_PATHNAME_PRIVATE + "profile")
+    @ResponseStatus(HttpStatus.OK)
+    public SuccessResponse getProfile(HttpServletRequest httpServletRequest) {
+        String email = this.getEmailFromRequest(httpServletRequest);
+        AccountEntity account = accountService.getByEmail(email);
+        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, account);
+    }
+
     @PutMapping(RequestMaps.ACCOUNT_PATHNAME_PRIVATE + "edit")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse editAccount(@Valid @RequestBody AccountRequest accountRequest, HttpServletRequest httpServletRequest) {

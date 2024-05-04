@@ -1,4 +1,4 @@
-package chivi.laptopstore.models.payloads;
+package chivi.laptopstore.communication.payload;
 
 import lombok.Data;
 import org.springframework.data.domain.Page;

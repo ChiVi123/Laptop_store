@@ -2,10 +2,10 @@ package chivi.laptopstore.controllers;
 
 import chivi.laptopstore.common.RequestMaps;
 import chivi.laptopstore.common.ResponseMessage;
+import chivi.laptopstore.communication.payload.PagePayload;
 import chivi.laptopstore.models.entities.CategoryInfo;
 import chivi.laptopstore.models.entities.ProductDetail;
 import chivi.laptopstore.models.entities.ProductInfo;
-import chivi.laptopstore.models.payloads.PagePayload;
 import chivi.laptopstore.models.requests.DiscountRequest;
 import chivi.laptopstore.models.requests.ProductRequest;
 import chivi.laptopstore.models.responses.SuccessResponse;

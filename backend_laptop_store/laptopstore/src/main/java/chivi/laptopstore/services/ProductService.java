@@ -4,12 +4,14 @@ import chivi.laptopstore.configurations.CloudinaryConfig;
 import chivi.laptopstore.exception.ConflictException;
 import chivi.laptopstore.exception.CustomBadRequestException;
 import chivi.laptopstore.exception.CustomNotFoundException;
-import chivi.laptopstore.models.entities.CategoryEntity;
+import chivi.laptopstore.models.entities.CategoryInfo;
 import chivi.laptopstore.models.entities.ImageEntity;
-import chivi.laptopstore.models.entities.ProductEntity;
+import chivi.laptopstore.models.entities.ProductDetail;
+import chivi.laptopstore.models.entities.ProductInfo;
 import chivi.laptopstore.models.requests.DiscountRequest;
 import chivi.laptopstore.models.requests.ProductRequest;
-import chivi.laptopstore.repositories.IProductRepository;
+import chivi.laptopstore.repositories.IProductDetailRepository;
+import chivi.laptopstore.repositories.IProductInfoRepository;
 import chivi.laptopstore.utils.CustomString;
 import chivi.laptopstore.utils.PriceHandler;
 import lombok.AllArgsConstructor;
@@ -21,96 +23,115 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
 @AllArgsConstructor
 public class ProductService {
-    private final IProductRepository repository;
+    private final IProductInfoRepository productInfoRepository;
+    private final IProductDetailRepository productDetailRepository;
     private final CloudinaryConfig cloudinaryConfig;
 
-    public List<ProductEntity> getAll() {
-        return repository.findAll();
+    public List<ProductInfo> getAll() {
+        return productInfoRepository.findAll();
     }
 
-    public Page<ProductEntity> getAllLatest(Pageable pageable) {
-        return repository.findAllByOrderByCreatedDateDesc(pageable);
+    public Page<ProductInfo> getAllLatest(Pageable pageable) {
+        return productInfoRepository.findAllByOrderByCreatedDateDesc(pageable);
     }
 
-    public ProductEntity getBySlug(String slug) {
-        return repository.findBySlug(slug).orElseThrow(() -> new CustomNotFoundException("product", slug));
+    public ProductDetail getBySlug(String slug) {
+        return productDetailRepository.findByInfo_Slug(slug).orElseThrow(() -> new CustomNotFoundException("product", slug));
     }
 
-    public ProductEntity getById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new CustomNotFoundException("product", id));
+    public ProductInfo getInfoById(Long id) {
+        return productInfoRepository.findById(id).orElseThrow(() -> new CustomNotFoundException("product", id));
+    }
+
+    public ProductDetail getDetailById(Long id) {
+        return productDetailRepository.findById(id).orElseThrow(() -> new CustomNotFoundException("product", id));
     }
 
     public void checkConflictByName(String name) {
-        if (repository.existsByName(name)) {
+        if (productInfoRepository.existsByName(name)) {
             throw new ConflictException("Product", name);
         }
     }
 
-    public ProductEntity create(List<CategoryEntity> categories, ProductRequest request) {
-        ProductEntity product = new ProductEntity();
-        product.setName(request.getName());
-        product.setSlug(request.getSlug());
-        product.setCategories(categories);
-        product.setDescription(request.getDescription());
-        product.setPrice(request.getPrice());
-        product.setQuantityStock(request.getQuantityStock());
-        product.setImages(request.getImages());
-        product.setStatus(request.getStatus());
-        return repository.save(product);
+    public ProductDetail create(Set<CategoryInfo> categories, ProductRequest request) {
+        ProductInfo productInfo = new ProductInfo();
+        productInfo.setName(request.getName());
+        productInfo.setSlug(request.getSlug());
+        productInfo.setDescription(request.getDescription());
+        productInfo.setPrice(request.getPrice());
+        productInfo.setQuantityStock(request.getQuantityStock());
+        productInfo.setStatus(request.getStatus());
+
+        // Product info set thumbnail from request
+        request.getImages().stream().findFirst().ifPresent(image -> productInfo.setThumbnailUrl(image.getSecureUrl()));
+
+        ProductInfo resultProductInfo = productInfoRepository.save(productInfo);
+        ProductDetail productDetail = new ProductDetail(resultProductInfo, categories, request.getImages());
+        return productDetailRepository.save(productDetail);
     }
 
-    public ProductEntity editInfo(ProductEntity product, List<CategoryEntity> categories, ProductRequest request) {
-        if (!product.getName().equals(request.getName())) {
+    public ProductDetail editInfo(ProductDetail productDetail, Set<CategoryInfo> categories, ProductRequest request) {
+        ProductInfo productInfo = productDetail.getInfo();
+
+        if (!productInfo.getName().equals(request.getName())) {
             this.checkConflictByName(request.getName());
             String slug = CustomString.toSlug(request.getName());
-            product.setName(request.getName());
-            product.setSlug(slug);
+            productInfo.setName(request.getName());
+            productInfo.setSlug(slug);
         }
-        product.setPrice(request.getPrice());
-        product.setDescription(request.getDescription());
-        product.setStatus(request.getStatus());
-        product.clearAllCategory();
-        product.addAllCategory(categories);
-        request.getImages().forEach(product::addImage);
+        productInfo.setPrice(request.getPrice());
+        productInfo.setDescription(request.getDescription());
+        productInfo.setStatus(request.getStatus());
+        productDetail.clearAllCategory();
+        productDetail.addAllCategory(categories);
+        productDetail.addImages(request.getImages());
 
-        return repository.save(product);
+        productInfoRepository.save(productInfo);
+        return productDetailRepository.save(productDetail);
     }
 
-    public ProductEntity updateDiscount(ProductEntity product, DiscountRequest discountRequest) {
-        BigDecimal price = product.getPrice();
+    public ProductInfo updateDiscount(ProductInfo productInfo, DiscountRequest discountRequest) {
+        BigDecimal price = productInfo.getPrice();
         BigDecimal discount = discountRequest.getDiscount();
         MathContext mathContext = new MathContext(4);
         if (price.compareTo(discount) < 0) {
             throw new CustomBadRequestException("Discount invalid");
         }
         BigDecimal rate = PriceHandler.discountRating(price, discount);
-        product.setPrice(price);
-        product.setDiscount(discount);
-        product.setDiscountRate(rate.round(mathContext).floatValue());
-        return repository.save(product);
+        productInfo.setPrice(price);
+        productInfo.setDiscount(discount);
+        productInfo.setDiscountRate(rate.round(mathContext).floatValue());
+        return productInfoRepository.save(productInfo);
     }
 
-    public List<ImageEntity> removeImage(ProductEntity product, Long publicId) {
-        Optional<ImageEntity> imageOptional = product.getImages().stream().filter(entity -> entity.getId().equals(publicId)).findFirst();
-        if (imageOptional.isPresent()) {
-            ImageEntity image = imageOptional.get();
-            cloudinaryConfig.deleteImage(List.of(image.getPublicId()));
-            product.removeImage(image);
-        }
-        ProductEntity result = repository.save(product);
+    public List<ImageEntity> removeImage(ProductDetail productDetail, Long publicId) {
+        List<ImageEntity> images = productDetail.getImages();
+        images.stream()
+                .filter(entity -> entity.getId().equals(publicId))
+                .findFirst()
+                .ifPresent(image -> {
+                    cloudinaryConfig.deleteImage(List.of(image.getPublicId()));
+                    productDetail.removeImage(image);
+                });
+
+        ProductDetail result = productDetailRepository.save(productDetail);
         return result.getImages();
     }
 
-    public void delete(ProductEntity product) {
-        List<String> publicIds = product.getImages().stream().map(ImageEntity::getPublicId).toList();
-        cloudinaryConfig.deleteImage(publicIds);
-        product.clearAllCategory();
-        repository.delete(product);
+    public void delete(ProductDetail productDetail) {
+        List<String> publicIds = productDetail.getImages().stream().map(ImageEntity::getPublicId).toList();
+        productDetail.clearAllCategory();
+
+        if (publicIds.size() > 0) {
+            cloudinaryConfig.deleteImage(publicIds);
+        }
+        productDetailRepository.delete(productDetail);
+        productInfoRepository.delete(productDetail.getInfo());
     }
 }

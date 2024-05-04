@@ -3,89 +3,98 @@ package chivi.laptopstore.services;
 import chivi.laptopstore.exception.BaseException;
 import chivi.laptopstore.exception.ConflictException;
 import chivi.laptopstore.exception.CustomNotFoundException;
-import chivi.laptopstore.models.entities.CategoryEntity;
+import chivi.laptopstore.models.entities.CategoryInfo;
+import chivi.laptopstore.models.entities.CategoryNode;
 import chivi.laptopstore.models.requests.CategoryRequest;
-import chivi.laptopstore.repositories.ICategoryRepository;
+import chivi.laptopstore.repositories.ICategoryInfoRepository;
+import chivi.laptopstore.repositories.ICategoryNodeRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
 @AllArgsConstructor
 public class CategoryService {
-    private final ICategoryRepository repository;
+    private final ICategoryInfoRepository categoryInfoRepository;
+    private final ICategoryNodeRepository categoryNodeRepository;
 
-    public CategoryEntity getRoot() {
-        return repository.findByParent_Id(null).orElseThrow(() -> new BaseException(HttpStatus.NOT_FOUND.value(), "root not found"));
+    public CategoryNode getRoot() {
+        return categoryNodeRepository
+                .findByParent_Id(null)
+                .orElseThrow(() -> new BaseException(HttpStatus.NOT_FOUND.value(), "root not found"));
     }
 
-    public List<CategoryEntity> getAllByIds(List<Long> ids) {
-        return repository.findAllByIdIn(ids);
+    public Set<CategoryInfo> getAllByIds(List<Long> ids) {
+        return categoryInfoRepository.findAllByIdIn(ids);
     }
 
-    public CategoryEntity getById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new CustomNotFoundException("category", id));
+    public CategoryNode getNodeById(Long id) {
+        return categoryNodeRepository.findById(id).orElseThrow(() -> new CustomNotFoundException("node category", id));
+    }
+
+    public CategoryInfo getInfoById(Long id) {
+        return categoryInfoRepository.findById(id).orElseThrow(() -> new CustomNotFoundException("category", id));
     }
 
     public void checkConflictByName(String name) {
-        if (repository.existsByName(name)) {
+        if (categoryInfoRepository.existsByName(name)) {
             throw new ConflictException("Category", name);
         }
     }
 
-    public CategoryEntity create(CategoryEntity parent, CategoryRequest request) {
-        int level = parent.getChildLevel();
-        String path = request.getPath();
-        String director = parent.getNewDirector();
-        CategoryEntity category = new CategoryEntity();
-        category.setName(request.getName());
-        category.setPath(path);
-        category.setLevel(level);
-        category.setDirector(director);
-        category.setStatus(request.getStatus());
-        parent.addChild(category);
-        CategoryEntity result = repository.save(parent);
-        int lastIndex = result.getChildren().size() - 1;
-        return result.getChildren().get(lastIndex);
+    public CategoryNode create(CategoryNode parent, CategoryRequest request) {
+        CategoryInfo categoryInfo = new CategoryInfo();
+        CategoryNode node = new CategoryNode();
+
+        categoryInfo.setName(request.getName());
+        categoryInfo.setPath(request.getPath());
+        categoryInfo.setCode(parent.getInfo().getCode() + "-" + parent.getInfo().getId());
+        categoryInfo.setStatus(request.getStatus());
+
+        CategoryInfo resultCategoryInfo = categoryInfoRepository.save(categoryInfo);
+
+        node.setInfo(resultCategoryInfo);
+        parent.addChild(node);
+
+        return categoryNodeRepository.save(parent);
     }
 
-    public CategoryEntity editInfo(CategoryEntity category, CategoryRequest request) {
-        String path = request.getPath();
-
-        category.setPath(path);
+    public CategoryInfo editInfo(CategoryInfo category, CategoryRequest request) {
+        category.setPath(request.getPath());
         category.setName(request.getName());
         category.setStatus(request.getStatus());
-        return repository.save(category);
+        return categoryInfoRepository.save(category);
     }
 
-    public void move(CategoryEntity fromCategory, CategoryEntity toCategory) {
-        CategoryEntity parentFrom = fromCategory.getParent();
-        if (parentFrom == null) {
-            toCategory.addChild(fromCategory);
-            repository.save(toCategory);
+    public void move(CategoryNode fromCategoryNode, CategoryNode toCategoryNode) {
+        CategoryNode parentCategoryNode = fromCategoryNode.getParent();
+        CategoryInfo fromCategoryInfo = fromCategoryNode.getInfo();
+        CategoryInfo toCategoryInfo = toCategoryNode.getInfo();
+
+        fromCategoryInfo.setCode(toCategoryInfo.getCode() + "-" + toCategoryInfo.getId());
+        toCategoryNode.addChild(fromCategoryNode);
+
+        if (parentCategoryNode == null) {
+            categoryNodeRepository.save(toCategoryNode);
         } else {
-            parentFrom.removeChild(fromCategory);
-            String path = fromCategory.getPath();
-
-            fromCategory.setPath(path);
-            fromCategory.setLevel(toCategory.getChildLevel());
-            fromCategory.setDirector(toCategory.getNewDirector());
-            toCategory.addChild(fromCategory);
-
-            repository.saveAll(List.of(parentFrom, toCategory));
+            parentCategoryNode.removeChild(fromCategoryNode);
+            categoryNodeRepository.saveAll(List.of(parentCategoryNode, toCategoryNode));
         }
     }
 
-    public CategoryEntity deleteChild(CategoryEntity category) {
-        CategoryEntity parent = category.getParent();
-        if (parent == null) {
+    public CategoryNode deleteChild(CategoryNode categoryNode) {
+        CategoryNode parentNode = categoryNode.getParent();
+        if (parentNode == null) {
             throw new BaseException(HttpStatus.BAD_REQUEST.value(), "Cannot delete root");
         }
-        parent.removeChild(category);
-        return repository.save(parent);
+        parentNode.removeChild(categoryNode);
+
+        categoryInfoRepository.delete(categoryNode.getInfo());
+        return categoryNodeRepository.save(parentNode);
     }
 }

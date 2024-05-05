@@ -16,7 +16,7 @@ interface IProps {
 async function AddSubCategoryPage({ params: { parentId } }: IProps) {
     const [rootCategoryResult, categoryResult] = await Promise.all([
         categoryServerAction.root(),
-        categoryServerAction.byId(Number(parentId)),
+        categoryServerAction.getNodeByInfoId(Number(parentId)),
     ]);
 
     return (
@@ -33,14 +33,14 @@ async function AddSubCategoryPage({ params: { parentId } }: IProps) {
             </Box>
 
             <Box px={3} py={2}>
-                <CategoryTreeView categoryTree={rootCategoryResult.children} parentCategory={categoryResult} />
+                <CategoryTreeView categoryTree={rootCategoryResult.children} parentCategoryNode={categoryResult} />
             </Box>
         </Fragment>
     );
 }
 
 export async function generateMetadata({ params: { parentId } }: IProps): Promise<Metadata> {
-    const result = await categoryServerAction.byId(Number(parentId));
+    const result = await categoryServerAction.getInfoById(Number(parentId));
     return { title: `${result.name} (ID: ${result.id}) | Laptop Store` };
 }
 export default AddSubCategoryPage;

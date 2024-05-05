@@ -22,7 +22,7 @@ public class CategoryNode extends EntityStandard {
     @JsonBackReference
     private CategoryNode parent;
 
-    @OneToOne
+    @OneToOne(orphanRemoval = true)
     @JoinColumn(name = "category_info_id")
     private CategoryInfo info;
 

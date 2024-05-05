@@ -3,7 +3,7 @@ import { EAccountRole, EStatus } from '~/common/enums';
 interface IEntity {
     id: number;
 }
-interface IEntityStatus {
+export interface IEntityStatus {
     status: EStatus;
 }
 interface IEntityDateTime {
@@ -11,14 +11,14 @@ interface IEntityDateTime {
     lastModifiedDate: string;
 }
 
-export interface IAccount extends IEntity, IEntityDateTime {
-    username: string;
-    fullName: string;
-    email: string;
-    phone: string;
-    reviewCount: number;
-    likeCount: number;
-    role: EAccountRole;
+export interface ICategoryInfo extends IEntity, IEntityStatus, IEntityDateTime {
+    name: string;
+    path: string;
+    code: string;
+}
+export interface ICategoryNode extends IEntity, IEntityDateTime {
+    info: ICategoryInfo;
+    children: ICategoryNode[];
 }
 export interface IImage {
     id?: number;
@@ -28,6 +28,15 @@ export interface IImage {
     bytes: number;
     secureUrl: string;
     folder: string;
+}
+export interface IAccount extends IEntity, IEntityDateTime {
+    username: string;
+    fullName: string;
+    email: string;
+    phone: string;
+    reviewCount: number;
+    likeCount: number;
+    role: EAccountRole;
 }
 export interface ICategory extends IEntity, IEntityStatus, IEntityDateTime {
     level: number;

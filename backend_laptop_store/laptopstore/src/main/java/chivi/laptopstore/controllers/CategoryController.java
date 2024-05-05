@@ -24,10 +24,16 @@ public class CategoryController {
         return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, categoryService.getRoot());
     }
 
-    @GetMapping(RequestMaps.CATEGORY_PATHNAME_PUBLIC + "{id}")
+    @GetMapping(RequestMaps.CATEGORY_PATHNAME_PUBLIC + "info-id/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse findCategoryById(@PathVariable Long id) {
-        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, categoryService.getNodeById(id));
+    public SuccessResponse findCategoryNodeByInfoId(@PathVariable Long id) {
+        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, categoryService.getNodeByInfoId(id));
+    }
+
+    @GetMapping(RequestMaps.CATEGORY_PATHNAME_PUBLIC + "{id}/info")
+    @ResponseStatus(HttpStatus.OK)
+    public SuccessResponse findCategoryInfoById(@PathVariable Long id) {
+        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, categoryService.getInfoById(id));
     }
 
     @PostMapping(RequestMaps.CATEGORY_PATHNAME_ADMIN + "create")
@@ -41,11 +47,14 @@ public class CategoryController {
     @PutMapping(RequestMaps.CATEGORY_PATHNAME_ADMIN + "{id}/edit")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse editCategory(@PathVariable Long id, @Valid @RequestBody CategoryRequest request) {
-        CategoryInfo category = categoryService.getInfoById(id);
-        if (!category.getName().equals(request.getName())) {
+        CategoryNode categoryNode = categoryService.getNodeById(id);
+        CategoryInfo categoryInfo = categoryNode.getInfo();
+        if (!categoryInfo.getName().equals(request.getName())) {
             categoryService.checkConflictByName(request.getName());
         }
-        return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, categoryService.editInfo(category, request));
+        categoryInfo = categoryService.editInfo(categoryInfo, request);
+        categoryNode.setInfo(categoryInfo);
+        return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, categoryNode);
     }
 
     @PutMapping(RequestMaps.CATEGORY_PATHNAME_ADMIN + "{fromId}/move/{toId}")

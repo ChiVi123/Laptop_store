@@ -29,6 +29,12 @@ public class CategoryService {
                 .orElseThrow(() -> new BaseException(HttpStatus.NOT_FOUND.value(), "root not found"));
     }
 
+    public CategoryNode getNodeByInfoId(Long info_id) {
+        return categoryNodeRepository
+                .findByInfo_Id(info_id)
+                .orElseThrow(() -> new CustomNotFoundException("node category", info_id));
+    }
+
     public Set<CategoryInfo> getAllByIds(List<Long> ids) {
         return categoryInfoRepository.findAllByIdIn(ids);
     }
@@ -60,8 +66,9 @@ public class CategoryService {
 
         node.setInfo(resultCategoryInfo);
         parent.addChild(node);
+        parent = categoryNodeRepository.save(parent);
 
-        return categoryNodeRepository.save(parent);
+        return parent.getChildren().get(parent.getChildren().size() - 1);
     }
 
     public CategoryInfo editInfo(CategoryInfo category, CategoryRequest request) {
@@ -72,19 +79,13 @@ public class CategoryService {
     }
 
     public void move(CategoryNode fromCategoryNode, CategoryNode toCategoryNode) {
-        CategoryNode parentCategoryNode = fromCategoryNode.getParent();
         CategoryInfo fromCategoryInfo = fromCategoryNode.getInfo();
         CategoryInfo toCategoryInfo = toCategoryNode.getInfo();
 
         fromCategoryInfo.setCode(toCategoryInfo.getCode() + "-" + toCategoryInfo.getId());
         toCategoryNode.addChild(fromCategoryNode);
 
-        if (parentCategoryNode == null) {
-            categoryNodeRepository.save(toCategoryNode);
-        } else {
-            parentCategoryNode.removeChild(fromCategoryNode);
-            categoryNodeRepository.saveAll(List.of(parentCategoryNode, toCategoryNode));
-        }
+        categoryNodeRepository.save(toCategoryNode);
     }
 
     public CategoryNode deleteChild(CategoryNode categoryNode) {

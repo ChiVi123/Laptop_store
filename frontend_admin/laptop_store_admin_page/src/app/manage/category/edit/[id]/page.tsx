@@ -17,7 +17,7 @@ interface IProps {
 async function EditCategoryPage({ params: { id } }: IProps) {
     const [rootCategoryResult, categoryResult] = await Promise.all([
         categoryServerAction.root(),
-        categoryServerAction.byId(Number(id)),
+        categoryServerAction.getNodeByInfoId(Number(id)),
     ]);
 
     return (
@@ -35,17 +35,17 @@ async function EditCategoryPage({ params: { id } }: IProps) {
                     {EText.EDIT}
                 </Typography>
             </Box>
-            {categoryResult.name && <CategoryBar category={categoryResult} />}
+            {categoryResult.info.name && <CategoryBar category={categoryResult} />}
 
             <Box px={3} py={2}>
-                <CategoryTreeView categoryTree={rootCategoryResult.children} category={categoryResult} />
+                <CategoryTreeView categoryTree={rootCategoryResult.children} categoryNode={categoryResult} />
             </Box>
         </Fragment>
     );
 }
 
 export async function generateMetadata({ params: { id } }: IProps): Promise<Metadata> {
-    const result = await categoryServerAction.byId(Number(id));
+    const result = await categoryServerAction.getInfoById(Number(id));
     return { title: `${result.name} (ID: ${result.id}) | Laptop Store` };
 }
 export default EditCategoryPage;

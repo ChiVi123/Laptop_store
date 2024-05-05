@@ -10,10 +10,11 @@ import { DragEvent, SyntheticEvent, useCallback, useMemo, useState } from 'react
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { categoryServerAction } from '~/actions';
 import { ELabel, EPath, EStatus, EText } from '~/common/enums';
+import { useEntityStatus } from '~/hooks';
 import logger from '~/libs/logger';
 import { categoryResolver } from '~/resolvers';
 import { categoryFormData } from '~/types/form.data';
-import { ICategory } from '~/types/models';
+import { ICategoryNode } from '~/types/models';
 import FormLabel from '../form.label';
 import CustomTreeItem from './custom.tree.item';
 
@@ -29,9 +30,9 @@ interface IDragAndDropStatus {
     dropTo: number | null;
 }
 interface IProps {
-    categoryTree: ICategory[];
-    category?: ICategory;
-    parentCategory?: ICategory;
+    categoryTree: ICategoryNode[];
+    categoryNode?: ICategoryNode;
+    parentCategoryNode?: ICategoryNode;
 }
 
 const styleBefore = {
@@ -52,7 +53,7 @@ const styleBefore = {
     zIndex: 2,
 };
 
-function CategoryTreeView({ categoryTree, category, parentCategory }: IProps) {
+function CategoryTreeView({ categoryTree, categoryNode, parentCategoryNode }: IProps) {
     const initDragAndDrop = useCallback(() => ({ type: '', dragFrom: null, dropTo: null } as IDragAndDropStatus), []);
     const {
         control,
@@ -61,22 +62,17 @@ function CategoryTreeView({ categoryTree, category, parentCategory }: IProps) {
         handleSubmit,
     } = useForm({
         resolver: categoryResolver,
-        defaultValues: { name: category?.name ?? '', path: category?.path ?? '' },
+        defaultValues: { name: categoryNode?.info.name ?? '', path: categoryNode?.info.path ?? '' },
     });
     const [dragAndDrop, setDragAndDrop] = useState(initDragAndDrop);
-    const [status, setStatus] = useState<boolean>(() => Boolean(category ? category.status === EStatus.ENABLED : true));
+    const [status, setStatus] = useEntityStatus(categoryNode?.info);
     const [disabled, setDisabled] = useState<boolean>(false);
-    const router = useRouter();
     const defaultExpanded = useMemo(() => {
-        const expanded = category?.director.split(',') || parentCategory?.director.split(',') || [];
-        if (category) {
-            expanded.push(category.id.toString());
-        }
-        if (parentCategory) {
-            expanded.push(parentCategory.id.toString());
-        }
-        return expanded;
-    }, [category, parentCategory]);
+        const expanded = categoryNode?.info.code.split('-') ?? parentCategoryNode?.info.code.split('-') ?? ['2'];
+        return [...expanded, categoryNode?.info.id.toString() ?? parentCategoryNode?.info.id.toString() ?? '2'];
+    }, [categoryNode?.info.code, categoryNode?.info.id, parentCategoryNode?.info.code, parentCategoryNode?.info.id]);
+    const router = useRouter();
+
     const pathDefault = '1';
 
     const handleSetSelected = (_: SyntheticEvent, nodeId: string) => {
@@ -107,29 +103,28 @@ function CategoryTreeView({ categoryTree, category, parentCategory }: IProps) {
     const handleOnSubmit: SubmitHandler<categoryFormData> = async (data) => {
         setDisabled(true);
 
-        data.parentId = parentCategory?.id;
+        data.parentId = parentCategoryNode?.id;
         data.status = status ? EStatus.ENABLED : EStatus.DISABLED;
 
-        const result = category
-            ? await categoryServerAction.edit(category.id, data)
+        const result = categoryNode
+            ? await categoryServerAction.edit(categoryNode.id, data)
             : await categoryServerAction.create(data);
 
         if (result) {
-            setValue('name', result.name);
-            setValue('path', result.path);
-            setValue('status', result.status);
-            setStatus(result.status === EStatus.ENABLED);
+            setValue('name', result.info.name);
+            setValue('path', result.info.path);
+            setValue('status', result.info.status);
+            setStatus(result.info.status === EStatus.ENABLED);
         }
 
         setDisabled(false);
     };
 
-    const renderTreeItem = (node: ICategory) => (
+    const renderTreeItem = (node: ICategoryNode) => (
         <CustomTreeItem
             key={node.id}
-            id={`parent-${node.id}`}
-            nodeId={node.id.toString()}
-            label={node.name.concat(` (ID: ${node.id})`)}
+            label={node.info.name.concat(` (ID: ${node.info.id})`)}
+            nodeId={node.info.id.toString()}
             data-id={node.id}
             draggable
             onDragStart={handleDragStart}
@@ -152,21 +147,21 @@ function CategoryTreeView({ categoryTree, category, parentCategory }: IProps) {
                     <Button
                         variant='outlined'
                         LinkComponent={Link}
-                        href={`${EPath.MANAGE_CATEGORY_ADD}${parentCategory ? parentCategory.id : pathDefault}`}
+                        href={`${EPath.MANAGE_CATEGORY_ADD}${parentCategoryNode?.info.id ?? pathDefault}`}
                     >
                         {EText.ADD_ROOT_CATEGORY}
                     </Button>
                     <Button
                         variant='outlined'
                         LinkComponent={Link}
-                        href={`${EPath.MANAGE_CATEGORY_ADD}${category ? category.id : pathDefault}`}
+                        href={`${EPath.MANAGE_CATEGORY_ADD}${categoryNode?.info.id ?? pathDefault}`}
                     >
                         {EText.ADD_SUBCATEGORY}
                     </Button>
                 </Box>
                 <TreeView
                     aria-label='category tree'
-                    defaultSelected={category?.id.toString() || parentCategory?.id.toString()}
+                    defaultSelected={categoryNode?.info.id.toString() || parentCategoryNode?.info.id.toString()}
                     defaultExpanded={defaultExpanded}
                     defaultCollapseIcon={<ExpandMoreIcon />}
                     defaultExpandIcon={<ChevronRightIcon />}

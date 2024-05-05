@@ -25,7 +25,7 @@ async function CategoryPage() {
             </Box>
 
             <Box px={3} py={2}>
-                <CategoryTreeView categoryTree={result.children} parentCategory={result} />
+                <CategoryTreeView categoryTree={result.children} parentCategoryNode={result} />
             </Box>
         </Fragment>
     );

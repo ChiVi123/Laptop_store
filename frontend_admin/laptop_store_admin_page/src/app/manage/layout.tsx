@@ -3,14 +3,11 @@ import Toolbar from '@mui/material/Toolbar';
 import { PropsWithChildren } from 'react';
 import { accountServerAction } from '~/actions';
 import { Header, Navigate } from '~/components/manage';
-import logger from '~/libs/logger';
 import { AccountProvider } from '~/providers';
 
 async function ManageLayout({ children }: PropsWithChildren) {
     const response = await accountServerAction.profile();
     const widthDrawer = 240;
-
-    logger.info('manage layout::', response.payload);
 
     return (
         <Box sx={{ display: 'flex' }}>

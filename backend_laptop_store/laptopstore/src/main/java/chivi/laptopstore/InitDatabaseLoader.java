@@ -26,8 +26,8 @@ public class InitDatabaseLoader implements CommandLineRunner {
             return;
         }
 
-        CategoryInfo rootCategoryInfo = new CategoryInfo("root", "root", "", EntityStatus.ENABLED);
-        CategoryInfo defaultCategoryInfo = new CategoryInfo("default", "default", "1", EntityStatus.ENABLED);
+        CategoryInfo rootCategoryInfo = new CategoryInfo("root", "root", "r", EntityStatus.ENABLED);
+        CategoryInfo defaultCategoryInfo = new CategoryInfo("default", "default", "r-1", EntityStatus.ENABLED);
 
         CategoryNode defaultCategoryNode = new CategoryNode();
         CategoryNode rootCategoryNode = new CategoryNode();

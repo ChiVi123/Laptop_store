@@ -3,13 +3,13 @@ package chivi.laptopstore.common;
 public class EntityNames {
     // Table name
     public static final String TABLE_ACCOUNT = "account";
-    public static final String TABLE_CATEGORY = "category";
-    public static final String TABLE_PRODUCT = "product";
+    public static final String TABLE_CATEGORY = "category_old";
+    public static final String TABLE_PRODUCT = "product_old";
     public static final String TABLE_IMAGE = "image";
     public static final String TABLE_REFRESH_TOKEN = "refresh_token";
-    public static final String TABLE_VERIFICATION_TOKEN = "verification_token";
-    public static final String TABLE_PRODUCT_CATEGORY = "product_category";
-    public static final String TABLE_PRODUCT_IMAGE = "product_image";
+    public static final String TABLE_VERIFICATION_TOKEN = "verify_token";
+    public static final String TABLE_PRODUCT_CATEGORY = "product_category_old";
+    public static final String TABLE_PRODUCT_IMAGE = "product_image_old";
 
     // Column name
     public static final String COLUMN_ACCOUNT_ID = "account_id";
@@ -29,11 +29,8 @@ public class EntityNames {
     public static final String JOIN_COLUMN_PRODUCT_ID = "product_id";
     public static final String JOIN_COLUMN_CATEGORY_ID = "category_id";
     public static final String JOIN_COLUMN_IMAGE_ID = "image_id";
+    public static final String JOIN_COLUMN_PARENT_ID = "parent_id";
 
     public static final String COLUMN_CREATED_AT = "created_at";
     public static final String COLUMN_UPDATED_AT = "updated_at";
-
-    // Join column
-    public static final String JOIN_COLUMN_PARENT_ID = "parent_id";
-
 }

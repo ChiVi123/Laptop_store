@@ -2,9 +2,10 @@ package chivi.laptopstore.controllers;
 
 import chivi.laptopstore.common.RequestMaps;
 import chivi.laptopstore.common.ResponseMessage;
-import chivi.laptopstore.models.entities.CategoryEntity;
-import chivi.laptopstore.models.entities.ProductEntity;
-import chivi.laptopstore.models.payloads.PagePayload;
+import chivi.laptopstore.communication.payload.PagePayload;
+import chivi.laptopstore.models.entities.CategoryInfo;
+import chivi.laptopstore.models.entities.ProductDetail;
+import chivi.laptopstore.models.entities.ProductInfo;
 import chivi.laptopstore.models.requests.DiscountRequest;
 import chivi.laptopstore.models.requests.ProductRequest;
 import chivi.laptopstore.models.responses.SuccessResponse;
@@ -19,7 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RestController
@@ -48,8 +49,8 @@ public class ProductController {
             @RequestParam(name = "page_size", defaultValue = "6") int pageSize
     ) {
         int currentPage = pageNumber - 1;
-        Page<ProductEntity> productPage = productService.getAllLatest(PageRequest.of(currentPage, pageSize));
-        PagePayload<ProductEntity> payload = new PagePayload<>(currentPage, productPage);
+        Page<ProductInfo> productPage = productService.getAllLatest(PageRequest.of(currentPage, pageSize));
+        PagePayload<ProductInfo> payload = new PagePayload<>(currentPage, productPage);
         return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, payload);
     }
 
@@ -71,37 +72,37 @@ public class ProductController {
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse createProduct(@Valid @RequestBody ProductRequest request) {
         productService.checkConflictByName(request.getName());
-        List<CategoryEntity> categories = categoryService.getAllByIds(request.getCategoryIds());
+        Set<CategoryInfo> categories = categoryService.getAllByIds(request.getCategoryIds());
         return new SuccessResponse(ResponseMessage.CREATE_SUCCESS, productService.create(categories, request));
     }
 
     @PutMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "{id}/edit")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse updateProduct(@PathVariable Long id, @Valid @RequestBody ProductRequest request) {
-        ProductEntity product = productService.getById(id);
-        List<CategoryEntity> categories = categoryService.getAllByIds(request.getCategoryIds());
-        ProductEntity result = productService.editInfo(product, categories, request);
+        ProductDetail product = productService.getDetailById(id);
+        Set<CategoryInfo> categories = categoryService.getAllByIds(request.getCategoryIds());
+        ProductDetail result = productService.editInfo(product, categories, request);
         return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, result);
     }
 
     @PatchMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "{id}/discount")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse updateDiscountProduct(@PathVariable Long id, @Valid @RequestBody DiscountRequest request) {
-        ProductEntity product = productService.getById(id);
+        ProductInfo product = productService.getInfoById(id);
         return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, productService.updateDiscount(product, request));
     }
 
     @DeleteMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "{productId}/remove-image/{imageId}")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse removeImageProduct(@PathVariable Long productId, @PathVariable Long imageId) {
-        ProductEntity product = productService.getById(productId);
+        ProductDetail product = productService.getDetailById(productId);
         return new SuccessResponse(ResponseMessage.DELETE_SUCCESS, productService.removeImage(product, imageId));
     }
 
     @DeleteMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "{id}/delete")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse deleteProduct(@PathVariable Long id) {
-        ProductEntity product = productService.getById(id);
+        ProductDetail product = productService.getDetailById(id);
         productService.delete(product);
         return new SuccessResponse(ResponseMessage.DELETE_SUCCESS);
     }

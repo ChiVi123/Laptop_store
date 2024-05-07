@@ -1,4 +1,4 @@
-import { IAccount, ICategory, IImage, IProduct } from './models';
+import { IAccount, ICategory, ICategoryNode, IImage, IProduct, IProductDetail, IProductInfo } from './models';
 
 export interface IResponse {
     message: string;
@@ -17,20 +17,39 @@ export interface ILoginResponse extends IResponse {
         expiration: number;
     };
 }
+// Account
 export interface IAccountResponse extends IResponse {
     payload: IAccount;
 }
+
+// Product
 export interface IProductResponse extends IResponse {
     payload: IProduct;
+}
+export interface IProductInfoResponse extends IResponse {
+    payload: IProductInfo;
+}
+export interface IProductDetailResponse extends IResponse {
+    payload: IProductDetail;
+}
+
+// Category
+export interface ICategoryInfoResponse extends IResponse {
+    payload: ICategoryInfo;
+}
+export interface ICategoryNodeResponse extends IResponse {
+    payload: ICategoryNode;
 }
 export interface ICategoryResponse extends IResponse {
     payload: ICategory;
 }
+
+// List
 export interface IListImageResponse extends IResponse {
     payload: IImage[];
 }
 export interface IListProductResponse extends IResponse {
-    payload: IProduct[];
+    payload: IProductInfo[];
 }
 export interface IListCategoryResponse extends IResponse {
     payload: ICategory[];

@@ -4,10 +4,10 @@ import { Box, Button, Modal, Typography } from '@mui/material';
 import { useState } from 'react';
 import { categoryServerAction } from '~/actions';
 import { EText } from '~/common/enums';
-import { ICategory } from '~/types/models';
+import { ICategoryNode } from '~/types/models';
 
 interface IProps {
-    category: ICategory;
+    category: ICategoryNode;
 }
 
 const styleModal = {
@@ -37,7 +37,7 @@ function CategoryBar({ category }: IProps) {
     return (
         <Box display='flex' justifyContent='space-between' px={3} pb={2} bgcolor='white'>
             <Typography variant='h2' mt={2}>
-                {category.name}
+                {category.info.name}
             </Typography>
             <Button variant='contained' color='warning' onClick={handleOpen}>
                 {EText.DELETE}
@@ -53,7 +53,7 @@ function CategoryBar({ category }: IProps) {
                         Xóa danh mục
                     </Typography>
                     <Typography id='modal-category-description' sx={{ mt: 2 }}>
-                        Bạn có muốn xóa danh mục {`"${category.name}"`} không?.
+                        Bạn có muốn xóa danh mục {`"${category.info.name}"`} không?.
                     </Typography>
                     <Box display='flex' justifyContent='flex-end' gap={2} mt={3}>
                         <Button color='inherit' onClick={handleClose}>

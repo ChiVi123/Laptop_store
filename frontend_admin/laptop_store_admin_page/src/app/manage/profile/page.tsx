@@ -5,20 +5,10 @@ import Typography from '@mui/material/Typography';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Fragment } from 'react';
-import { categoryServerAction, productServerAction } from '~/actions';
 import { EPath } from '~/common/enums';
-import ProductForm from '~/components/manage/product/product.form';
+import FormAccount from '~/components/manage/profile/form.account';
 
-interface IProps {
-    params: { slug: string };
-}
-
-async function EditProductPage({ params: { slug } }: IProps) {
-    const [productResult, categoryResult] = await Promise.all([
-        productServerAction.bySlug(slug),
-        categoryServerAction.root(),
-    ]);
-
+function ProfilePage() {
     return (
         <Fragment>
             <Box p='18px 24px 12px' bgcolor='white'>
@@ -27,22 +17,22 @@ async function EditProductPage({ params: { slug } }: IProps) {
                         Trang chủ
                     </LinkMUI>
                     <Typography color='text.primary' component='span'>
-                        Chinh sua sản phẩm
+                        Tai khoan
                     </Typography>
                 </Breadcrumbs>
 
                 <Typography variant='h2' mt={2}>
-                    Chinh sua sản phẩm
+                    Tai khoan
                 </Typography>
             </Box>
 
-            <ProductForm product={productResult} categories={categoryResult.children} />
+            <FormAccount />
         </Fragment>
     );
 }
 
-export async function generateMetadata({ params: { slug } }: IProps): Promise<Metadata> {
-    const result = await productServerAction.bySlug(slug);
-    return { title: ''.concat(result.info.name, ' | Laptop store') };
-}
-export default EditProductPage;
+export default ProfilePage;
+
+export const metadata: Metadata = {
+    title: 'Account | Laptop store',
+};

@@ -1,8 +1,10 @@
 package chivi.laptopstore;
 
 import chivi.laptopstore.common.EntityStatus;
-import chivi.laptopstore.models.entities.CategoryEntity;
-import chivi.laptopstore.repositories.ICategoryRepository;
+import chivi.laptopstore.models.entities.CategoryInfo;
+import chivi.laptopstore.models.entities.CategoryNode;
+import chivi.laptopstore.repositories.ICategoryInfoRepository;
+import chivi.laptopstore.repositories.ICategoryNodeRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -14,36 +16,31 @@ import java.util.List;
 @Component
 @AllArgsConstructor
 public class InitDatabaseLoader implements CommandLineRunner {
-    private final ICategoryRepository repository;
+    private final ICategoryInfoRepository categoryInfoRepository;
+    private final ICategoryNodeRepository categoryNodeRepository;
 
     @Override
     public void run(String... args) throws Exception {
-        if (!repository.findAll().isEmpty()) {
-            log.info("Categories have already");
+        if (!categoryInfoRepository.findAll().isEmpty()) {
+            log.info("Categories have already!!!");
             return;
         }
-        int rootLevel = 0;
-        String rootDirector = "";
-        int defaultLevel = 1;
-        String defaultDirector = "0";
 
-        CategoryEntity rootCategory = new CategoryEntity();
-        rootCategory.setName("root");
-        rootCategory.setPath("root");
-        rootCategory.setLevel(rootLevel);
-        rootCategory.setDirector(rootDirector);
-        rootCategory.setStatus(EntityStatus.ENABLED);
+        CategoryInfo rootCategoryInfo = new CategoryInfo("root", "root", "r", EntityStatus.ENABLED);
+        CategoryInfo defaultCategoryInfo = new CategoryInfo("default", "default", "r-1", EntityStatus.ENABLED);
 
-        CategoryEntity defaultCategory = new CategoryEntity();
-        defaultCategory.setName("default category");
-        defaultCategory.setPath("default-category");
-        defaultCategory.setLevel(defaultLevel);
-        defaultCategory.setDirector(defaultDirector);
-        defaultCategory.setStatus(EntityStatus.ENABLED);
+        CategoryNode defaultCategoryNode = new CategoryNode();
+        CategoryNode rootCategoryNode = new CategoryNode();
 
-        rootCategory.addChild(defaultCategory);
+        defaultCategoryNode.setParent(rootCategoryNode);
+        defaultCategoryNode.setInfo(defaultCategoryInfo);
 
-        repository.saveAll(List.of(rootCategory, defaultCategory));
-        log.info("Category root level");
+        rootCategoryNode.setInfo(rootCategoryInfo);
+        rootCategoryNode.setChildren(List.of(defaultCategoryNode));
+
+        categoryInfoRepository.saveAll(List.of(rootCategoryInfo, defaultCategoryInfo));
+        categoryNodeRepository.saveAll(List.of(rootCategoryNode, defaultCategoryNode));
+
+        log.info("Init root and default category!!!");
     }
 }

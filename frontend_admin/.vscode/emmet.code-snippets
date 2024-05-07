@@ -20,7 +20,7 @@
     "Logger": {
         "scope": "typescriptreact, typescript",
         "prefix": "logger",
-        "body": ["logger$1({ $2 });"],
+        "body": ["logger$1.info('$2::', $3);"],
         "description": "Use state"
     },
     "Use state": {

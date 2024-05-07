@@ -92,6 +92,8 @@ public class ProductService {
         productDetail.addAllCategory(categories);
         productDetail.addImages(request.getImages());
 
+        request.getImages().stream().findFirst().ifPresent(image -> productInfo.setThumbnailUrl(image.getSecureUrl()));
+
         productInfoRepository.save(productInfo);
         return productDetailRepository.save(productDetail);
     }

@@ -18,7 +18,7 @@ import java.util.Set;
 @Getter
 @Setter
 public class ProductDetail extends EntityStandard {
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "product_info_id")
     private ProductInfo info;
 

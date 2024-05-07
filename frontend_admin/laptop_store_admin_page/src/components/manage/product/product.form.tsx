@@ -6,9 +6,10 @@ import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { productServerAction, uploadFileServerAction } from '~/actions';
 import { EKeys, EStatus, EText } from '~/common/enums';
 import { productDefaultValues } from '~/common/values';
+import { useEntityStatus } from '~/hooks';
 import { productResolver } from '~/resolvers';
 import { productFormData } from '~/types/form.data';
-import { ICategory, IImage, IProduct } from '~/types/models';
+import { ICategoryNode, IImage, IProductDetail } from '~/types/models';
 import FormLabel from '../form.label';
 import CategorySelectField from './category.select.field';
 import EditorField from './editor.field';
@@ -17,8 +18,8 @@ import NumberField from './number.field';
 import { StyleBackgroundFormGroup } from './styles';
 
 interface IProps {
-    product?: IProduct;
-    categories: ICategory[];
+    product?: IProductDetail;
+    categories: ICategoryNode[];
 }
 
 function ProductForm({ product, categories }: IProps) {
@@ -26,9 +27,12 @@ function ProductForm({ product, categories }: IProps) {
         control,
         formState: { errors },
         handleSubmit,
-    } = useForm<productFormData>({ resolver: productResolver, defaultValues: product || productDefaultValues });
+    } = useForm<productFormData>({
+        resolver: productResolver,
+        defaultValues: product ? { ...product, ...product?.info } : productDefaultValues,
+    });
     const [loading, setLoading] = useState<boolean>(false);
-    const [status, setStatus] = useState<boolean>(product ? product.status === EStatus.ENABLED : true);
+    const [status, setStatus] = useEntityStatus(product?.info);
 
     const handleRemoveImage = async (value: IImage) => {
         if (product && value.id) {

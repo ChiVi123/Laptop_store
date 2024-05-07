@@ -43,6 +43,6 @@ async function EditProductPage({ params: { slug } }: IProps) {
 
 export async function generateMetadata({ params: { slug } }: IProps): Promise<Metadata> {
     const result = await productServerAction.bySlug(slug);
-    return { title: ''.concat(result.name, ' | Laptop store') };
+    return { title: ''.concat(result.info.name, ' | Laptop store') };
 }
 export default EditProductPage;

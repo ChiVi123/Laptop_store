@@ -1,4 +1,4 @@
-import { IAccount, ICategory, ICategoryNode, IImage, IProduct } from './models';
+import { IAccount, ICategory, ICategoryNode, IImage, IProduct, IProductDetail, IProductInfo } from './models';
 
 export interface IResponse {
     message: string;
@@ -26,6 +26,12 @@ export interface IAccountResponse extends IResponse {
 export interface IProductResponse extends IResponse {
     payload: IProduct;
 }
+export interface IProductInfoResponse extends IResponse {
+    payload: IProductInfo;
+}
+export interface IProductDetailResponse extends IResponse {
+    payload: IProductDetail;
+}
 
 // Category
 export interface ICategoryInfoResponse extends IResponse {
@@ -43,7 +49,7 @@ export interface IListImageResponse extends IResponse {
     payload: IImage[];
 }
 export interface IListProductResponse extends IResponse {
-    payload: IProduct[];
+    payload: IProductInfo[];
 }
 export interface IListCategoryResponse extends IResponse {
     payload: ICategory[];

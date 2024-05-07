@@ -29,6 +29,25 @@ export interface IImage {
     secureUrl: string;
     folder: string;
 }
+export interface IProductInfo extends IEntity, IEntityStatus, IEntityDateTime {
+    name: string;
+    slug: string;
+    thumbnailUrl: string;
+    description: string;
+    price: number;
+    discount: number | null;
+    quantityStock: number;
+    discountRate: number;
+    quantitySold: number;
+    ratingAverage: number;
+    reviewCount: number;
+}
+export interface IProductDetail extends IEntity, IEntityDateTime {
+    info: IProductInfo;
+    categories: ICategoryInfo[];
+    images: IImage[];
+}
+
 export interface IAccount extends IEntity, IEntityDateTime {
     username: string;
     fullName: string;

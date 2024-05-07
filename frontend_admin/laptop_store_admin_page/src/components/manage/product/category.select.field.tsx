@@ -3,62 +3,69 @@
 import { AutocompleteChangeReason, TextField } from '@mui/material';
 import TreeSelect from 'mui-tree-select';
 import { useCallback, useMemo } from 'react';
-import { ICategory } from '~/types/models';
+import { ICategoryInfo, ICategoryNode } from '~/types/models';
 
-class Node {
-    private _value: ICategory;
+class Node implements ICategoryNode {
+    id: number;
+    info: ICategoryInfo;
+    children: ICategoryNode[];
+    createdDate: string;
+    lastModifiedDate: string;
 
-    constructor(value: ICategory) {
-        this._value = value;
+    constructor(node: ICategoryNode | ICategoryInfo) {
+        if ('info' in node) {
+            this.id = node.id;
+            this.info = node.info;
+            this.children = node.children;
+            this.createdDate = node.createdDate;
+            this.lastModifiedDate = node.lastModifiedDate;
+        } else {
+            this.id = 0;
+            this.info = node;
+            this.children = [];
+            this.createdDate = '';
+            this.lastModifiedDate = '';
+        }
     }
 
-    get value(): ICategory {
-        return this._value;
-    }
-
-    get director(): string {
-        return this._value.director;
-    }
-
-    get children(): Node[] | null {
-        const children = this._value.children;
-        return Boolean(children.length) ? children.map((item) => new Node(item)) : null;
+    get childrenNode() {
+        return Boolean(this.children.length) ? this.children.map((item) => new Node(item)) : null;
     }
 
     isBranch(): boolean {
-        return Boolean(this._value.children.length);
+        return Boolean(this.children.length);
     }
 
     isEqual(node: Node): boolean {
-        return this._value.id === node.value.id;
+        return this.id === node.id;
     }
 
     toString(): string {
-        return this._value.name;
+        return this.info.name;
     }
 }
 interface IProps {
     id: string;
-    value?: ICategory[];
-    tree: ICategory[];
-    onChange(value: ICategory[]): void;
+    value?: ICategoryInfo[];
+    tree: ICategoryNode[];
+    onChange(value: ICategoryInfo[]): void;
 }
 
 function CategorySelectField({ id, value, tree, onChange }: IProps) {
     const data = useMemo(() => tree.map((item) => new Node(item)), [tree]);
-    const nodeValue = useMemo(() => (value === undefined ? [] : value.map((item) => new Node(item))), [value]);
+    const nodeValue = useMemo(() => value?.map((item) => new Node(item)) ?? [], [value]);
 
     const handleGetParent = useCallback(
         (node: Node): Node | null => {
-            let parentElement: ICategory | undefined;
+            let parentElement: ICategoryNode | undefined;
             let childrenElement = tree;
 
-            node.director.split(',').forEach((pathId) => {
+            node.info.code.split('-').forEach((pathId) => {
                 if (!pathId) {
                     return;
                 }
 
-                parentElement = childrenElement.find((element) => element.id === Number(pathId));
+                parentElement = childrenElement.find((element) => element.info.id === Number(pathId));
 
                 if (parentElement) {
                     childrenElement = parentElement.children;
@@ -77,7 +84,7 @@ function CategorySelectField({ id, value, tree, onChange }: IProps) {
         switch (reason) {
             case 'selectOption':
             case 'removeOption':
-                onChange(nodes.map((item) => item.value));
+                onChange(nodes.map((item) => item.info));
                 break;
 
             default:
@@ -89,10 +96,10 @@ function CategorySelectField({ id, value, tree, onChange }: IProps) {
         <TreeSelect
             id={'select-' + id}
             size='small'
-            multiple
             value={nodeValue}
-            getChildren={(node) => (node ? node.children : data)}
+            getChildren={(node) => (node ? node.childrenNode : data)}
             getParent={handleGetParent}
+            multiple
             renderInput={(params) => <TextField {...params} label='' />}
             onChange={handleOnChange}
         />

@@ -16,13 +16,13 @@ import { Fragment, useMemo, useState } from 'react';
 import { productServerAction } from '~/actions';
 import { EPath, EStatus, EText } from '~/common/enums';
 import { mapStatus } from '~/common/maps';
-import { IImage, IProduct } from '~/types/models';
+import { IProductInfo } from '~/types/models';
 import DeleteActionCell from './delete.action.cell';
 
 import '~/libs/string.extensions';
 
 interface IProps {
-    rows: IProduct[];
+    rows: IProductInfo[];
 }
 
 function ProductList({ rows }: IProps) {
@@ -37,17 +37,17 @@ function ProductList({ rows }: IProps) {
         () => [
             { field: 'id', headerName: 'ID', type: 'number', width: 40 },
             {
-                field: 'images',
+                field: 'thumbnailUrl',
                 headerName: '',
                 width: 120,
                 sortable: false,
                 filterable: false,
-                renderCell: (params: GridRenderCellParams<any, IImage[]>) => (
+                renderCell: (params: GridRenderCellParams<any, string>) => (
                     <Fragment>
-                        {params.value?.length ? (
+                        {Boolean(params.value) ? (
                             <Image
-                                src={params.value ? params.value[0].secureUrl : ''}
-                                alt={params.value ? params.value[0].publicId : ''}
+                                src={params.value ?? ''}
+                                alt=''
                                 width={100}
                                 height={100}
                                 priority
@@ -115,11 +115,7 @@ function ProductList({ rows }: IProps) {
                 rows={rows}
                 columns={columns}
                 getRowHeight={() => 'auto'}
-                initialState={{
-                    pagination: {
-                        paginationModel: { page: 0, pageSize: 5 },
-                    },
-                }}
+                initialState={{ pagination: { paginationModel: { page: 0, pageSize: 5 } } }}
                 pageSizeOptions={[5, 10]}
                 checkboxSelection
                 rowSelectionModel={rowSelectionModel}

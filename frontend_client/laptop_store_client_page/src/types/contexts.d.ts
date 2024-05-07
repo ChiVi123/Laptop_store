@@ -1,6 +1,6 @@
-import { IAccount, ICategory } from './models';
+import { IAccount, ICategoryNode } from './models';
 
 export type DataContextType = {
-    categories: ICategory[];
+    categories: ICategoryNode[];
     account: IAccount | undefined;
 };

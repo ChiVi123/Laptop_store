@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import { ICategory } from '~/types/models';
+import { ICategoryNode } from '~/types/models';
 import {
     DropdownMenuItem,
     DropdownMenuPortal,
@@ -9,7 +9,7 @@ import {
 } from './ui/dropdown-menu';
 
 interface IProps {
-    category: ICategory;
+    category: ICategoryNode;
 }
 
 function CategoryMenuItem({ category }: IProps) {
@@ -17,7 +17,7 @@ function CategoryMenuItem({ category }: IProps) {
         <Fragment key={'category-' + category.id}>
             {category.children.length > 0 ? (
                 <DropdownMenuSub>
-                    <DropdownMenuSubTrigger>{category.name}</DropdownMenuSubTrigger>
+                    <DropdownMenuSubTrigger>{category.info.name}</DropdownMenuSubTrigger>
                     <DropdownMenuPortal>
                         <DropdownMenuSubContent>
                             {category.children.map((child) => (
@@ -27,7 +27,7 @@ function CategoryMenuItem({ category }: IProps) {
                     </DropdownMenuPortal>
                 </DropdownMenuSub>
             ) : (
-                <DropdownMenuItem>{category.name}</DropdownMenuItem>
+                <DropdownMenuItem>{category.info.name}</DropdownMenuItem>
             )}
         </Fragment>
     );

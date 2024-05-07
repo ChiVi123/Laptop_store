@@ -1,4 +1,4 @@
-import { IAccount, ICategory, IImage, IProduct } from './models';
+import { IAccount, ICategoryNode, IProductDetail, IProductInfo } from './models';
 
 export interface IBodyResponse {
     message: string;
@@ -20,21 +20,21 @@ export interface ILoginBodyResponse extends IBodyResponse {
 export interface IAccountBodyResponse extends IBodyResponse {
     payload: IAccount;
 }
-export interface IProductBodyResponse extends IBodyResponse {
-    payload: IProduct;
+
+// Product
+export interface IProductInfoBodyResponse extends IResponse {
+    payload: IProductInfo;
 }
-export interface ICategoryBodyResponse extends IBodyResponse {
-    payload: ICategory;
+export interface IProductDetailBodyResponse extends IResponse {
+    payload: IProductDetail;
 }
-export interface IListImageBodyResponse extends IBodyResponse {
-    payload: IImage[];
+
+// Category
+export interface ICategoryNodeBodyResponse extends IBodyResponse {
+    payload: ICategoryNode;
 }
-export interface IListProductBodyResponse extends IBodyResponse {
-    payload: IProduct[];
-}
-export interface IListCategoryBodyResponse extends IBodyResponse {
-    payload: ICategory[];
-}
+
+// Pagination
 export interface IPaginationBodyResponse<Type> extends IBodyResponse {
     payload: {
         pageNumber: number;

@@ -1,28 +1,29 @@
 import { EntityStatus } from '~/common/enums';
 import { apiRequest, logger } from '~/libs';
-import { ICategoryBodyResponse } from '~/types/body.responses';
-import { ICategory } from '~/types/models';
+import { ICategoryNodeBodyResponse } from '~/types/body.responses';
+import { ICategoryInfo, ICategoryNode } from '~/types/models';
 
-const rawCategory: ICategory = {
+const rawCategoryInfo: ICategoryInfo = {
     id: 0,
     name: '',
     path: '',
-    level: 0,
-    director: '',
+    code: '',
+    status: EntityStatus.ENABLED,
+    createdDate: '',
+    lastModifiedDate: '',
+};
+const rawCategoryNode: ICategoryNode = {
+    id: 0,
+    info: rawCategoryInfo,
     children: [
         {
             id: 0,
-            name: '',
-            path: '',
-            level: 0,
-            director: '',
+            info: rawCategoryInfo,
             children: new Array(),
-            status: EntityStatus.ENABLED,
             createdDate: '',
             lastModifiedDate: '',
         },
     ],
-    status: EntityStatus.ENABLED,
     createdDate: '',
     lastModifiedDate: '',
 };
@@ -32,9 +33,8 @@ export async function getRootCategory() {
         .get('public/categories/root')
         .fetchError((error) => {
             logger.anger('get root category::', error.status, error.json);
-
-            return { message: error.json?.message, payload: rawCategory } as ICategoryBodyResponse;
+            return { message: error.json?.message, payload: rawCategoryNode } as ICategoryNodeBodyResponse;
         })
-        .json<ICategoryBodyResponse>();
+        .json<ICategoryNodeBodyResponse>();
     return payload;
 }

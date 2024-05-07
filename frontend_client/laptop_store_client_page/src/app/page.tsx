@@ -1,16 +1,15 @@
+import '~/libs/extension.number';
+
 import Image from 'next/image';
 import { Fragment } from 'react';
+import { AspectRatio } from '~/components/ui/aspect-ratio';
+import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '~/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '~/components/ui/carousel';
 import { getAllProduct } from '~/services/product';
 
-import { AspectRatio } from '~/components/ui/aspect-ratio';
-import { Button } from '~/components/ui/button';
-import '~/libs/extension.number';
-
 async function HomePage() {
     const result = await getAllProduct();
-
     return (
         <Fragment>
             <Carousel className='w-full'>
@@ -19,13 +18,14 @@ async function HomePage() {
                         <CarouselItem key={item.id} className='pl-2.5 md:basis-1/2 lg:basis-1/5'>
                             <Card className='h-full p-1 rounded-sm shadow-none'>
                                 <CardHeader className='p-2'>
-                                    <AspectRatio ratio={16 / 9}>
+                                    <AspectRatio ratio={1}>
                                         <Image
-                                            src={item.images[0].secureUrl}
+                                            src={item.thumbnailUrl}
                                             alt={item.name}
-                                            width={300}
-                                            height={100}
-                                            className='rounded-t-sm object-cover'
+                                            width={200}
+                                            height={200}
+                                            priority
+                                            className='rounded-t-sm'
                                         />
                                     </AspectRatio>
                                 </CardHeader>

@@ -53,10 +53,6 @@ public class ProductService {
         return productDetailRepository.findById(id).orElseThrow(() -> new CustomNotFoundException("product", id));
     }
 
-    public Page<ProductEntity> getAllByCategories(long categoryId, Pageable pageable) {
-        return repository.findAllByCategories_Id(categoryId, pageable);
-    }
-
     public void checkConflictByName(String name) {
         if (productInfoRepository.existsByName(name)) {
             throw new ConflictException("Product", name);

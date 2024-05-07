@@ -54,20 +54,6 @@ public class ProductController {
         return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, payload);
     }
 
-    @GetMapping(RequestMaps.PRODUCT_PATHNAME_PUBLIC + "collection")
-    @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse findAllByCategory(
-            @RequestParam(name = "category_id", defaultValue = "1") long categoryId,
-            @RequestParam(name = "page_number", defaultValue = "1") int pageNumber,
-            @RequestParam(name = "page_size", defaultValue = "6") int pageSize
-    ) {
-        int currentPage = pageNumber - 1;
-        Pageable pageable = PageRequest.of(currentPage, pageSize);
-        Page<ProductEntity> productPage = productService.getAllByCategories(categoryId, pageable);
-        PagePayload<ProductEntity> payload = new PagePayload<>(currentPage, productPage);
-        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, payload);
-    }
-
     @PostMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "create")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse createProduct(@Valid @RequestBody ProductRequest request) {

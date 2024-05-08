@@ -1,6 +1,7 @@
 package chivi.laptopstore.models.entities;
 
 import chivi.laptopstore.common.EntityStatus;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -23,6 +24,10 @@ public class CategoryInfo extends EntityStandard {
     private String path;
 
     private String code;
+
+    @Column(name = "is_leaf", nullable = false)
+    @JsonProperty(value = "isLeaf")
+    private boolean leaf;
 
     private EntityStatus status;
 }

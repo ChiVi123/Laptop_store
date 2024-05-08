@@ -24,7 +24,7 @@ function Header() {
     };
 
     return (
-        <header className='fixed top-0 right-0 left-0 h-[3.875rem] border border-border bg-white shadow-sm'>
+        <header className='fixed top-0 right-0 left-0 z-10 h-[3.875rem] border border-border bg-white shadow-sm'>
             <Container component='nav' className='flex items-center h-[3.875rem]'>
                 <div className='hidden lg:flex items-center mr-32'>
                     <Link href='/' title='home' className='p-1.5 mr-6 -ml-1'>

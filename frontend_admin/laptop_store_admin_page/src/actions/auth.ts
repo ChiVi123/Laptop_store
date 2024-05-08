@@ -5,8 +5,8 @@ import { redirect } from 'next/navigation';
 import { EKeys, EPath } from '~/common/enums';
 import { MILLISECOND } from '~/common/values';
 import { JwtType, apiRequest, createResponseCookie, decodeJwt, handleReturnError } from '~/libs';
+import { ILoginResponse } from '~/types/body.response';
 import { loginFormData, registerFormData } from '~/types/form.data';
-import { ILoginResponse } from '~/types/response';
 
 export async function login(data: loginFormData) {
     const cookieStore = cookies();

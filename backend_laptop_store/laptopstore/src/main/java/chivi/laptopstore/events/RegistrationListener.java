@@ -1,6 +1,6 @@
 package chivi.laptopstore.events;
 
-import chivi.laptopstore.models.entities.AccountEntity;
+import chivi.laptopstore.models.entities.Account;
 import chivi.laptopstore.services.AuthenticationService;
 import chivi.laptopstore.utils.CustomMail;
 import chivi.laptopstore.utils.ElementHTML;
@@ -35,7 +35,7 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationE
         log.info("Start send mail: {}", Thread.currentThread().getName());
 
         String appURL = event.getAppURL();
-        AccountEntity account = event.getAccount();
+        Account account = event.getAccount();
         String toMail = account.getEmail();
         String token = UUID.randomUUID().toString();
 

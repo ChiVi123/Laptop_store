@@ -2,7 +2,7 @@ package chivi.laptopstore.controllers;
 
 import chivi.laptopstore.common.RequestMaps;
 import chivi.laptopstore.common.ResponseMessage;
-import chivi.laptopstore.models.entities.AccountEntity;
+import chivi.laptopstore.models.entities.Account;
 import chivi.laptopstore.models.requests.AccountRequest;
 import chivi.laptopstore.models.responses.SuccessResponse;
 import chivi.laptopstore.security.jwt.JwtUtils;
@@ -30,7 +30,7 @@ public class AccountController {
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse getProfile(HttpServletRequest httpServletRequest) {
         String email = this.getEmailFromRequest(httpServletRequest);
-        AccountEntity account = accountService.getByEmail(email);
+        Account account = accountService.getByEmail(email);
         return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, account);
     }
 
@@ -38,8 +38,8 @@ public class AccountController {
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse editAccount(@Valid @RequestBody AccountRequest accountRequest, HttpServletRequest httpServletRequest) {
         String email = this.getEmailFromRequest(httpServletRequest);
-        AccountEntity account = accountService.getByEmail(email);
-        AccountEntity result = accountService.editInfo(account, accountRequest);
+        Account account = accountService.getByEmail(email);
+        Account result = accountService.editInfo(account, accountRequest);
         return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, result);
     }
 

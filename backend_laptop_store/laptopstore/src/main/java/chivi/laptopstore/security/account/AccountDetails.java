@@ -1,6 +1,6 @@
 package chivi.laptopstore.security.account;
 
-import chivi.laptopstore.models.entities.AccountEntity;
+import chivi.laptopstore.models.entities.Account;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,7 +13,7 @@ import java.util.Collections;
 @AllArgsConstructor
 @Data
 public class AccountDetails implements UserDetails {
-    private AccountEntity account;
+    private Account account;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -1,5 +1,6 @@
 package chivi.laptopstore.models.entities;
 
+import chivi.laptopstore.common.EntityNames;
 import chivi.laptopstore.common.EntityStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "category_info")
+@Table(name = EntityNames.TABLE_CATEGORY_INFO)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -25,7 +26,7 @@ public class CategoryInfo extends EntityStandard {
 
     private String code;
 
-    @Column(name = "is_leaf", nullable = false)
+    @Column(name = EntityNames.COLUMN_CATEGORY_IS_LEAF, nullable = false)
     @JsonProperty(value = "isLeaf")
     private boolean leaf;
 

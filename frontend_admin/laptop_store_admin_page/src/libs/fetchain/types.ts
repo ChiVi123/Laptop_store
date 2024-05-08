@@ -1,4 +1,4 @@
-import { IErrorResponse } from '~/types/response';
+import { IErrorBodyResponse } from '~/types/body.response';
 import { HttpStatus } from './constants';
 
 type FetchainOptions = RequestInit & { baseURL?: string };
@@ -10,7 +10,7 @@ export class FetchainError extends Error {
     public status?: HttpStatus;
     public response?: Response;
     public url?: string;
-    public json?: IErrorResponse;
+    public json?: IErrorBodyResponse;
 }
 
 export interface IFetchainResponse {

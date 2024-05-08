@@ -3,7 +3,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { EKeys, EPath } from '~/common/enums';
-import { IResponse } from '~/types/response';
+import { IBodyResponse } from '~/types/body.response';
 import { apiRequest } from '.';
 import { FetchainError, IFetchain } from './fetchain';
 import { HttpStatus } from './fetchain/constants';
@@ -11,7 +11,7 @@ import { HttpStatus } from './fetchain/constants';
 export const handleRefetch = async (request: IFetchain) => {
     const refreshToken = cookies().get(EKeys.REFRESH_TOKEN)?.value;
     if (refreshToken) {
-        const { payload } = await apiRequest.body({ refreshToken }).post('auth/refresh-token').json<IResponse>();
+        const { payload } = await apiRequest.body({ refreshToken }).post('auth/refresh-token').json<IBodyResponse>();
         return request.auth(payload).recall().json();
     } else {
         redirect(EPath.AUTH_LOGIN);

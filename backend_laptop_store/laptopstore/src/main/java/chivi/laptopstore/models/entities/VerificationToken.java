@@ -11,20 +11,20 @@ import java.time.LocalDateTime;
 @Table(name = EntityNames.TABLE_VERIFICATION_TOKEN)
 @NoArgsConstructor
 @Data
-public class VerificationTokenEntity {
+public class VerificationToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne
     @JoinColumn(name = EntityNames.COLUMN_ACCOUNT_ID)
-    private AccountEntity account;
+    private Account account;
 
     private String token;
 
     private LocalDateTime expired;
 
-    public VerificationTokenEntity(AccountEntity account, String token) {
+    public VerificationToken(Account account, String token) {
         this.account = account;
         this.token = token;
         this.expired = LocalDateTime.now().plusMinutes(10);

@@ -1,9 +1,9 @@
 package chivi.laptopstore.services;
 
 import chivi.laptopstore.exception.BaseException;
-import chivi.laptopstore.exception.CustomNotFoundException;
-import chivi.laptopstore.models.entities.AccountEntity;
-import chivi.laptopstore.models.entities.RefreshTokenEntity;
+import chivi.laptopstore.exception.NotFoundDataException;
+import chivi.laptopstore.models.entities.Account;
+import chivi.laptopstore.models.entities.RefreshToken;
 import chivi.laptopstore.repositories.IRefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,8 +20,8 @@ public class RefreshTokenService {
     @Value("${app.refresh.token.expired}")
     private long expireDuration;
 
-    public RefreshTokenEntity getByToken(String token) {
-        RefreshTokenEntity refreshToken = repository.findById(token).orElseThrow(() -> new CustomNotFoundException("refresh token", token));
+    public RefreshToken getByToken(String token) {
+        RefreshToken refreshToken = repository.findById(token).orElseThrow(() -> new NotFoundDataException("refresh token", token));
         if (refreshToken.getExpiration().compareTo(Instant.now()) < 0) {
             repository.delete(refreshToken);
             throw new BaseException(HttpStatus.FORBIDDEN.value(), "Refresh token was expired");
@@ -29,13 +29,13 @@ public class RefreshTokenService {
         return refreshToken;
     }
 
-    public RefreshTokenEntity create(AccountEntity account) {
+    public RefreshToken create(Account account) {
         Instant expiration = Instant.now().plusMillis(expireDuration);
-        RefreshTokenEntity refreshToken = new RefreshTokenEntity(UUID.randomUUID().toString(), account, expiration);
+        RefreshToken refreshToken = new RefreshToken(UUID.randomUUID().toString(), account, expiration);
         return repository.save(refreshToken);
     }
 
-    public void destroy(RefreshTokenEntity refreshToken) {
+    public void destroy(RefreshToken refreshToken) {
         repository.delete(refreshToken);
     }
 }

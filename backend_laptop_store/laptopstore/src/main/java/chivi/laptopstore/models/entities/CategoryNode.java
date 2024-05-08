@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "category_node")
+@Table(name = EntityNames.TABLE_CATEGORY_NODE)
 @NoArgsConstructor
 @Getter
 @Setter
@@ -23,7 +23,7 @@ public class CategoryNode extends EntityStandard {
     private CategoryNode parent;
 
     @OneToOne(orphanRemoval = true)
-    @JoinColumn(name = "category_info_id")
+    @JoinColumn(name = EntityNames.JOIN_COLUMN_CATEGORY_INFO_ID)
     private CategoryInfo info;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)

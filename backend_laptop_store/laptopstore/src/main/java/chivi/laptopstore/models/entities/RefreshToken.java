@@ -11,17 +11,17 @@ import java.time.Instant;
 @Table(name = EntityNames.TABLE_REFRESH_TOKEN)
 @NoArgsConstructor
 @Getter
-public class RefreshTokenEntity {
+public class RefreshToken {
     @Id
     @Column(columnDefinition = "varchar(36)")
     private String id;
 
     @ManyToOne
-    private AccountEntity account;
+    private Account account;
 
     private Instant expiration;
 
-    public RefreshTokenEntity(String id, AccountEntity account, Instant expiration) {
+    public RefreshToken(String id, Account account, Instant expiration) {
         this.id = id;
         this.account = account;
         this.expiration = expiration;

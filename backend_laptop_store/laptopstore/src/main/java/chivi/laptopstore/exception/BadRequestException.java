@@ -2,8 +2,8 @@ package chivi.laptopstore.exception;
 
 import org.springframework.http.HttpStatus;
 
-public class CustomBadRequestException extends BaseException {
-    public CustomBadRequestException(String message) {
+public class BadRequestException extends BaseException {
+    public BadRequestException(String message) {
         super(HttpStatus.BAD_REQUEST.value(), message);
     }
 }

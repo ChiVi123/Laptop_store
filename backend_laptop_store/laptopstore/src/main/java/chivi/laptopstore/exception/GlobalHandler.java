@@ -1,11 +1,10 @@
-package chivi.laptopstore.exception.handler;
+package chivi.laptopstore.exception;
 
 import chivi.laptopstore.common.CodeError;
 import chivi.laptopstore.communication.error.ErrorBodyResponse;
 import chivi.laptopstore.communication.error.FamilyErrorBodyResponse;
 import chivi.laptopstore.communication.error.FieldErrorBodyResponse;
 import chivi.laptopstore.communication.error.NameErrorBodyResponse;
-import chivi.laptopstore.exception.BaseException;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

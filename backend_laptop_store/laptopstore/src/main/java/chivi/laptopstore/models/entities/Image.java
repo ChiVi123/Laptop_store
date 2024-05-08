@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Table(name = EntityNames.TABLE_IMAGE)
 @NoArgsConstructor
 @Data
-public class ImageEntity {
+public class Image {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

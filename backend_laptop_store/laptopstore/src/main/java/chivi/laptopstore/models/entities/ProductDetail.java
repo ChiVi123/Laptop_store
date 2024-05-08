@@ -12,19 +12,19 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "product_detail")
+@Table(name = EntityNames.TABLE_PRODUCT_DETAIL)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 public class ProductDetail extends EntityStandard {
     @OneToOne
-    @JoinColumn(name = "product_info_id")
+    @JoinColumn(name = EntityNames.JOIN_COLUMN_PRODUCT_INFO_ID)
     private ProductInfo info;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
-            name = "product_category",
+            name = EntityNames.TABLE_PRODUCT_CATEGORY,
             joinColumns = @JoinColumn(name = EntityNames.JOIN_COLUMN_PRODUCT_ID),
             inverseJoinColumns = @JoinColumn(name = EntityNames.JOIN_COLUMN_CATEGORY_ID)
     )
@@ -32,11 +32,11 @@ public class ProductDetail extends EntityStandard {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinTable(
-            name = "product_image",
+            name = EntityNames.TABLE_PRODUCT_IMAGE,
             joinColumns = @JoinColumn(name = EntityNames.JOIN_COLUMN_PRODUCT_ID),
             inverseJoinColumns = @JoinColumn(name = EntityNames.JOIN_COLUMN_IMAGE_ID)
     )
-    private List<ImageEntity> images = new ArrayList<>();
+    private List<Image> images = new ArrayList<>();
 
     public void addAllCategory(Set<CategoryInfo> categories) {
         this.categories.addAll(categories);
@@ -46,11 +46,11 @@ public class ProductDetail extends EntityStandard {
         this.categories.clear();
     }
 
-    public void addImages(List<ImageEntity> images) {
+    public void addImages(List<Image> images) {
         this.images.addAll(images);
     }
 
-    public void removeImage(ImageEntity image) {
+    public void removeImage(Image image) {
         this.images.remove(image);
     }
 }

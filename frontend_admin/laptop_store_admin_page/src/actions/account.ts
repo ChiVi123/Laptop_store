@@ -4,8 +4,8 @@ import { cookies } from 'next/headers';
 import { EAccountRole, EKeys } from '~/common/enums';
 import { apiRequest, handleRefetch } from '~/libs';
 import logger from '~/libs/logger';
+import { IAccountBodyResponse } from '~/types/body.response';
 import { IAccount } from '~/types/models';
-import { IAccountResponse } from '~/types/response';
 
 const accountPayload: IAccount = {
     id: 0,
@@ -29,11 +29,11 @@ export async function profile() {
             logger.anger('profile::', error.status, error.json);
 
             const resultRefresh = await handleRefetch(request);
-            return resultRefresh ?? ({ message: error.json?.message, payload: accountPayload } as IAccountResponse);
+            return resultRefresh ?? ({ message: error.json?.message, payload: accountPayload } as IAccountBodyResponse);
         })
         .fetchError((error) => {
             logger.error('profile::', error.status, error.json);
-            return { message: error.json?.message, payload: accountPayload } as IAccountResponse;
+            return { message: error.json?.message, payload: accountPayload } as IAccountBodyResponse;
         })
-        .json<IAccountResponse>();
+        .json<IAccountBodyResponse>();
 }

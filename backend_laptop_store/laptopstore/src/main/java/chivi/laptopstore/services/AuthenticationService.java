@@ -3,9 +3,9 @@ package chivi.laptopstore.services;
 import chivi.laptopstore.common.AccountRole;
 import chivi.laptopstore.common.AccountStatus;
 import chivi.laptopstore.exception.ConflictException;
-import chivi.laptopstore.exception.CustomNotFoundException;
-import chivi.laptopstore.models.entities.AccountEntity;
-import chivi.laptopstore.models.entities.VerificationTokenEntity;
+import chivi.laptopstore.exception.NotFoundDataException;
+import chivi.laptopstore.models.entities.Account;
+import chivi.laptopstore.models.entities.VerificationToken;
 import chivi.laptopstore.models.requests.RegisterRequest;
 import chivi.laptopstore.repositories.IAccountRepository;
 import chivi.laptopstore.repositories.IVerificationTokenRepository;
@@ -31,11 +31,11 @@ public class AuthenticationService {
     private final IAccountRepository accountRepository;
     private final IVerificationTokenRepository verificationTokenRepository;
 
-    public VerificationTokenEntity getVerificationToken(String token) {
-        return verificationTokenRepository.findByToken(token).orElseThrow(() -> new CustomNotFoundException("token", token));
+    public VerificationToken getVerificationToken(String token) {
+        return verificationTokenRepository.findByToken(token).orElseThrow(() -> new NotFoundDataException("token", token));
     }
 
-    public AccountEntity getByEmailAndPassword(String email, String password) throws BadCredentialsException {
+    public Account getByEmailAndPassword(String email, String password) throws BadCredentialsException {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -49,9 +49,9 @@ public class AuthenticationService {
         }
     }
 
-    public AccountEntity createAccount(RegisterRequest request, AccountRole role) {
+    public Account createAccount(RegisterRequest request, AccountRole role) {
         String encoded = passwordEncoder.encode(request.getPassword());
-        AccountEntity account = new AccountEntity();
+        Account account = new Account();
         account.setFullName(request.getFullName());
         account.setEmail(request.getEmail());
         account.setPassword(encoded);
@@ -60,20 +60,20 @@ public class AuthenticationService {
         return accountRepository.save(account);
     }
 
-    public AccountEntity activeAccount(AccountEntity account) {
+    public Account activeAccount(Account account) {
         account.setStatus(AccountStatus.ACTIVE);
         return accountRepository.save(account);
     }
 
-    public void saveVerificationToken(AccountEntity account, String token) {
-        Optional<VerificationTokenEntity> optional = verificationTokenRepository.findByAccountId(account.getId());
+    public void saveVerificationToken(Account account, String token) {
+        Optional<VerificationToken> optional = verificationTokenRepository.findByAccountId(account.getId());
 
         if (optional.isEmpty()) {
-            verificationTokenRepository.save(new VerificationTokenEntity(account, token));
+            verificationTokenRepository.save(new VerificationToken(account, token));
             return;
         }
 
-        VerificationTokenEntity verificationToken = optional.get();
+        VerificationToken verificationToken = optional.get();
         verificationToken.setToken(token);
         verificationToken.setNewExpired();
         verificationTokenRepository.save(verificationToken);

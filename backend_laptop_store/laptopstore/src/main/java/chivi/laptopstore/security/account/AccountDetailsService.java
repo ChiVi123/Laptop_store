@@ -2,7 +2,7 @@ package chivi.laptopstore.security.account;
 
 import chivi.laptopstore.common.AccountStatus;
 import chivi.laptopstore.exception.UnauthorizedException;
-import chivi.laptopstore.models.entities.AccountEntity;
+import chivi.laptopstore.models.entities.Account;
 import chivi.laptopstore.repositories.IAccountRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ public class AccountDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         List<AccountStatus> specifiesStatus = List.of(AccountStatus.ACTIVE, AccountStatus.NOT_VERIFIED);
-        AccountEntity account = accountRepository
+        Account account = accountRepository
                 .findByEmailAndStatusIn(email, specifiesStatus)
                 .orElseThrow(() -> new UsernameNotFoundException("Can't found account with email: " + email));
 

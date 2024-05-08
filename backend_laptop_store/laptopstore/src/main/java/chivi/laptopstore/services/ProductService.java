@@ -1,11 +1,11 @@
 package chivi.laptopstore.services;
 
 import chivi.laptopstore.configurations.CloudinaryConfig;
+import chivi.laptopstore.exception.BadRequestException;
 import chivi.laptopstore.exception.ConflictException;
-import chivi.laptopstore.exception.CustomBadRequestException;
-import chivi.laptopstore.exception.CustomNotFoundException;
+import chivi.laptopstore.exception.NotFoundDataException;
 import chivi.laptopstore.models.entities.CategoryInfo;
-import chivi.laptopstore.models.entities.ImageEntity;
+import chivi.laptopstore.models.entities.Image;
 import chivi.laptopstore.models.entities.ProductDetail;
 import chivi.laptopstore.models.entities.ProductInfo;
 import chivi.laptopstore.models.requests.DiscountRequest;
@@ -46,15 +46,15 @@ public class ProductService {
     }
 
     public ProductDetail getBySlug(String slug) {
-        return productDetailRepository.findByInfo_Slug(slug).orElseThrow(() -> new CustomNotFoundException("product", slug));
+        return productDetailRepository.findByInfo_Slug(slug).orElseThrow(() -> new NotFoundDataException("product", slug));
     }
 
     public ProductInfo getInfoById(Long id) {
-        return productInfoRepository.findById(id).orElseThrow(() -> new CustomNotFoundException("product", id));
+        return productInfoRepository.findById(id).orElseThrow(() -> new NotFoundDataException("product", id));
     }
 
     public ProductDetail getDetailById(Long id) {
-        return productDetailRepository.findById(id).orElseThrow(() -> new CustomNotFoundException("product", id));
+        return productDetailRepository.findById(id).orElseThrow(() -> new NotFoundDataException("product", id));
     }
 
     public void checkConflictByName(String name) {
@@ -107,7 +107,7 @@ public class ProductService {
         BigDecimal discount = discountRequest.getDiscount();
         MathContext mathContext = new MathContext(4);
         if (price.compareTo(discount) < 0) {
-            throw new CustomBadRequestException("Discount invalid");
+            throw new BadRequestException("Discount invalid");
         }
         BigDecimal rate = PriceHandler.discountRating(price, discount);
         productInfo.setPrice(price);
@@ -116,8 +116,8 @@ public class ProductService {
         return productInfoRepository.save(productInfo);
     }
 
-    public List<ImageEntity> removeImage(ProductDetail productDetail, Long publicId) {
-        List<ImageEntity> images = productDetail.getImages();
+    public List<Image> removeImage(ProductDetail productDetail, Long publicId) {
+        List<Image> images = productDetail.getImages();
         images.stream()
                 .filter(entity -> entity.getId().equals(publicId))
                 .findFirst()
@@ -131,7 +131,7 @@ public class ProductService {
     }
 
     public void delete(ProductDetail productDetail) {
-        List<String> publicIds = productDetail.getImages().stream().map(ImageEntity::getPublicId).toList();
+        List<String> publicIds = productDetail.getImages().stream().map(Image::getPublicId).toList();
         productDetail.clearAllCategory();
 
         if (publicIds.size() > 0) {

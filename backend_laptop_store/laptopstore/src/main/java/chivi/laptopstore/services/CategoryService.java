@@ -2,7 +2,7 @@ package chivi.laptopstore.services;
 
 import chivi.laptopstore.exception.BaseException;
 import chivi.laptopstore.exception.ConflictException;
-import chivi.laptopstore.exception.CustomNotFoundException;
+import chivi.laptopstore.exception.NotFoundDataException;
 import chivi.laptopstore.models.entities.CategoryInfo;
 import chivi.laptopstore.models.entities.CategoryNode;
 import chivi.laptopstore.models.requests.CategoryRequest;
@@ -32,7 +32,7 @@ public class CategoryService {
     public CategoryNode getNodeByInfoId(Long info_id) {
         return categoryNodeRepository
                 .findByInfo_Id(info_id)
-                .orElseThrow(() -> new CustomNotFoundException("node category", info_id));
+                .orElseThrow(() -> new NotFoundDataException("node category", info_id));
     }
 
     public Set<CategoryInfo> getAllByIds(List<Long> ids) {
@@ -43,16 +43,12 @@ public class CategoryService {
         return categoryInfoRepository.findAllIdByCodeLikeAndLeaf(code, true);
     }
 
-    public String getNameByCode(String code) {
-        return categoryInfoRepository.findNameByCode(code).orElseThrow(() -> new CustomNotFoundException("category name", code));
-    }
-
     public CategoryNode getNodeById(Long id) {
-        return categoryNodeRepository.findById(id).orElseThrow(() -> new CustomNotFoundException("node category", id));
+        return categoryNodeRepository.findById(id).orElseThrow(() -> new NotFoundDataException("node category", id));
     }
 
     public CategoryInfo getInfoById(Long id) {
-        return categoryInfoRepository.findById(id).orElseThrow(() -> new CustomNotFoundException("category", id));
+        return categoryInfoRepository.findById(id).orElseThrow(() -> new NotFoundDataException("category", id));
     }
 
     public void checkConflictByName(String name) {

@@ -1,6 +1,6 @@
 package chivi.laptopstore.security.jwt;
 
-import chivi.laptopstore.models.entities.AccountEntity;
+import chivi.laptopstore.models.entities.Account;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -49,7 +49,7 @@ public class JwtUtils {
         return null;
     }
 
-    public String createTokenFromAccount(AccountEntity account) {
+    public String createTokenFromAccount(Account account) {
         return Jwts.builder()
                 .subject(account.getEmail())
                 .issuedAt(new Date())

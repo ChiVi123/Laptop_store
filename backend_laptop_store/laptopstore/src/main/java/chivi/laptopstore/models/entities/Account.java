@@ -16,7 +16,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class AccountEntity extends EntityStandard {
+public class Account extends EntityStandard {
     @Column(unique = true)
     private String username;
 

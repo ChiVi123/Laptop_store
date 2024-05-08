@@ -7,9 +7,9 @@ import chivi.laptopstore.communication.payload.LoginPayload;
 import chivi.laptopstore.events.OnRegistrationEvent;
 import chivi.laptopstore.events.OnResetPasswordEvent;
 import chivi.laptopstore.exception.BaseException;
-import chivi.laptopstore.models.entities.AccountEntity;
-import chivi.laptopstore.models.entities.RefreshTokenEntity;
-import chivi.laptopstore.models.entities.VerificationTokenEntity;
+import chivi.laptopstore.models.entities.Account;
+import chivi.laptopstore.models.entities.RefreshToken;
+import chivi.laptopstore.models.entities.VerificationToken;
 import chivi.laptopstore.models.requests.LoginRequest;
 import chivi.laptopstore.models.requests.RefreshTokenRequest;
 import chivi.laptopstore.models.requests.RegisterRequest;
@@ -42,8 +42,8 @@ public class AuthenticationController {
     @GetMapping(RequestMaps.AUTH_PATHNAME + "registration-confirm")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse registrationConfirm(@RequestParam("token") String token) {
-        VerificationTokenEntity verificationToken = authenticationService.getVerificationToken(token);
-        AccountEntity account = verificationToken.getAccount();
+        VerificationToken verificationToken = authenticationService.getVerificationToken(token);
+        Account account = verificationToken.getAccount();
 
         if (LocalDateTime.now().isAfter(verificationToken.getExpired())) {
             throw new BaseException(HttpStatus.UNAUTHORIZED.value(), "Token's " + account.getEmail() + " expired");
@@ -53,9 +53,9 @@ public class AuthenticationController {
             throw new BaseException(HttpStatus.UNAUTHORIZED.value(), "Email: " + account.getEmail() + " verified");
         }
 
-        AccountEntity result = authenticationService.activeAccount(account);
+        Account result = authenticationService.activeAccount(account);
         String accessToken = jwtUtils.createTokenFromAccount(result);
-        RefreshTokenEntity refreshToken = refreshTokenService.create(account);
+        RefreshToken refreshToken = refreshTokenService.create(account);
         return new SuccessResponse("Verify successfully", new LoginPayload(accessToken, refreshToken));
     }
 
@@ -64,17 +64,17 @@ public class AuthenticationController {
     public SuccessResponse login(@Valid @RequestBody LoginRequest loginRequest) {
         String email = loginRequest.getEmail();
         String password = loginRequest.getPassword();
-        AccountEntity account = authenticationService.getByEmailAndPassword(email, password);
+        Account account = authenticationService.getByEmailAndPassword(email, password);
         String accessToken = jwtUtils.createTokenFromAccount(account);
-        RefreshTokenEntity refreshToken = refreshTokenService.create(account);
+        RefreshToken refreshToken = refreshTokenService.create(account);
         return new SuccessResponse("Login success", new LoginPayload(accessToken, refreshToken));
     }
 
     @PostMapping(RequestMaps.AUTH_PATHNAME + "refresh-token")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse renewToken(@Valid @RequestBody RefreshTokenRequest request) {
-        RefreshTokenEntity refreshToken = refreshTokenService.getByToken(request.getRefreshToken());
-        AccountEntity account = refreshToken.getAccount();
+        RefreshToken refreshToken = refreshTokenService.getByToken(request.getRefreshToken());
+        Account account = refreshToken.getAccount();
         String accessToken = jwtUtils.createTokenFromAccount(account);
         return new SuccessResponse("Renew access token", accessToken);
     }
@@ -83,7 +83,7 @@ public class AuthenticationController {
     @ResponseStatus(HttpStatus.CREATED)
     public SuccessResponse registerAdmin(@RequestParam("app_url") String appURL, @Valid @RequestBody RegisterRequest request) {
         authenticationService.checkConflictAccountByEmail(request.getEmail());
-        AccountEntity account = authenticationService.createAccount(request, AccountRole.ADMIN);
+        Account account = authenticationService.createAccount(request, AccountRole.ADMIN);
         OnRegistrationEvent event = new OnRegistrationEvent(account, appURL);
         applicationEventPublisher.publishEvent(event);
         return new SuccessResponse("Register success", account);
@@ -93,7 +93,7 @@ public class AuthenticationController {
     @ResponseStatus(HttpStatus.CREATED)
     public SuccessResponse registerCustomer(@RequestParam("app_url") String appURL, @Valid @RequestBody RegisterRequest request) {
         authenticationService.checkConflictAccountByEmail(request.getEmail());
-        AccountEntity account = authenticationService.createAccount(request, AccountRole.CUSTOMER);
+        Account account = authenticationService.createAccount(request, AccountRole.CUSTOMER);
         OnRegistrationEvent event = new OnRegistrationEvent(account, appURL);
         applicationEventPublisher.publishEvent(event);
         return new SuccessResponse("Register success", account);
@@ -104,7 +104,7 @@ public class AuthenticationController {
     public SuccessResponse sendVerificationToken(@Valid @RequestBody SendEmailRequest sendEmailRequest) {
         String email = sendEmailRequest.getEmail();
         String appURL = sendEmailRequest.getAppURL();
-        AccountEntity account = accountService.getByEmailAndStatus(email, AccountStatus.NOT_VERIFIED);
+        Account account = accountService.getByEmailAndStatus(email, AccountStatus.NOT_VERIFIED);
         OnRegistrationEvent event = new OnRegistrationEvent(account, appURL);
         applicationEventPublisher.publishEvent(event);
         return new SuccessResponse("Resend verification token successfully");
@@ -122,7 +122,7 @@ public class AuthenticationController {
     @DeleteMapping(RequestMaps.AUTH_PATHNAME + "logout")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse logout(@RequestParam(name = "token") String token) {
-        RefreshTokenEntity refreshToken = refreshTokenService.getByToken(token);
+        RefreshToken refreshToken = refreshTokenService.getByToken(token);
         refreshTokenService.destroy(refreshToken);
         return new SuccessResponse("Logout successfully");
     }

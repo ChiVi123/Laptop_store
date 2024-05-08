@@ -1,12 +1,12 @@
 package chivi.laptopstore.repositories;
 
-import chivi.laptopstore.models.entities.VerificationTokenEntity;
+import chivi.laptopstore.models.entities.VerificationToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface IVerificationTokenRepository extends JpaRepository<VerificationTokenEntity, Long> {
-    Optional<VerificationTokenEntity> findByToken(String token);
+public interface IVerificationTokenRepository extends JpaRepository<VerificationToken, Long> {
+    Optional<VerificationToken> findByToken(String token);
 
-    Optional<VerificationTokenEntity> findByAccountId(Long account_id);
+    Optional<VerificationToken> findByAccountId(Long account_id);
 }

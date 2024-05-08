@@ -11,15 +11,6 @@ interface IEntityDateTime {
     lastModifiedDate: string;
 }
 
-export interface ICategoryInfo extends IEntity, IEntityStatus, IEntityDateTime {
-    name: string;
-    path: string;
-    code: string;
-}
-export interface ICategoryNode extends IEntity, IEntityDateTime {
-    info: ICategoryInfo;
-    children: ICategoryNode[];
-}
 export interface IImage {
     id?: number;
     publicId: string;
@@ -28,6 +19,15 @@ export interface IImage {
     bytes: number;
     secureUrl: string;
     folder: string;
+}
+export interface ICategoryInfo extends IEntity, IEntityStatus, IEntityDateTime {
+    name: string;
+    path: string;
+    code: string;
+}
+export interface ICategoryNode extends IEntity, IEntityDateTime {
+    info: ICategoryInfo;
+    children: ICategoryNode[];
 }
 export interface IProductInfo extends IEntity, IEntityStatus, IEntityDateTime {
     name: string;
@@ -56,25 +56,4 @@ export interface IAccount extends IEntity, IEntityDateTime {
     reviewCount: number;
     likeCount: number;
     role: EAccountRole;
-}
-export interface ICategory extends IEntity, IEntityStatus, IEntityDateTime {
-    level: number;
-    director: string;
-    name: string;
-    path: string;
-    children: ICategory[];
-}
-export interface IProduct extends IEntity, IEntityStatus, IEntityDateTime {
-    name: string;
-    slug: string;
-    categories: ICategory[];
-    description: string;
-    discount: number | null;
-    discountRate: number;
-    images: IImage[];
-    price: number;
-    quantitySold: number;
-    quantityStock: number;
-    ratingAverage: number;
-    reviewCount: number;
 }

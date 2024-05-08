@@ -12,7 +12,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "product_info")
+@Table(name = EntityNames.TABLE_PRODUCT_INFO)
 @NoArgsConstructor
 @Getter
 @Setter
@@ -23,7 +23,7 @@ public class ProductInfo extends EntityStandard {
     @Column(unique = true, nullable = false)
     private String slug;
 
-    @Column(name = "thumbnail_url")
+    @Column(name = EntityNames.COLUMN_THUMBNAIL_URL)
     private String thumbnailUrl;
 
     @Column(columnDefinition = "longtext")

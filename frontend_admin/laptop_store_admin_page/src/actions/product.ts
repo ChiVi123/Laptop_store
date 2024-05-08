@@ -6,9 +6,14 @@ import { redirect } from 'next/navigation';
 import { EKeys, EPath, EStatus } from '~/common/enums';
 import { apiRequest, handleRefetch } from '~/libs';
 import logger from '~/libs/logger';
+import {
+    IBodyResponse,
+    IListImageResponse,
+    IListProductResponse,
+    IProductDetailBodyResponse,
+} from '~/types/body.response';
 import { productFormData } from '~/types/form.data';
 import { IProductDetail, IProductInfo } from '~/types/models';
-import { IListImageResponse, IListProductResponse, IProductDetailResponse, IResponse } from '~/types/response';
 
 const rawProductInfo: IProductInfo = {
     id: 0,
@@ -54,9 +59,9 @@ export async function bySlug(slug: string) {
         .get(`public/products/${slug}`, { cache: 'no-store' })
         .fetchError((error) => {
             logger.anger('product by slug::', error.status, error.json);
-            return { payload: rawProductDetail } as IProductDetailResponse;
+            return { payload: rawProductDetail } as IProductDetailBodyResponse;
         })
-        .json<IProductDetailResponse>();
+        .json<IProductDetailBodyResponse>();
     return payload;
 }
 export async function create(data: productFormData) {
@@ -68,9 +73,9 @@ export async function create(data: productFormData) {
         .unauthorized(async (error, request) => {
             logger.anger('create product::', error.status, error.json);
             const resultRefresh = await handleRefetch(request);
-            return resultRefresh ?? ({ payload: rawProductDetail } as IProductDetailResponse);
+            return resultRefresh ?? ({ payload: rawProductDetail } as IProductDetailBodyResponse);
         })
-        .json<IProductDetailResponse>();
+        .json<IProductDetailBodyResponse>();
 
     revalidateTag(EKeys.PRODUCT_LIST);
     redirect(EPath.MANAGE_PRODUCT_EDIT.concat(payload.info.slug));
@@ -85,9 +90,9 @@ export async function edit(id: number, data: productFormData) {
         .unauthorized(async (error, request) => {
             logger.anger('edit product::', error.status, error.json);
             const resultRefresh = await handleRefetch(request);
-            return resultRefresh ?? ({ payload: rawProductDetail } as IProductDetailResponse);
+            return resultRefresh ?? ({ payload: rawProductDetail } as IProductDetailBodyResponse);
         })
-        .json<IProductDetailResponse>();
+        .json<IProductDetailBodyResponse>();
 
     revalidateTag(EKeys.PRODUCT_LIST);
     redirect(EPath.MANAGE_PRODUCT_EDIT.concat(payload.info.slug));
@@ -112,6 +117,6 @@ export async function destroy(id: number) {
             logger.anger('destroy product::', error.status, error.json);
             await handleRefetch(request);
         })
-        .json<IResponse>();
+        .json<IBodyResponse>();
     revalidateTag(EKeys.PRODUCT_LIST);
 }

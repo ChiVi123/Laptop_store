@@ -3,7 +3,7 @@ package chivi.laptopstore.models.requests;
 import chivi.laptopstore.common.EntityStatus;
 import chivi.laptopstore.common.ValidationMessage;
 import chivi.laptopstore.common.ValidationValues;
-import chivi.laptopstore.models.entities.ImageEntity;
+import chivi.laptopstore.models.entities.Image;
 import chivi.laptopstore.utils.CustomString;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -35,7 +35,7 @@ public class ProductRequest {
 
     private BigDecimal discount;
 
-    private List<ImageEntity> images;
+    private List<Image> images;
 
     @NotNull(message = ValidationMessage.NOT_NULL)
     private EntityStatus status;
@@ -68,7 +68,7 @@ public class ProductRequest {
         return this.discount;
     }
 
-    public List<ImageEntity> getImages() {
+    public List<Image> getImages() {
         return this.images;
     }
 

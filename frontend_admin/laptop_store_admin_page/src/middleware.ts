@@ -5,7 +5,7 @@ import { MILLISECOND } from './common/values';
 import { JwtType, apiRequest } from './libs';
 import { createResponseCookie, decodeJwt } from './libs/helper.token';
 import logger from './libs/logger';
-import { IResponse } from './types/response';
+import { IBodyResponse } from './types/body.response';
 
 export async function middleware(request: NextRequest) {
     const { method, url, nextUrl } = request;
@@ -23,7 +23,10 @@ export async function middleware(request: NextRequest) {
 
     if (!accessToken && refreshToken) {
         try {
-            const { payload } = await apiRequest.body({ refreshToken }).post('auth/refresh-token').json<IResponse>();
+            const { payload } = await apiRequest
+                .body({ refreshToken })
+                .post('auth/refresh-token')
+                .json<IBodyResponse>();
             const jwt = decodeJwt<JwtType>(payload);
             const cookieAccessToken = createResponseCookie(EKeys.ACCESS_TOKEN, payload, jwt.exp * MILLISECOND);
 

@@ -15,6 +15,7 @@ import org.springframework.security.authentication.InsufficientAuthenticationExc
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -41,6 +42,17 @@ public class GlobalHandler {
         String requestUri = request.getRequest().getRequestURI();
         ErrorBodyResponse body = new ErrorBodyResponse(message, requestUri);
         return ResponseEntity.status(codeStatus).body(body);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorBodyResponse handleMissingServletRequestParameter(
+            MissingServletRequestParameterException exception,
+            ServletWebRequest request
+    ) {
+        String message = exception.getMessage();
+        String requestUri = request.getRequest().getRequestURI();
+        return new ErrorBodyResponse(message, requestUri);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

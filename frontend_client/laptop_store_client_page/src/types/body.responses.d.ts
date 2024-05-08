@@ -42,3 +42,8 @@ export interface IPaginationBodyResponse<Type> extends IBodyResponse {
         list: Type[];
     };
 }
+
+// Other
+export interface ISectionBodyResponse<Type> extends IBodyResponse {
+    payload: { title: string; list: Type[] }[];
+}

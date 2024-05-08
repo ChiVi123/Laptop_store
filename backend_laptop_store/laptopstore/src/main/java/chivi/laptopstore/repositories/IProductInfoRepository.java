@@ -13,9 +13,10 @@ import java.util.List;
 public interface IProductInfoRepository extends JpaRepository<ProductInfo, Long> {
     Page<ProductInfo> findAllByOrderByCreatedDateDesc(Pageable pageable);
 
-    @Query(value = "SELECT pro_in.id, pro_in.name, pro_in.slug, pro_in.thumbnail_url, pro_in.description, pro_in.price, pro_in.discount, " +
-            "pro_in.quantity_stock, pro_in.discount_rate, pro_in.quantity_sold, pro_in.rating_average, pro_in.review_count, pro_in.status, " +
-            "pro_in.created_at, pro_in.updated_at " +
+    @Query(value = "SELECT DISTINCT " +
+            "pro_in.id, pro_in.name, pro_in.slug, pro_in.thumbnail_url, pro_in.description, pro_in.price, " +
+            "pro_in.discount, pro_in.quantity_stock, pro_in.discount_rate, pro_in.quantity_sold, " +
+            "pro_in.rating_average, pro_in.review_count, pro_in.status, pro_in.created_at, pro_in.updated_at " +
             "FROM product_category pro_cate " +
             "JOIN product_detail pro_dt ON pro_cate.product_id=pro_dt.id " +
             "JOIN product_info pro_in ON pro_dt.product_info_id=pro_in.id " +

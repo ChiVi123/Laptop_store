@@ -41,6 +41,10 @@ public class ProductService {
         return productInfoRepository.findAllByOrderByCreatedDateDesc(pageable);
     }
 
+    public List<ProductInfo> getAllByCategoryIds(List<Long> categoryIds) {
+        return productInfoRepository.findAllByCategories(categoryIds);
+    }
+
     public ProductDetail getBySlug(String slug) {
         return productDetailRepository.findByInfo_Slug(slug).orElseThrow(() -> new CustomNotFoundException("product", slug));
     }

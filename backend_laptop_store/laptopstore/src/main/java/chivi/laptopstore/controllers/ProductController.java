@@ -3,6 +3,7 @@ package chivi.laptopstore.controllers;
 import chivi.laptopstore.common.RequestMaps;
 import chivi.laptopstore.common.ResponseMessage;
 import chivi.laptopstore.communication.payload.PagePayload;
+import chivi.laptopstore.communication.payload.SectionPayload;
 import chivi.laptopstore.models.entities.CategoryInfo;
 import chivi.laptopstore.models.entities.ProductDetail;
 import chivi.laptopstore.models.entities.ProductInfo;
@@ -16,10 +17,11 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Slf4j
@@ -40,6 +42,28 @@ public class ProductController {
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse getProductBySlug(@PathVariable String slug) {
         return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, productService.getBySlug(slug));
+    }
+
+    @GetMapping(RequestMaps.PRODUCT_PATHNAME_PUBLIC + "list-data-home-page")
+    @ResponseStatus(HttpStatus.OK)
+    public SuccessResponse getDataHomepage(@RequestParam(name = "category_ids") List<Long> categoryIds) {
+        List<SectionPayload> sectionPayloads = new ArrayList<>();
+        categoryIds.forEach(id -> {
+            CategoryInfo categoryInfo = categoryService.getInfoById(id);
+            String code = categoryInfo.getCode() + "-" + categoryInfo.getId();
+            List<Long> allIdIsLeafByCode = categoryService.getAllIdIsLeafByCode(code);
+            List<ProductInfo> products = productService.getAllByCategoryIds(allIdIsLeafByCode);
+            sectionPayloads.add(new SectionPayload(categoryInfo.getName(), products));
+        });
+        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, sectionPayloads);
+    }
+
+    @GetMapping(RequestMaps.PRODUCT_PATHNAME_PUBLIC + "search")
+    @ResponseStatus(HttpStatus.OK)
+    public SuccessResponse searchProduct(@RequestParam(name = "category_code", defaultValue = "1-2") String code) {
+        List<Long> categoryIds = categoryService.getAllIdIsLeafByCode(code);
+        List<ProductInfo> products = productService.getAllByCategoryIds(categoryIds);
+        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, products);
     }
 
     @GetMapping(RequestMaps.PRODUCT_PATHNAME_PUBLIC + "sort-latest")

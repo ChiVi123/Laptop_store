@@ -39,6 +39,14 @@ public class CategoryService {
         return categoryInfoRepository.findAllByIdIn(ids);
     }
 
+    public List<Long> getAllIdIsLeafByCode(String code) {
+        return categoryInfoRepository.findAllIdByCodeLikeAndLeaf(code, true);
+    }
+
+    public String getNameByCode(String code) {
+        return categoryInfoRepository.findNameByCode(code).orElseThrow(() -> new CustomNotFoundException("category name", code));
+    }
+
     public CategoryNode getNodeById(Long id) {
         return categoryNodeRepository.findById(id).orElseThrow(() -> new CustomNotFoundException("node category", id));
     }
@@ -54,17 +62,21 @@ public class CategoryService {
     }
 
     public CategoryNode create(CategoryNode parent, CategoryRequest request) {
-        CategoryInfo categoryInfo = new CategoryInfo();
+        CategoryInfo parentInfo = parent.getInfo();
+        CategoryInfo info = new CategoryInfo();
         CategoryNode node = new CategoryNode();
 
-        categoryInfo.setName(request.getName());
-        categoryInfo.setPath(request.getPath());
-        categoryInfo.setCode(parent.getInfo().getCode() + "-" + parent.getInfo().getId());
-        categoryInfo.setStatus(request.getStatus());
+        info.setName(request.getName());
+        info.setPath(request.getPath());
+        info.setCode(parent.getInfo().getCode() + "-" + parent.getInfo().getId());
+        info.setLeaf(true);
+        info.setStatus(request.getStatus());
+        parentInfo.setLeaf(false);
 
-        CategoryInfo resultCategoryInfo = categoryInfoRepository.save(categoryInfo);
+        categoryInfoRepository.save(parentInfo);
+        CategoryInfo resultInfo = categoryInfoRepository.save(info);
 
-        node.setInfo(resultCategoryInfo);
+        node.setInfo(resultInfo);
         parent.addChild(node);
         parent = categoryNodeRepository.save(parent);
 
@@ -78,14 +90,16 @@ public class CategoryService {
         return categoryInfoRepository.save(category);
     }
 
-    public void move(CategoryNode fromCategoryNode, CategoryNode toCategoryNode) {
-        CategoryInfo fromCategoryInfo = fromCategoryNode.getInfo();
-        CategoryInfo toCategoryInfo = toCategoryNode.getInfo();
+    public void move(CategoryNode fromNode, CategoryNode toNode) {
+        CategoryInfo fromInfo = fromNode.getInfo();
+        CategoryInfo toInfo = toNode.getInfo();
 
-        fromCategoryInfo.setCode(toCategoryInfo.getCode() + "-" + toCategoryInfo.getId());
-        toCategoryNode.addChild(fromCategoryNode);
+        fromInfo.setCode(toInfo.getCode() + "-" + toInfo.getId());
+        toInfo.setLeaf(false);
+        toNode.addChild(fromNode);
 
-        categoryNodeRepository.save(toCategoryNode);
+        categoryInfoRepository.save(toInfo);
+        categoryNodeRepository.save(toNode);
     }
 
     public CategoryNode deleteChild(CategoryNode categoryNode) {

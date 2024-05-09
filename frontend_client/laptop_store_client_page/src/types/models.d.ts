@@ -15,6 +15,7 @@ export interface ICategoryInfo extends IEntity, IEntityStatus, IEntityDateTime {
     name: string;
     path: string;
     code: string;
+    isLeaf: boolean;
 }
 export interface ICategoryNode extends IEntity, IEntityDateTime {
     info: ICategoryInfo;

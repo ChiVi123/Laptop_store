@@ -8,7 +8,7 @@ interface IProps {
 
 function Container({ children, component = 'div', className }: PropsWithChildren<IProps>) {
     const Component = component;
-    return <Component className={cn('max-w-7xl px-4 lg:px-[2.125rem] mx-auto', className)}>{children}</Component>;
+    return <Component className={cn('max-w-[77rem] px-4 mx-auto', className)}>{children}</Component>;
 }
 
 export default Container;

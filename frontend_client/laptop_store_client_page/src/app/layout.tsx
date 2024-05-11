@@ -12,10 +12,10 @@ async function RootLayout({ children }: PropsWithChildren) {
 
     return (
         <html lang='vi'>
-            <body>
+            <body className='bg-cv-primary-background'>
                 <DataProvider categories={rootCategory.children} account={undefined}>
                     <Header />
-                    <Container component='main' className='py-[4.625rem] bg-cv-primary-background'>
+                    <Container component='main' className='py-[4.625rem]'>
                         {children}
                     </Container>
                 </DataProvider>

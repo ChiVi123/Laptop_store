@@ -25,6 +25,7 @@ const rawProductDetail: IProductDetail = {
     info: rawProductInfo,
     categories: new Array(),
     images: new Array(),
+    attributes: new Array(),
     createdDate: '',
     lastModifiedDate: '',
 };

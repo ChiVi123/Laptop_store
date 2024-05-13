@@ -68,6 +68,7 @@ export enum ELabel {
     USERNAME = 'Tên tài khoản',
 }
 export enum EText {
+    ADD = 'Thêm',
     ADD_ROOT_CATEGORY = 'Thêm danh mục gốc',
     ADD_SUBCATEGORY = 'Thêm danh mục con',
     CANCEL = 'Hủy',

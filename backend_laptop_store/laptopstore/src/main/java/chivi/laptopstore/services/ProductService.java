@@ -76,7 +76,7 @@ public class ProductService {
         request.getImages().stream().findFirst().ifPresent(image -> productInfo.setThumbnailUrl(image.getSecureUrl()));
 
         ProductInfo resultProductInfo = productInfoRepository.save(productInfo);
-        ProductDetail productDetail = new ProductDetail(resultProductInfo, categories, request.getImages());
+        ProductDetail productDetail = new ProductDetail(resultProductInfo, categories, request.getImages(), request.getAttributes());
         return productDetailRepository.save(productDetail);
     }
 
@@ -94,6 +94,8 @@ public class ProductService {
         productInfo.setStatus(request.getStatus());
         productDetail.clearAllCategory();
         productDetail.addAllCategory(categories);
+        productDetail.clearAttribute();
+        productDetail.addAllAttribute(request.getAttributes());
         productDetail.addImages(request.getImages());
 
         request.getImages().stream().findFirst().ifPresent(image -> productInfo.setThumbnailUrl(image.getSecureUrl()));

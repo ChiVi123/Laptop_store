@@ -7,11 +7,13 @@ public class EntityNames {
     public static final String TABLE_CATEGORY_NODE = "category_node";
     public static final String TABLE_PRODUCT_INFO = "product_info";
     public static final String TABLE_PRODUCT_DETAIL = "product_detail";
+    public static final String TABLE_ATTRIBUTE = "attribute";
     public static final String TABLE_IMAGE = "image";
     public static final String TABLE_REFRESH_TOKEN = "refresh_token";
     public static final String TABLE_VERIFICATION_TOKEN = "verify_token";
     public static final String TABLE_PRODUCT_CATEGORY = "product_category";
     public static final String TABLE_PRODUCT_IMAGE = "product_image";
+    public static final String TABLE_PRODUCT_ATTRIBUTE = "product_attribute";
 
     // Column name
     public static final String COLUMN_ACCOUNT_ID = "account_id";
@@ -32,6 +34,8 @@ public class EntityNames {
     public static final String COLUMN_IMAGE_PUBLIC_ID = "public_id";
     public static final String COLUMN_IMAGE_SECURE_URL = "secure_url";
 
+
+    public static final String JOIN_COLUMN_ATTRIBUTE_ID = "attribute_id";
     public static final String JOIN_COLUMN_PRODUCT_ID = "product_id";
     public static final String JOIN_COLUMN_PRODUCT_INFO_ID = "product_info_id";
     public static final String JOIN_COLUMN_CATEGORY_ID = "category_id";

@@ -3,6 +3,7 @@ package chivi.laptopstore.models.requests;
 import chivi.laptopstore.common.EntityStatus;
 import chivi.laptopstore.common.ValidationMessage;
 import chivi.laptopstore.common.ValidationValues;
+import chivi.laptopstore.models.entities.Attribute;
 import chivi.laptopstore.models.entities.Image;
 import chivi.laptopstore.utils.CustomString;
 import jakarta.validation.constraints.DecimalMin;
@@ -37,6 +38,8 @@ public class ProductRequest {
 
     private List<Image> images;
 
+    private List<Attribute> attributes;
+
     @NotNull(message = ValidationMessage.NOT_NULL)
     private EntityStatus status;
 
@@ -70,6 +73,10 @@ public class ProductRequest {
 
     public List<Image> getImages() {
         return this.images;
+    }
+
+    public List<Attribute> getAttributes() {
+        return this.attributes;
     }
 
     public EntityStatus getStatus() {

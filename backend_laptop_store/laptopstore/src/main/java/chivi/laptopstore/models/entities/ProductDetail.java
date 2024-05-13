@@ -38,6 +38,14 @@ public class ProductDetail extends EntityStandard {
     )
     private List<Image> images = new ArrayList<>();
 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinTable(
+            name = EntityNames.TABLE_PRODUCT_ATTRIBUTE,
+            joinColumns = @JoinColumn(name = EntityNames.JOIN_COLUMN_PRODUCT_ID),
+            inverseJoinColumns = @JoinColumn(name = EntityNames.JOIN_COLUMN_ATTRIBUTE_ID)
+    )
+    private List<Attribute> attributes = new ArrayList<>();
+
     public void addAllCategory(Set<CategoryInfo> categories) {
         this.categories.addAll(categories);
     }
@@ -52,5 +60,13 @@ public class ProductDetail extends EntityStandard {
 
     public void removeImage(Image image) {
         this.images.remove(image);
+    }
+
+    public void addAllAttribute(List<Attribute> attributes) {
+        this.attributes.addAll(attributes);
+    }
+
+    public void clearAttribute() {
+        this.attributes.clear();
     }
 }

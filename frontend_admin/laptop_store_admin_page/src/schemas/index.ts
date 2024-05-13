@@ -2,7 +2,7 @@
 
 import * as yup from 'yup';
 import { EInvalid } from '~/common/enums';
-import { ICategoryInfo, IImage } from '~/types/models';
+import { IAttribute, ICategoryInfo, IImage } from '~/types/models';
 
 function yupString() {
     return yup.string().trim();
@@ -29,6 +29,7 @@ export const productSchema = yup.object({
     price: yup.number().positive().required(),
     quantityStock: yup.number().min(0).required(),
     images: yup.array().of(yup.mixed<File | IImage>()).min(1),
+    attributes: yup.array().of(yup.mixed<IAttribute>()).min(0),
     status: yupString(),
 });
 export const categorySchema = yup.object({

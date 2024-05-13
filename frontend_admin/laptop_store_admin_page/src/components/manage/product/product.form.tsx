@@ -1,12 +1,24 @@
 'use client';
 
-import { Box, Button, FormControlLabel, FormHelperText, Paper, Switch, TextField, Typography } from '@mui/material';
+import { Delete } from '@mui/icons-material';
+import {
+    Box,
+    Button,
+    FormControlLabel,
+    FormHelperText,
+    IconButton,
+    Paper,
+    Switch,
+    TextField,
+    Typography,
+} from '@mui/material';
 import { useState } from 'react';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { productServerAction, uploadFileServerAction } from '~/actions';
 import { EKeys, EStatus, EText } from '~/common/enums';
 import { productDefaultValues } from '~/common/values';
 import { useEntityStatus } from '~/hooks';
+import logger from '~/libs/logger';
 import { productResolver } from '~/resolvers';
 import { productFormData } from '~/types/form.data';
 import { ICategoryNode, IImage, IProductDetail } from '~/types/models';
@@ -33,6 +45,7 @@ function ProductForm({ product, categories }: IProps) {
     });
     const [loading, setLoading] = useState<boolean>(false);
     const [status, setStatus] = useEntityStatus(product?.info);
+    const { fields, append, remove } = useFieldArray({ control, name: 'attributes' });
 
     const handleRemoveImage = async (value: IImage) => {
         if (product && value.id) {
@@ -56,6 +69,8 @@ function ProductForm({ product, categories }: IProps) {
         }
         product ? await productServerAction.edit(product.id, data) : await productServerAction.create(data);
 
+        logger.info('data::', data);
+
         setLoading(false);
     };
 
@@ -65,10 +80,7 @@ function ProductForm({ product, categories }: IProps) {
                 elevation={0}
                 component='form'
                 onSubmit={handleSubmit(handleOnSubmit)}
-                sx={{
-                    p: 3,
-                    '& > div:not(:last-of-type)': { mb: 3 },
-                }}
+                sx={{ p: 3, '& > div:not(:last-of-type)': { mb: 3 } }}
             >
                 <div>
                     <FormControlLabel
@@ -215,6 +227,76 @@ function ProductForm({ product, categories }: IProps) {
                     </Box>
                     <FormHelperText error={Boolean(errors.images?.message)}>{errors.images?.message}</FormHelperText>
                 </div>
+
+                <Box sx={{ '& > * ~ *': { mt: 2 } }}>
+                    <Typography variant='h2'>Các thuộc tính khác</Typography>
+
+                    {Boolean(fields.length) && (
+                        <Box sx={{ '& > div:not(:first-of-type)': { mt: 3 } }}>
+                            {fields.map((field, index) => (
+                                <StyleBackgroundFormGroup key={field.id}>
+                                    <Box key={field.id} sx={{ display: 'flex', gap: 1 }}>
+                                        <Box sx={{ flex: '1' }}>
+                                            <Controller
+                                                name={`attributes.${index}.key`}
+                                                control={control}
+                                                render={({ field: { value, onChange } }) => (
+                                                    <TextField
+                                                        id={`attributes-${index}-key`}
+                                                        type='text'
+                                                        label=''
+                                                        placeholder='Nhập tên thuộc tính...'
+                                                        autoComplete='on'
+                                                        size='small'
+                                                        fullWidth
+                                                        error={Boolean(errors.attributes?.[index]?.message)}
+                                                        helperText={errors.attributes?.[index]?.message}
+                                                        value={value}
+                                                        onChange={onChange}
+                                                    />
+                                                )}
+                                            />
+                                        </Box>
+                                        <Box sx={{ flex: '1' }}>
+                                            <Controller
+                                                name={`attributes.${index}.value`}
+                                                control={control}
+                                                render={({ field: { value, onChange } }) => (
+                                                    <TextField
+                                                        id={`attributes-${index}-value`}
+                                                        type='text'
+                                                        label=''
+                                                        autoComplete='on'
+                                                        size='small'
+                                                        fullWidth
+                                                        error={Boolean(errors.attributes?.[index]?.message)}
+                                                        helperText={errors.attributes?.[index]?.message}
+                                                        value={value}
+                                                        onChange={onChange}
+                                                    />
+                                                )}
+                                            />
+                                        </Box>
+                                        <Box>
+                                            <IconButton
+                                                size='small'
+                                                aria-label='remove-attr'
+                                                sx={{ ml: 'auto' }}
+                                                onClick={() => remove(index)}
+                                            >
+                                                <Delete />
+                                            </IconButton>
+                                        </Box>
+                                    </Box>
+                                </StyleBackgroundFormGroup>
+                            ))}
+                        </Box>
+                    )}
+
+                    <Button type='button' variant='outlined' onClick={() => append({ key: '', value: '' })}>
+                        {EText.ADD}
+                    </Button>
+                </Box>
 
                 <Box display='flex' justifyContent='flex-end' gap={1}>
                     <Button type='submit' variant='contained' disabled={loading}>

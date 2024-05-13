@@ -10,6 +10,10 @@ interface IEntityDateTime {
     createdDate: string;
     lastModifiedDate: string;
 }
+interface IAttribute extends IEntity {
+    key: string;
+    value: string;
+}
 
 export interface ICategoryInfo extends IEntity, IEntityStatus, IEntityDateTime {
     name: string;
@@ -38,6 +42,7 @@ export interface IProductDetail extends IEntity, IEntityDateTime {
     info: IProductInfo;
     categories: ICategoryInfo[];
     images: IImage[];
+    attributes: IAttribute[];
 }
 
 export interface IAccount extends IEntity, IEntityDateTime {

@@ -55,7 +55,6 @@ function ProductForm({ product, categories }: IProps) {
     };
     const handleRemoveAttribute = async (index: number) => {
         const attribute = getValues('attributes')?.[index];
-        logger.info('attributes::', attribute);
 
         if (!attribute) {
             return;

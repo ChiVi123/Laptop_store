@@ -98,8 +98,8 @@ export async function edit(id: number, data: productFormData) {
         })
         .json<IProductDetailBodyResponse>();
 
-    // revalidateTag(EKeys.PRODUCT_LIST);
-    // redirect(EPath.MANAGE_PRODUCT_EDIT.concat(payload.info.slug));
+    revalidateTag(EKeys.PRODUCT_LIST);
+    redirect(EPath.MANAGE_PRODUCT_EDIT.concat(payload.info.slug));
 }
 export async function removeImage(productId: number, imageId: number) {
     const token = cookies().get(EKeys.ACCESS_TOKEN)?.value;

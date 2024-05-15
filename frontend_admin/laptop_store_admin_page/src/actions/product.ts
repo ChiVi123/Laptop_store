@@ -37,6 +37,7 @@ const rawProductDetail: IProductDetail = {
     info: rawProductInfo,
     categories: new Array(),
     images: new Array(),
+    attributes: new Array(),
     createdDate: '',
     lastModifiedDate: '',
 };
@@ -82,7 +83,6 @@ export async function create(data: productFormData) {
 }
 export async function edit(id: number, data: productFormData) {
     const token = cookies().get(EKeys.ACCESS_TOKEN)?.value;
-
     const { payload } = await apiRequest
         .auth(token)
         .body(data)
@@ -92,14 +92,18 @@ export async function edit(id: number, data: productFormData) {
             const resultRefresh = await handleRefetch(request);
             return resultRefresh ?? ({ payload: rawProductDetail } as IProductDetailBodyResponse);
         })
+        .fetchError((error) => {
+            logger.anger('edit product::', error.status, error.json);
+            return { payload: rawProductDetail } as IProductDetailBodyResponse;
+        })
         .json<IProductDetailBodyResponse>();
 
-    revalidateTag(EKeys.PRODUCT_LIST);
-    redirect(EPath.MANAGE_PRODUCT_EDIT.concat(payload.info.slug));
+    // revalidateTag(EKeys.PRODUCT_LIST);
+    // redirect(EPath.MANAGE_PRODUCT_EDIT.concat(payload.info.slug));
 }
 export async function removeImage(productId: number, imageId: number) {
     const token = cookies().get(EKeys.ACCESS_TOKEN)?.value;
-    apiRequest
+    await apiRequest
         .auth(token)
         .delete(`admin/products/${productId}/remove-image/${imageId}`)
         .unauthorized(async (error, request) => {
@@ -107,6 +111,17 @@ export async function removeImage(productId: number, imageId: number) {
             await handleRefetch(request);
         })
         .json<IListImageResponse>();
+}
+export async function removeAttribute(productId: number, attributeId: number) {
+    const token = cookies().get(EKeys.ACCESS_TOKEN)?.value;
+    await apiRequest
+        .auth(token)
+        .delete(`admin/products/${productId}/remove-attribute/${attributeId}`)
+        .fetchError((error) => {
+            logger.anger('remove attribute::', error.status, error.json);
+            return { payload: rawProductDetail } as IProductDetailBodyResponse;
+        })
+        .json();
 }
 export async function destroy(id: number) {
     const token = cookies().get(EKeys.ACCESS_TOKEN)?.value;

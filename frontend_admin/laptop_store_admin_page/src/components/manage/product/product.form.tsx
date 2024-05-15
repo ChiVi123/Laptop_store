@@ -1,6 +1,6 @@
 'use client';
 
-import { Delete } from '@mui/icons-material';
+import { Delete as DeleteIcon } from '@mui/icons-material';
 import {
     Box,
     Button,
@@ -38,6 +38,7 @@ function ProductForm({ product, categories }: IProps) {
     const {
         control,
         formState: { errors },
+        getValues,
         handleSubmit,
     } = useForm<productFormData>({
         resolver: productResolver,
@@ -52,13 +53,32 @@ function ProductForm({ product, categories }: IProps) {
             await productServerAction.removeImage(product.id, value.id);
         }
     };
+    const handleRemoveAttribute = async (index: number) => {
+        const attribute = getValues('attributes')?.[index];
+        logger.info('attributes::', attribute);
+
+        if (!attribute) {
+            return;
+        }
+
+        if ('id' in attribute) {
+            if (product && typeof attribute.id === 'number') {
+                await productServerAction.removeAttribute(product.id, attribute.id);
+                remove(index);
+            }
+        } else {
+            remove(index);
+        }
+    };
 
     const handleOnSubmit: SubmitHandler<productFormData> = async (data) => {
         setLoading(true);
 
         data.categoryIds = data.categories.map((item) => item.id);
+        data.attributes = data.attributes?.filter((item) => !(item && 'id' in item));
         data.status = status ? EStatus.ENABLED : EStatus.DISABLED;
-        if (data.images && data.images.length) {
+
+        if (data.images.length) {
             const formData = new FormData();
             data.images.forEach((image) => {
                 if (image && image instanceof File) {
@@ -282,9 +302,9 @@ function ProductForm({ product, categories }: IProps) {
                                                 size='small'
                                                 aria-label='remove-attr'
                                                 sx={{ ml: 'auto' }}
-                                                onClick={() => remove(index)}
+                                                onClick={() => handleRemoveAttribute(index)}
                                             >
-                                                <Delete />
+                                                <DeleteIcon />
                                             </IconButton>
                                         </Box>
                                     </Box>

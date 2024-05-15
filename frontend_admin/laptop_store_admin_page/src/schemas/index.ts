@@ -28,8 +28,8 @@ export const productSchema = yup.object({
     description: yupString().required(),
     price: yup.number().positive().required(),
     quantityStock: yup.number().min(0).required(),
-    images: yup.array().of(yup.mixed<File | IImage>()).min(1),
-    attributes: yup.array().of(yup.mixed<IAttribute>()).min(0),
+    images: yup.array().of(yup.mixed<File | IImage>().required()).required().min(1),
+    attributes: yup.array().of(yup.mixed<IAttribute>().required()),
     status: yupString(),
 });
 export const categorySchema = yup.object({

@@ -31,7 +31,7 @@ public class ProductService {
     private final CloudinaryConfig cloudinaryConfig;
 
     public List<ProductInfo> getAll() {
-        return productInfoRepository.findAll();
+        return productInfoRepository.findAllByOrderByCreatedDateDesc();
     }
 
     public Page<ProductInfo> getAllLatest(Pageable pageable) {

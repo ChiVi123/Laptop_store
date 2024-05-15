@@ -13,6 +13,8 @@ import java.util.List;
 public interface IProductInfoRepository extends JpaRepository<ProductInfo, Long> {
     Page<ProductInfo> findAllByOrderByCreatedDateDesc(Pageable pageable);
 
+    List<ProductInfo> findAllByOrderByCreatedDateDesc();
+
     @Query(value = "SELECT DISTINCT " +
             "pro_in.id, pro_in.name, pro_in.slug, pro_in.thumbnail_url, pro_in.description, pro_in.price, " +
             "pro_in.discount, pro_in.quantity_stock, pro_in.discount_rate, pro_in.quantity_sold, " +

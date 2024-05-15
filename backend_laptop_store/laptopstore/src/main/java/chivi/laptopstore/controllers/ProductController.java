@@ -4,13 +4,13 @@ import chivi.laptopstore.common.RequestMaps;
 import chivi.laptopstore.common.ResponseMessage;
 import chivi.laptopstore.communication.payload.PagePayload;
 import chivi.laptopstore.communication.payload.SectionPayload;
-import chivi.laptopstore.models.entities.CategoryInfo;
-import chivi.laptopstore.models.entities.ProductDetail;
-import chivi.laptopstore.models.entities.ProductInfo;
+import chivi.laptopstore.models.entities.*;
 import chivi.laptopstore.models.requests.DiscountRequest;
 import chivi.laptopstore.models.requests.ProductRequest;
 import chivi.laptopstore.models.responses.SuccessResponse;
+import chivi.laptopstore.services.AttributeService;
 import chivi.laptopstore.services.CategoryService;
+import chivi.laptopstore.services.ImageService;
 import chivi.laptopstore.services.ProductService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -31,6 +31,8 @@ import java.util.Set;
 public class ProductController {
     private final ProductService productService;
     private final CategoryService categoryService;
+    private final AttributeService attributeService;
+    private final ImageService imageService;
 
     @GetMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "all")
     @ResponseStatus(HttpStatus.OK)
@@ -89,9 +91,9 @@ public class ProductController {
     @PutMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "{id}/edit")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse updateProduct(@PathVariable Long id, @Valid @RequestBody ProductRequest request) {
-        ProductDetail product = productService.getDetailById(id);
+        ProductDetail productDetail = productService.getDetailById(id);
         Set<CategoryInfo> categories = categoryService.getAllByIds(request.getCategoryIds());
-        ProductDetail result = productService.editInfo(product, categories, request);
+        ProductDetail result = productService.editInfo(productDetail, categories, request);
         return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, result);
     }
 
@@ -102,11 +104,22 @@ public class ProductController {
         return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, productService.updateDiscount(product, request));
     }
 
+
+    @DeleteMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "{productId}/remove-attribute/{attributeId}")
+    @ResponseStatus(HttpStatus.OK)
+    public SuccessResponse removeAttributeProduct(@PathVariable Long productId, @PathVariable Long attributeId) {
+        ProductDetail product = productService.getDetailById(productId);
+        Attribute attribute = attributeService.getById(attributeId);
+        productService.removeAttribute(product, attribute);
+        return new SuccessResponse(ResponseMessage.DELETE_SUCCESS);
+    }
+
     @DeleteMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "{productId}/remove-image/{imageId}")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse removeImageProduct(@PathVariable Long productId, @PathVariable Long imageId) {
         ProductDetail product = productService.getDetailById(productId);
-        return new SuccessResponse(ResponseMessage.DELETE_SUCCESS, productService.removeImage(product, imageId));
+        Image image = imageService.getById(imageId);
+        return new SuccessResponse(ResponseMessage.DELETE_SUCCESS, productService.removeImage(product, image));
     }
 
     @DeleteMapping(RequestMaps.PRODUCT_PATHNAME_ADMIN + "{id}/delete")

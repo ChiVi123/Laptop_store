@@ -46,15 +46,11 @@ public class ProductDetail extends EntityStandard {
     )
     private List<Attribute> attributes = new ArrayList<>();
 
-    public void addAllCategory(Set<CategoryInfo> categories) {
-        this.categories.addAll(categories);
-    }
-
     public void clearAllCategory() {
         this.categories.clear();
     }
 
-    public void addImages(List<Image> images) {
+    public void addAllImage(List<Image> images) {
         this.images.addAll(images);
     }
 
@@ -66,7 +62,7 @@ public class ProductDetail extends EntityStandard {
         this.attributes.addAll(attributes);
     }
 
-    public void clearAttribute() {
-        this.attributes.clear();
+    public void removeAttribute(Attribute attribute) {
+        this.attributes.remove(attribute);
     }
 }

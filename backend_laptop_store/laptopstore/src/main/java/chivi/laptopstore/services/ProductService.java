@@ -4,10 +4,7 @@ import chivi.laptopstore.configurations.CloudinaryConfig;
 import chivi.laptopstore.exception.BadRequestException;
 import chivi.laptopstore.exception.ConflictException;
 import chivi.laptopstore.exception.NotFoundDataException;
-import chivi.laptopstore.models.entities.CategoryInfo;
-import chivi.laptopstore.models.entities.Image;
-import chivi.laptopstore.models.entities.ProductDetail;
-import chivi.laptopstore.models.entities.ProductInfo;
+import chivi.laptopstore.models.entities.*;
 import chivi.laptopstore.models.requests.DiscountRequest;
 import chivi.laptopstore.models.requests.ProductRequest;
 import chivi.laptopstore.repositories.IProductDetailRepository;
@@ -92,11 +89,10 @@ public class ProductService {
         productInfo.setPrice(request.getPrice());
         productInfo.setDescription(request.getDescription());
         productInfo.setStatus(request.getStatus());
-        productDetail.clearAllCategory();
-        productDetail.addAllCategory(categories);
-        productDetail.clearAttribute();
+
+        productDetail.setCategories(categories);
         productDetail.addAllAttribute(request.getAttributes());
-        productDetail.addImages(request.getImages());
+        productDetail.addAllImage(request.getImages());
 
         request.getImages().stream().findFirst().ifPresent(image -> productInfo.setThumbnailUrl(image.getSecureUrl()));
 
@@ -118,16 +114,14 @@ public class ProductService {
         return productInfoRepository.save(productInfo);
     }
 
-    public List<Image> removeImage(ProductDetail productDetail, Long publicId) {
-        List<Image> images = productDetail.getImages();
-        images.stream()
-                .filter(entity -> entity.getId().equals(publicId))
-                .findFirst()
-                .ifPresent(image -> {
-                    cloudinaryConfig.deleteImage(List.of(image.getPublicId()));
-                    productDetail.removeImage(image);
-                });
+    public void removeAttribute(ProductDetail productDetail, Attribute attribute) {
+        productDetail.removeAttribute(attribute);
+        productDetailRepository.save(productDetail);
+    }
 
+    public List<Image> removeImage(ProductDetail productDetail, Image image) {
+        cloudinaryConfig.deleteImage(List.of(image.getPublicId()));
+        productDetail.removeImage(image);
         ProductDetail result = productDetailRepository.save(productDetail);
         return result.getImages();
     }

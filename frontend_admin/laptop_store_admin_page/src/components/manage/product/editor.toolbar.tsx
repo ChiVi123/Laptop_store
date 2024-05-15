@@ -148,11 +148,12 @@ function EditorToolbar({ editor }: IProps) {
         function (event: ChangeEvent<HTMLInputElement>) {
             if (event.target.files) {
                 const file = event.target.files.item(0);
+                const alt = window.prompt('Alt') ?? '';
                 const reader = new FileReader();
 
                 reader.onloadend = function () {
                     if (typeof reader.result === 'string') {
-                        editor.chain().focus().setImage({ src: reader.result }).run();
+                        editor.chain().focus().setImage({ src: reader.result, alt }).run();
                     }
                 };
 

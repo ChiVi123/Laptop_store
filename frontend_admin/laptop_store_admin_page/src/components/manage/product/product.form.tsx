@@ -159,6 +159,8 @@ function ProductForm({ product, categories }: IProps) {
                                         id='input-category'
                                         value={value}
                                         tree={categories}
+                                        error={Boolean(errors.categories?.message)}
+                                        helperText={errors.categories?.message ?? ''}
                                         onChange={onChange}
                                     />
                                 )}
@@ -178,7 +180,7 @@ function ProductForm({ product, categories }: IProps) {
                             <EditorField
                                 value={value}
                                 error={Boolean(errors.description?.message)}
-                                helperText={errors.description?.message || ''}
+                                helperText={errors.description?.message ?? ''}
                                 onChange={onChange}
                             />
                         )}
@@ -247,7 +249,7 @@ function ProductForm({ product, categories }: IProps) {
                     <FormHelperText error={Boolean(errors.images?.message)}>{errors.images?.message}</FormHelperText>
                 </div>
 
-                <Box sx={{ '& > * ~ *': { mt: 2 } }}>
+                <Box sx={{ '& > * + *': { mt: 2 } }}>
                     <Typography variant='h2'>Các thuộc tính khác</Typography>
 
                     {Boolean(fields.length) && (

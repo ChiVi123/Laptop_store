@@ -23,11 +23,11 @@ export const registerSchema = yup.object({
 export const sendMailSchema = yup.object({ email });
 export const productSchema = yup.object({
     name: yupString().required(),
-    categories: yup.array(yup.mixed<ICategoryInfo>().required()).required(),
+    categories: yup.array(yup.mixed<ICategoryInfo>().required()).required().min(1),
     categoryIds: yup.array(yup.number().required()),
     description: yupString().required(),
-    price: yup.number().positive().required(),
-    quantityStock: yup.number().min(0).required(),
+    price: yup.number().typeError('price is number').positive().required(),
+    quantityStock: yup.number().typeError('quantity stock is number').min(0).required(),
     images: yup.array().of(yup.mixed<File | IImage>().required()).required().min(1),
     attributes: yup.array().of(yup.mixed<IAttribute>().required()),
     status: yupString(),

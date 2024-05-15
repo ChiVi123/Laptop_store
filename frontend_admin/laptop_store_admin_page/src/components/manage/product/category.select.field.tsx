@@ -1,6 +1,6 @@
 'use client';
 
-import { AutocompleteChangeReason, TextField } from '@mui/material';
+import { AutocompleteChangeReason, FormHelperText, TextField } from '@mui/material';
 import TreeSelect from 'mui-tree-select';
 import { useCallback, useMemo } from 'react';
 import { ICategoryInfo, ICategoryNode } from '~/types/models';
@@ -48,10 +48,12 @@ interface IProps {
     id: string;
     value?: ICategoryInfo[];
     tree: ICategoryNode[];
+    error: boolean;
+    helperText: string;
     onChange(value: ICategoryInfo[]): void;
 }
 
-function CategorySelectField({ id, value, tree, onChange }: IProps) {
+function CategorySelectField({ id, value, tree, error, helperText, onChange }: IProps) {
     const data = useMemo(() => tree.map((item) => new Node(item)), [tree]);
     const nodeValue = useMemo(() => value?.map((item) => new Node(item)) ?? [], [value]);
 
@@ -93,16 +95,21 @@ function CategorySelectField({ id, value, tree, onChange }: IProps) {
     }
 
     return (
-        <TreeSelect
-            id={'select-' + id}
-            size='small'
-            value={nodeValue}
-            getChildren={(node) => (node ? node.childrenNode : data)}
-            getParent={handleGetParent}
-            multiple
-            renderInput={(params) => <TextField {...params} label='' />}
-            onChange={handleOnChange}
-        />
+        <div>
+            <TreeSelect
+                id={'select-' + id}
+                size='small'
+                value={nodeValue}
+                getChildren={(node) => (node ? node.childrenNode : data)}
+                getParent={handleGetParent}
+                multiple
+                renderInput={(params) => <TextField {...params} label='' />}
+                onChange={handleOnChange}
+            />
+            <div>
+                <FormHelperText error={error}>{helperText}</FormHelperText>
+            </div>
+        </div>
     );
 }
 

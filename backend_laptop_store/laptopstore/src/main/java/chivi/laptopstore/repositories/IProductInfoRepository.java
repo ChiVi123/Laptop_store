@@ -22,7 +22,8 @@ public interface IProductInfoRepository extends JpaRepository<ProductInfo, Long>
             "FROM product_category pro_cate " +
             "JOIN product_detail pro_dt ON pro_cate.product_id=pro_dt.id " +
             "JOIN product_info pro_in ON pro_dt.product_info_id=pro_in.id " +
-            "WHERE pro_cate.category_id IN (?1)",
+            "WHERE pro_cate.category_id IN (?1) " +
+            "ORDER BY pro_in.created_at desc",
             nativeQuery = true
     )
     List<ProductInfo> findAllByCategories(List<Long> categoryIds);

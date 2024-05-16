@@ -1,4 +1,5 @@
 import '~/libs/extension.number';
+import style from './style.module.css';
 
 import { HomeIcon } from '@radix-ui/react-icons';
 import { Metadata } from 'next';
@@ -93,7 +94,10 @@ async function ProductDetailPage({ params: { slug } }: IProps) {
                     {/* Description */}
                     <div className='p-4 rounded-md bg-white'>
                         <h3 className='font-semibold text-lg text-cv-gray-100'>Mô tả chi tiết</h3>
-                        <div dangerouslySetInnerHTML={{ __html: productInfo.description }}></div>
+                        <div
+                            dangerouslySetInnerHTML={{ __html: productInfo.description }}
+                            className={style.description}
+                        ></div>
                     </div>
                 </div>
 

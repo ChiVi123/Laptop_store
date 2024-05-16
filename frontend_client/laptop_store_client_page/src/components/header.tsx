@@ -35,11 +35,11 @@ function Header() {
                         <DropdownMenuTrigger asChild>
                             <Button variant='outline' className='gap-2'>
                                 <HamburgerMenuIcon width='1.125rem' height='1.125rem' className='text-cv-gray-80' />
-                                <span className='mb-[2px] text-center font-medium text-cv-gray-70'>Danh mục</span>
+                                <span className='mb-0.5 text-center font-medium text-cv-gray-70'>Danh mục</span>
                             </Button>
                         </DropdownMenuTrigger>
 
-                        <DropdownMenuContent className='w-56'>
+                        <DropdownMenuContent align='start' className='w-56'>
                             {defaultCategory.children.map((item) => (
                                 <CategoryMenuItem key={'category-' + item.id} category={item} />
                             ))}

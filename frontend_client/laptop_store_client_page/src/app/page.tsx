@@ -14,7 +14,7 @@ async function HomePage() {
                     <div className='flex justify-between items-center mb-3'>
                         <span className='text-lg font-semibold text-cv-gray-200'>{section.title}</span>
                         <Link href='' className='group flex items-center gap-1 text-cv-primary-100'>
-                            <span className='text-inherit group-hover:underline'>Xem them</span>
+                            <span className='text-inherit group-hover:underline'>Xem thêm</span>
                             <ChevronRightIcon className='w-4 h-4 mt-0.5 group-hover:translate-x-1 transition-transform' />
                         </Link>
                     </div>

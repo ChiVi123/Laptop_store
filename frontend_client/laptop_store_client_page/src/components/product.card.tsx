@@ -17,7 +17,7 @@ function ProductCard({ product, className }: IProps) {
     return (
         <Card className={cn('h-full p-1 rounded-sm shadow-none', className)}>
             <CardHeader className='p-2'>
-                <Link href={`/${product.slug}`}>
+                <Link title={product.name} href={`/${product.slug}`}>
                     <AspectRatio ratio={1}>
                         <Image
                             src={product.thumbnailUrl}
@@ -45,7 +45,7 @@ function ProductCard({ product, className }: IProps) {
             <CardFooter className='flex justify-center p-2'>
                 <Button
                     variant='outline'
-                    className='min-w-24 border-cv-primary-100 text-cv-primary-100 hover:bg-cv-primary-10 hover:text-cv-primary-200'
+                    className='w-full border-cv-primary-100 text-cv-primary-100 hover:bg-cv-primary-10 hover:text-cv-primary-200'
                 >
                     Thêm giỏ hàng
                 </Button>

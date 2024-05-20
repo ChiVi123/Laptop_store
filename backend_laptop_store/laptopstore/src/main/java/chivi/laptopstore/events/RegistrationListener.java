@@ -1,6 +1,6 @@
 package chivi.laptopstore.events;
 
-import chivi.laptopstore.models.entities.Account;
+import chivi.laptopstore.models.Account;
 import chivi.laptopstore.services.AuthenticationService;
 import chivi.laptopstore.utils.CustomMail;
 import chivi.laptopstore.utils.ElementHTML;

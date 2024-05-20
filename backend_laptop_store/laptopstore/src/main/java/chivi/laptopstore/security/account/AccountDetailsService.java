@@ -2,7 +2,7 @@ package chivi.laptopstore.security.account;
 
 import chivi.laptopstore.common.AccountStatus;
 import chivi.laptopstore.exception.UnauthorizedException;
-import chivi.laptopstore.models.entities.Account;
+import chivi.laptopstore.models.Account;
 import chivi.laptopstore.repositories.IAccountRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

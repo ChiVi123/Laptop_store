@@ -2,8 +2,8 @@ package chivi.laptopstore.services;
 
 import chivi.laptopstore.exception.BaseException;
 import chivi.laptopstore.exception.NotFoundDataException;
-import chivi.laptopstore.models.entities.Account;
-import chivi.laptopstore.models.entities.RefreshToken;
+import chivi.laptopstore.models.Account;
+import chivi.laptopstore.models.RefreshToken;
 import chivi.laptopstore.repositories.IRefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

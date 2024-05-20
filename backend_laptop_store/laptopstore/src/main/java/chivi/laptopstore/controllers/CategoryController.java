@@ -2,10 +2,10 @@ package chivi.laptopstore.controllers;
 
 import chivi.laptopstore.common.RequestMaps;
 import chivi.laptopstore.common.ResponseMessage;
-import chivi.laptopstore.models.entities.CategoryInfo;
-import chivi.laptopstore.models.entities.CategoryNode;
-import chivi.laptopstore.models.requests.CategoryRequest;
-import chivi.laptopstore.models.responses.SuccessResponse;
+import chivi.laptopstore.models.CategoryInfo;
+import chivi.laptopstore.models.CategoryNode;
+import chivi.laptopstore.communication.requests.CategoryRequest;
+import chivi.laptopstore.communication.responses.SuccessResponse;
 import chivi.laptopstore.services.CategoryService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;

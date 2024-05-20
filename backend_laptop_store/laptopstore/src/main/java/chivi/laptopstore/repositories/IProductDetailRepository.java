@@ -1,6 +1,6 @@
 package chivi.laptopstore.repositories;
 
-import chivi.laptopstore.models.entities.ProductDetail;
+import chivi.laptopstore.models.ProductDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

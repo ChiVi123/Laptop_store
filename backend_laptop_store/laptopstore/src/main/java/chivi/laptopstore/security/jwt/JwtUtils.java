@@ -1,6 +1,6 @@
 package chivi.laptopstore.security.jwt;
 
-import chivi.laptopstore.models.entities.Account;
+import chivi.laptopstore.models.Account;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;

@@ -1,6 +1,6 @@
 package chivi.laptopstore.communication.payload;
 
-import chivi.laptopstore.models.entities.RefreshToken;
+import chivi.laptopstore.models.RefreshToken;
 import lombok.Data;
 
 @Data

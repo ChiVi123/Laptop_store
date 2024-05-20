@@ -1,8 +1,8 @@
 package chivi.laptopstore;
 
 import chivi.laptopstore.common.EntityStatus;
-import chivi.laptopstore.models.entities.CategoryInfo;
-import chivi.laptopstore.models.entities.CategoryNode;
+import chivi.laptopstore.models.CategoryInfo;
+import chivi.laptopstore.models.CategoryNode;
 import chivi.laptopstore.repositories.ICategoryInfoRepository;
 import chivi.laptopstore.repositories.ICategoryNodeRepository;
 import lombok.AllArgsConstructor;

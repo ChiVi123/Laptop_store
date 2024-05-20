@@ -1,7 +1,7 @@
 package chivi.laptopstore.services;
 
 import chivi.laptopstore.exception.NotFoundDataException;
-import chivi.laptopstore.models.entities.Image;
+import chivi.laptopstore.models.Image;
 import chivi.laptopstore.repositories.IImageRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

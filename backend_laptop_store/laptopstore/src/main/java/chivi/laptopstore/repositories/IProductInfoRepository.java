@@ -1,6 +1,6 @@
 package chivi.laptopstore.repositories;
 
-import chivi.laptopstore.models.entities.ProductInfo;
+import chivi.laptopstore.models.ProductInfo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

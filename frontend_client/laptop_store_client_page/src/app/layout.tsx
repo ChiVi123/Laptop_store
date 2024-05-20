@@ -2,8 +2,9 @@ import './globals.css';
 
 import type { Metadata } from 'next';
 import { PropsWithChildren } from 'react';
-import { Header } from '~/components';
 import Container from '~/components/container';
+import Header from '~/components/header';
+import { Toaster } from '~/components/ui/sonner';
 import DataProvider from '~/provider/data.provider';
 import { getRootCategory } from '~/services/category';
 
@@ -13,6 +14,7 @@ async function RootLayout({ children }: PropsWithChildren) {
     return (
         <html lang='vi'>
             <body className='bg-cv-primary-background'>
+                <Toaster />
                 <DataProvider categories={rootCategory.children} account={undefined}>
                     <Header />
                     <Container component='main' className='py-[4.625rem]'>

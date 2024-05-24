@@ -81,6 +81,15 @@ public class CartController {
         return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, cartService.removeItem(cart, item));
     }
 
+    @DeleteMapping("private/cart/remove-all")
+    @ResponseStatus(HttpStatus.OK)
+    public SuccessResponse deleteAllItem() {
+        Account account = this.getAccountFromSecurityContext();
+        String email = account.getEmail();
+        Cart cart = cartService.getByAccountEmail(email);
+        return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, cartService.removeAll(cart));
+    }
+
     private Account getAccountFromSecurityContext() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return ((AccountDetails) authentication.getPrincipal()).getAccount();

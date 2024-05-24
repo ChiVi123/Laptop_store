@@ -52,6 +52,11 @@ public class CartService {
         return repository.save(cart);
     }
 
+    public Cart removeAll(Cart cart) {
+        cart.removeAllItem();
+        return repository.save(cart);
+    }
+
     public Cart editStatus(Cart cart, EntityStatus status) {
         cart.setStatus(status);
         return repository.save(cart);

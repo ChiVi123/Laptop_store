@@ -17,5 +17,5 @@
             "source.organizeImports": "explicit"
         }
     },
-    "cSpell.words": ["clsx", "fetchain", "hookform", "khóa", "sonner", "tailwindcss"]
+    "cSpell.words": ["clsx", "fetchain", "hookform", "khóa", "sonner", "tailwindcss", "tanstack"]
 }

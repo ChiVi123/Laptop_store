@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
+
 import { Key } from '~/common/enums';
 
 export function decodeJwt<Payload = jwt.JwtPayload>(token: string) {

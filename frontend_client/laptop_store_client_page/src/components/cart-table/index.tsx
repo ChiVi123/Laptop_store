@@ -100,7 +100,7 @@ function CartTable({ data }: { data: IOrderItem[] }) {
     );
 
     return (
-        <Table>
+        <Table className='h-full'>
             <TableHeader className='bg-white border rounded-sm'>
                 {headerGroups.map((headerGroup) => (
                     <TableRow key={headerGroup.id} className=''>
@@ -122,9 +122,18 @@ function CartTable({ data }: { data: IOrderItem[] }) {
                         </TableRow>
                     ))
                 ) : (
-                    <TableRow className='bg-white'>
-                        <TableCell colSpan={columns.length} className='h-24 text-center'>
-                            No results.
+                    <TableRow className='h-full bg-white'>
+                        <TableCell colSpan={columns.length} className='text-center'>
+                            <div className='flex flex-col items-center justify-center h-full'>
+                                <Image
+                                    src='/empty_cart.png'
+                                    alt='empty cart'
+                                    width={80}
+                                    height={80}
+                                    className='w-20 h-20'
+                                />
+                                <span>Giỏ hàng chưa có sản phẩm nào.</span>
+                            </div>
                         </TableCell>
                     </TableRow>
                 )}

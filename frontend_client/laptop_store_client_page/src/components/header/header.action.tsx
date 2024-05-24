@@ -33,10 +33,10 @@ function HeaderAction() {
         const result = await authServerAction.login(data);
 
         if (result.accessToken) {
-            toast.success('Đăng nhập thanh cong');
+            toast.success('Đăng nhập thành công');
             setOpenDialog(false);
         } else {
-            toast.error('Email hoac mật khẩu khong dung');
+            toast.error('Email hoặc mật khẩu đúng không');
         }
     };
 
@@ -50,6 +50,7 @@ function HeaderAction() {
                     <DialogTitle>Đăng nhập bằng email</DialogTitle>
                     <DialogDescription>Nhập email và mật khẩu tài khoản.</DialogDescription>
                 </DialogHeader>
+
                 <Form {...form}>
                     <form id='dialog-log-in' className='grid gap-4 py-4' onSubmit={form.handleSubmit(handleOnSubmit)}>
                         <FormField
@@ -103,6 +104,7 @@ function HeaderAction() {
                         />
                     </form>
                 </Form>
+
                 <DialogFooter>
                     <Button type='submit' form='dialog-log-in'>
                         Đăng nhập

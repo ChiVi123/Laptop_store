@@ -4,6 +4,7 @@ export enum Key {
     IMAGE = 'image',
     LOGO = 'logo',
     ROOT_CATEGORY = 'root-category',
+    CART = 'cart',
 }
 export enum Invalid {
     FULL_NAME_REQUIRED = 'Hãy nhập họ tên',

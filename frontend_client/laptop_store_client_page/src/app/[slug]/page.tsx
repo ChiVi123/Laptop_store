@@ -5,6 +5,7 @@ import { HomeIcon } from '@radix-ui/react-icons';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Fragment } from 'react';
+
 import { CarouselImage } from '~/components/product-detail';
 import {
     Breadcrumb,
@@ -16,7 +17,7 @@ import {
 } from '~/components/ui/breadcrumb';
 import { Button } from '~/components/ui/button';
 import { Separator } from '~/components/ui/separator';
-import { getProductBySlug } from '~/services/product';
+import { getProductBySlug } from '~/services';
 
 interface IProps {
     params: { slug: string };

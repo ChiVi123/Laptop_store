@@ -1,12 +1,15 @@
-import '~/libs/extension.number';
-
 import Image from 'next/image';
 import Link from 'next/link';
+
+import '~/libs/extension.number';
+
 import { cn } from '~/libs/utils';
 import { IProductInfo } from '~/types/models';
-import { AspectRatio } from './ui/aspect-ratio';
-import { Button } from './ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card';
+
+import { AspectRatio } from '../ui/aspect-ratio';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/card';
+
+import ButtonAddCart from './button.add.cart';
 
 interface IProps {
     product: IProductInfo;
@@ -43,12 +46,7 @@ function ProductCard({ product, className }: IProps) {
                 <span className='text-cv-primary-100 font-semibold'>{product.price.toCurrency()}</span>
             </CardContent>
             <CardFooter className='flex justify-center p-2'>
-                <Button
-                    variant='outline'
-                    className='w-full border-cv-primary-100 text-cv-primary-100 hover:bg-cv-primary-10 hover:text-cv-primary-200'
-                >
-                    Thêm giỏ hàng
-                </Button>
+                <ButtonAddCart productId={product.id} />
             </CardFooter>
         </Card>
     );

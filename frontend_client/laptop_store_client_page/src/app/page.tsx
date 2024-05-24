@@ -1,9 +1,10 @@
 import { ChevronRightIcon } from '@radix-ui/react-icons';
 import Link from 'next/link';
 import { Fragment } from 'react';
+
 import { CarouselWithButton, ProductCard } from '~/components';
 import { CarouselItem } from '~/components/ui/carousel';
-import { getDataHomePage } from '~/services/product';
+import { getDataHomePage } from '~/services';
 
 async function HomePage() {
     const result = await getDataHomePage([8, 15]);

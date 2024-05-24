@@ -1,12 +1,14 @@
 import { Fragment } from 'react';
+
 import { ICategoryNode } from '~/types/models';
+
 import {
     DropdownMenuItem,
     DropdownMenuPortal,
     DropdownMenuSub,
     DropdownMenuSubContent,
     DropdownMenuSubTrigger,
-} from './ui/dropdown-menu';
+} from '../ui/dropdown-menu';
 
 interface IProps {
     category: ICategoryNode;

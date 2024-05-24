@@ -5,9 +5,10 @@ import { useContext } from 'react';
 
 import { DataContext } from '~/context';
 
-import CategoryMenuItem from '../category.menu.item';
 import { Button } from '../ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '../ui/dropdown-menu';
+
+import CategoryMenuItem from './category.menu.item';
 
 function HeaderCategoryMenu() {
     const { categories } = useContext(DataContext);

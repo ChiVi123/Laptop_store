@@ -1,48 +1,8 @@
-import { EntityStatus } from '~/common/enums';
+import { RAW_PRODUCT_DETAIL } from '~/common/values';
 import { apiRequest, logger } from '~/libs';
-import { IPaginationBodyResponse, IProductDetailBodyResponse, ISectionBodyResponse } from '~/types/body.responses';
-import { IProductDetail, IProductInfo } from '~/types/models';
+import { IProductDetailBodyResponse, ISectionBodyResponse } from '~/types/body.responses';
+import { IProductInfo } from '~/types/models';
 
-const rawProductInfo: IProductInfo = {
-    id: 0,
-    name: '',
-    slug: '',
-    thumbnailUrl: '',
-    description: '',
-    price: 0,
-    discount: 0,
-    discountRate: 0,
-    quantityStock: 0,
-    quantitySold: 0,
-    reviewCount: 0,
-    ratingAverage: 0,
-    status: EntityStatus.ENABLED,
-    createdDate: '',
-    lastModifiedDate: '',
-};
-const rawProductDetail: IProductDetail = {
-    id: 0,
-    info: rawProductInfo,
-    categories: new Array(),
-    images: new Array(),
-    attributes: new Array(),
-    createdDate: '',
-    lastModifiedDate: '',
-};
-
-export async function getAllProduct() {
-    const { payload } = await apiRequest
-        .get('public/products/sort-latest')
-        .fetchError((error) => {
-            logger.anger('get all product::', error.status, error.json);
-            return {
-                message: error.json?.message,
-                payload: { pageNumber: 0, totalPage: 0, list: new Array() },
-            } as IPaginationBodyResponse<IProductInfo>;
-        })
-        .json<IPaginationBodyResponse<IProductInfo>>();
-    return payload;
-}
 export async function getDataHomePage(ids: number[]) {
     const { payload } = await apiRequest
         .params({ category_ids: ids })
@@ -54,13 +14,12 @@ export async function getDataHomePage(ids: number[]) {
         .json<ISectionBodyResponse<IProductInfo>>();
     return payload;
 }
-export async function getAllProductByCategories(code: string) {}
 export async function getProductBySlug(slug: string) {
     const { payload } = await apiRequest
         .get(`public/products/${slug}`)
         .fetchError((error) => {
             logger.anger('product slug::', error.status, error.json);
-            return { message: error.json?.message, payload: rawProductDetail } as IProductDetailBodyResponse;
+            return { message: error.json?.message, payload: RAW_PRODUCT_DETAIL } as IProductDetailBodyResponse;
         })
         .json<IProductDetailBodyResponse>();
     return payload;

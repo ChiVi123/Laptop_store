@@ -1,7 +1,7 @@
 package chivi.laptopstore.repositories;
 
 import chivi.laptopstore.common.AccountStatus;
-import chivi.laptopstore.models.entities.Account;
+import chivi.laptopstore.models.Account;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

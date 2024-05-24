@@ -2,9 +2,9 @@ package chivi.laptopstore.controllers;
 
 import chivi.laptopstore.common.RequestMaps;
 import chivi.laptopstore.common.ResponseMessage;
-import chivi.laptopstore.models.entities.Account;
-import chivi.laptopstore.models.requests.AccountRequest;
-import chivi.laptopstore.models.responses.SuccessResponse;
+import chivi.laptopstore.models.Account;
+import chivi.laptopstore.communication.requests.AccountRequest;
+import chivi.laptopstore.communication.responses.SuccessResponse;
 import chivi.laptopstore.security.jwt.JwtUtils;
 import chivi.laptopstore.services.AccountService;
 import jakarta.servlet.http.HttpServletRequest;

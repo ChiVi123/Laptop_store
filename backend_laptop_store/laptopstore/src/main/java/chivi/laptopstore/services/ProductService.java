@@ -1,12 +1,12 @@
 package chivi.laptopstore.services;
 
+import chivi.laptopstore.communication.requests.DiscountRequest;
+import chivi.laptopstore.communication.requests.ProductRequest;
 import chivi.laptopstore.configurations.CloudinaryConfig;
 import chivi.laptopstore.exception.BadRequestException;
 import chivi.laptopstore.exception.ConflictException;
 import chivi.laptopstore.exception.NotFoundDataException;
-import chivi.laptopstore.models.entities.*;
-import chivi.laptopstore.models.requests.DiscountRequest;
-import chivi.laptopstore.models.requests.ProductRequest;
+import chivi.laptopstore.models.*;
 import chivi.laptopstore.repositories.IProductDetailRepository;
 import chivi.laptopstore.repositories.IProductInfoRepository;
 import chivi.laptopstore.utils.CustomString;

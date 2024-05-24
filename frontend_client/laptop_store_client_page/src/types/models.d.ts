@@ -44,7 +44,6 @@ export interface IProductDetail extends IEntity, IEntityDateTime {
     images: IImage[];
     attributes: IAttribute[];
 }
-
 export interface IAccount extends IEntity, IEntityDateTime {
     username: string;
     fullName: string;
@@ -63,4 +62,19 @@ export interface IImage {
     bytes: number;
     secureUrl: string;
     folder: string;
+}
+export interface IOrderItem {
+    id: number;
+    product: IProductInfo;
+    quantity: number;
+    subTotal: number;
+}
+export interface ICart extends IEntityStatus {
+    id: number;
+    account: IAccount;
+    items: IOrderItem[];
+    subTotal: number;
+}
+export interface IOrder {
+    items: IOrderItem[];
 }

@@ -1,4 +1,4 @@
-import { IAccount, ICategoryNode, IProductDetail, IProductInfo } from './models';
+import { IAccount, ICart, ICategoryNode, IOrderItem, IProductDetail, IProductInfo } from './models';
 
 export interface IBodyResponse {
     message: string;
@@ -32,6 +32,16 @@ export interface IProductDetailBodyResponse extends IResponse {
 // Category
 export interface ICategoryNodeBodyResponse extends IBodyResponse {
     payload: ICategoryNode;
+}
+
+// Cart
+export interface ICartBodyResponse extends IBodyResponse {
+    payload: ICart;
+}
+
+// Order item
+export interface IOrderItemBodyResponse extends IBodyResponse {
+    payload: IOrderItem;
 }
 
 // Pagination

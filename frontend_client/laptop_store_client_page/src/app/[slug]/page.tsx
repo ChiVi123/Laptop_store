@@ -1,11 +1,12 @@
 import '~/libs/extension.number';
+import style from './style.module.css';
 
 import { HomeIcon } from '@radix-ui/react-icons';
 import { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Fragment } from 'react';
-import { AspectRatio } from '~/components/ui/aspect-ratio';
+
+import { CarouselImage } from '~/components/product-detail';
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -15,9 +16,8 @@ import {
     BreadcrumbSeparator,
 } from '~/components/ui/breadcrumb';
 import { Button } from '~/components/ui/button';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '~/components/ui/carousel';
 import { Separator } from '~/components/ui/separator';
-import { getProductBySlug } from '~/services/product';
+import { getProductBySlug } from '~/services';
 
 interface IProps {
     params: { slug: string };
@@ -56,31 +56,7 @@ async function ProductDetailPage({ params: { slug } }: IProps) {
                     <div className='flex justify-between gap-6'>
                         {/* Image */}
                         <div className='w-[22rem] p-4 rounded-md bg-white'>
-                            <Carousel className='border border-border rounded-t-md'>
-                                <CarouselContent>
-                                    {images.map((image) => (
-                                        <CarouselItem key={image.publicId}>
-                                            <AspectRatio ratio={1}>
-                                                <Image
-                                                    src={image.secureUrl}
-                                                    alt={image.publicId}
-                                                    width={200}
-                                                    height={200}
-                                                    priority
-                                                    className='w-full h-full'
-                                                />
-                                            </AspectRatio>
-                                        </CarouselItem>
-                                    ))}
-                                </CarouselContent>
-
-                                <CarouselPrevious
-                                    type='button'
-                                    aria-label='carousel button previous'
-                                    className='left-0'
-                                />
-                                <CarouselNext type='button' aria-label='carousel button next' className='right-0' />
-                            </Carousel>
+                            <CarouselImage alt={productInfo.name} images={images} />
                         </div>
 
                         {/* Info */}
@@ -119,7 +95,10 @@ async function ProductDetailPage({ params: { slug } }: IProps) {
                     {/* Description */}
                     <div className='p-4 rounded-md bg-white'>
                         <h3 className='font-semibold text-lg text-cv-gray-100'>Mô tả chi tiết</h3>
-                        <div dangerouslySetInnerHTML={{ __html: productInfo.description }}></div>
+                        <div
+                            dangerouslySetInnerHTML={{ __html: productInfo.description }}
+                            className={style.description}
+                        ></div>
                     </div>
                 </div>
 

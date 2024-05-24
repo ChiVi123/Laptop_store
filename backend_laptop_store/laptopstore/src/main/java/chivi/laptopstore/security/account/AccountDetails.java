@@ -1,6 +1,6 @@
 package chivi.laptopstore.security.account;
 
-import chivi.laptopstore.models.entities.Account;
+import chivi.laptopstore.models.Account;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;

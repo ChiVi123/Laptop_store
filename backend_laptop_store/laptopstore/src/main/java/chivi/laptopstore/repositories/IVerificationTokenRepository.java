@@ -1,6 +1,6 @@
 package chivi.laptopstore.repositories;
 
-import chivi.laptopstore.models.entities.VerificationToken;
+import chivi.laptopstore.models.VerificationToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

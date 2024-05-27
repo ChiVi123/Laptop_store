@@ -5,7 +5,9 @@ import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-import { authServerAction } from '~/actions';
+import { authServerAction, cartServerAction } from '~/actions';
+import { useAppDispatch } from '~/hooks/redux';
+import { accountActions, cartActions } from '~/libs/redux/features';
 import { loginSchema } from '~/schemas';
 import { loginTypeSchema } from '~/types/schemas';
 
@@ -28,12 +30,16 @@ function ButtonLogin() {
         resolver: zodResolver(loginSchema),
         defaultValues: { email: '', password: '' },
     });
+    const dispatch = useAppDispatch();
 
     const handleOnSubmit: SubmitHandler<loginTypeSchema> = async (data) => {
         const result = await authServerAction.login(data);
+        const cart = await cartServerAction.getCart();
 
         if (result.accessToken) {
             toast.success('Đăng nhập thành công');
+            dispatch(accountActions.update(cart.account));
+            dispatch(cartActions.update(cart.items.length));
             setOpenDialog(false);
         } else {
             toast.error('Email hoặc mật khẩu đúng không');

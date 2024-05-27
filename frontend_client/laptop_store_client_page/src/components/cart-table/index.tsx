@@ -1,6 +1,7 @@
 'use client';
 
 import { ColumnDef, Header, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import clsx from 'clsx';
 import Image from 'next/image';
 import { useCallback, useMemo } from 'react';
 
@@ -100,7 +101,7 @@ function CartTable({ data }: { data: IOrderItem[] }) {
     );
 
     return (
-        <Table className='h-full'>
+        <Table className={clsx({ 'h-full': !table.getRowModel().rows.length })}>
             <TableHeader className='bg-white border rounded-sm'>
                 {headerGroups.map((headerGroup) => (
                     <TableRow key={headerGroup.id} className=''>

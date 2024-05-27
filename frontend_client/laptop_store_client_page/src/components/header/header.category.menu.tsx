@@ -1,9 +1,9 @@
 'use client';
 
 import { HamburgerMenuIcon } from '@radix-ui/react-icons';
-import { useContext } from 'react';
 
-import { DataContext } from '~/context';
+import { useAppSelector } from '~/hooks/redux';
+import { categorySelectors } from '~/libs/redux/features';
 
 import { Button } from '../ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '../ui/dropdown-menu';
@@ -11,8 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '../ui/dr
 import CategoryMenuItem from './category.menu.item';
 
 function HeaderCategoryMenu() {
-    const { categories } = useContext(DataContext);
-    const [defaultCategory] = categories;
+    const category = useAppSelector(categorySelectors.selectDefault);
 
     return (
         <DropdownMenu>
@@ -24,7 +23,7 @@ function HeaderCategoryMenu() {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align='start' className='w-56'>
-                {defaultCategory.children.map((item) => (
+                {category.children.map((item) => (
                     <CategoryMenuItem key={'category-' + item.id} category={item} />
                 ))}
             </DropdownMenuContent>

@@ -4,6 +4,8 @@ import { TrashIcon } from '@radix-ui/react-icons';
 import { useState } from 'react';
 
 import { cartServerAction } from '~/actions';
+import { useAppDispatch } from '~/hooks/redux';
+import { cartActions } from '~/libs/redux/features';
 
 import { Button } from '../ui/button';
 import {
@@ -19,9 +21,11 @@ import {
 
 function CellRemoveItem({ id }: { id: number }) {
     const [openDialog, setOpenDialog] = useState<boolean>(false);
+    const dispatch = useAppDispatch();
 
     const handleClick = async () => {
-        await cartServerAction.removeItem(id);
+        const cart = await cartServerAction.removeItem(id);
+        dispatch(cartActions.update(cart.items.length));
         setOpenDialog(false);
     };
     return (

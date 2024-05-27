@@ -1,8 +1,10 @@
+'use server';
+
 import { RAW_CATEGORY_NODE } from '~/common/values';
 import { apiRequest, logger } from '~/libs';
 import { ICategoryNodeBodyResponse } from '~/types/body.responses';
 
-export async function getRootCategory() {
+export async function getRoot() {
     const { payload } = await apiRequest
         .get('public/categories/root')
         .fetchError((error) => {

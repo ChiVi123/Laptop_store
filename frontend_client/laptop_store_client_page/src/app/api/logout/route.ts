@@ -5,5 +5,5 @@ export async function GET() {
     const cookieStore = cookies();
     cookieStore.delete(Key.ACCESS_TOKEN);
     cookieStore.delete(Key.REFRESH_TOKEN);
-    return Response.json({ message: 'logout!!' });
+    return Response.json({ message: 'logout!!', success: true });
 }

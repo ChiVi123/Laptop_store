@@ -1,6 +1,8 @@
 'use client';
 
+import { useAppDispatch } from '~/hooks/redux';
 import { apiRequest } from '~/libs';
+import { accountActions } from '~/libs/redux/features';
 
 import { Button } from '../ui/button';
 import {
@@ -12,8 +14,15 @@ import {
 } from '../ui/dropdown-menu';
 
 function DropdownAccount() {
+    const dispatch = useAppDispatch();
+
     const handleLogout = async () => {
-        apiRequest.get('api/logout', { baseURL: '' }).json();
+        const response = await apiRequest
+            .get('api/logout', { baseURL: '' })
+            .json<{ message: string; success: boolean }>();
+        if (response.success) {
+            dispatch(accountActions.logout());
+        }
     };
 
     return (

@@ -1,10 +1,11 @@
 export enum Key {
     ACCESS_TOKEN = 'access_token',
-    REFRESH_TOKEN = 'refresh_token',
+    ACCOUNT = 'account',
+    CART = 'cart',
     IMAGE = 'image',
     LOGO = 'logo',
+    REFRESH_TOKEN = 'refresh_token',
     ROOT_CATEGORY = 'root-category',
-    CART = 'cart',
 }
 export enum Invalid {
     FULL_NAME_REQUIRED = 'Hãy nhập họ tên',

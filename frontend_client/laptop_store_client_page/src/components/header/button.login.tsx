@@ -6,8 +6,10 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
 import { authServerAction, cartServerAction } from '~/actions';
+import { Key } from '~/common/enums';
 import { useAppDispatch } from '~/hooks/redux';
 import { accountActions, cartActions } from '~/libs/redux/features';
+import { storage } from '~/libs/utilities';
 import { loginSchema } from '~/schemas';
 import { loginTypeSchema } from '~/types/schemas';
 
@@ -34,12 +36,14 @@ function ButtonLogin() {
 
     const handleOnSubmit: SubmitHandler<loginTypeSchema> = async (data) => {
         const result = await authServerAction.login(data);
-        const cart = await cartServerAction.getCart();
+        const { account, items } = await cartServerAction.getCart();
 
         if (result.accessToken) {
             toast.success('Đăng nhập thành công');
-            dispatch(accountActions.update(cart.account));
-            dispatch(cartActions.update(cart.items.length));
+            dispatch(accountActions.update(account));
+            dispatch(cartActions.update(items.length));
+            storage.set(Key.ACCOUNT, account);
+            storage.set(Key.CART, items.length);
             setOpenDialog(false);
         } else {
             toast.error('Email hoặc mật khẩu đúng không');

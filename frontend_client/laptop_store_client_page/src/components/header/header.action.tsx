@@ -1,10 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { Fragment } from 'react';
+import { Fragment, useEffect } from 'react';
 
-import { useAppSelector } from '~/hooks/redux';
-import { accountSelectors, cartSelectors } from '~/libs/redux/features';
+import { Key } from '~/common/enums';
+import { useAppDispatch, useAppSelector } from '~/hooks/redux';
+import { accountActions, accountSelectors, cartActions, cartSelectors } from '~/libs/redux/features';
+import { storage } from '~/libs/utilities';
+import { IAccount } from '~/types/models';
 
 import { CartIcon } from '../icons';
 import { Badge } from '../ui/badge';
@@ -17,6 +20,14 @@ import DropdownAccount from './dropdown.account';
 function HeaderAction() {
     const account = useAppSelector(accountSelectors.selectAccount);
     const cartSize = useAppSelector(cartSelectors.selectSize);
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        const localAccount = storage.get<IAccount | null>(Key.ACCOUNT, 'null');
+        const localCartSize = storage.get<number>(Key.CART, '0');
+        dispatch(accountActions.update(localAccount));
+        dispatch(cartActions.update(localCartSize));
+    }, [dispatch]);
 
     return (
         <Fragment>

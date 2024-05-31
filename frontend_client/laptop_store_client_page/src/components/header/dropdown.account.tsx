@@ -1,8 +1,12 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+
+import { Key } from '~/common/enums';
 import { useAppDispatch } from '~/hooks/redux';
 import { apiRequest } from '~/libs';
-import { accountActions } from '~/libs/redux/features';
+import { accountActions, cartActions } from '~/libs/redux/features';
+import { storage } from '~/libs/utilities';
 
 import { Button } from '../ui/button';
 import {
@@ -15,6 +19,7 @@ import {
 
 function DropdownAccount() {
     const dispatch = useAppDispatch();
+    const router = useRouter();
 
     const handleLogout = async () => {
         const response = await apiRequest
@@ -22,6 +27,10 @@ function DropdownAccount() {
             .json<{ message: string; success: boolean }>();
         if (response.success) {
             dispatch(accountActions.logout());
+            dispatch(cartActions.reset());
+            storage.set(Key.ACCOUNT, null);
+            storage.set(Key.CART, 0);
+            router.push('/');
         }
     };
 

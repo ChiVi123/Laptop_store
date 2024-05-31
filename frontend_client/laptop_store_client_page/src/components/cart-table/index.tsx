@@ -26,7 +26,7 @@ function CartTable({ data }: { data: IOrderItem[] }) {
                     <div className='text-left'>Tất cả ({table.getRowModel().rows.length} sản phẩm)</div>
                 ),
                 cell: ({ getValue }) => {
-                    const { thumbnailUrl, name } = getValue() as IProductInfo;
+                    const { thumbnailUrl, name } = getValue<IProductInfo>();
                     return (
                         <div className='flex items-center gap-2'>
                             <Image src={thumbnailUrl} alt={name} width={60} height={60} />
@@ -41,7 +41,7 @@ function CartTable({ data }: { data: IOrderItem[] }) {
                 accessorKey: 'product',
                 header: () => <div className='text-right'>Đơn giá</div>,
                 cell: ({ getValue }) => {
-                    const { price } = getValue() as IProductInfo;
+                    const { price } = getValue<IProductInfo>();
                     return <div className='text-right font-semibold'>{price.toCurrency()}</div>;
                 },
             },
@@ -54,8 +54,7 @@ function CartTable({ data }: { data: IOrderItem[] }) {
                         id,
                         quantity,
                         product: { quantityStock },
-                    } = getValue() as IOrderItem;
-
+                    } = getValue<IOrderItem>();
                     return (
                         <InputQuantity
                             id={id}
@@ -71,7 +70,7 @@ function CartTable({ data }: { data: IOrderItem[] }) {
                 accessorKey: 'subTotal',
                 header: () => <div className='text-right'>Thành tiền</div>,
                 cell: ({ getValue }) => (
-                    <div className='text-right font-semibold text-red-600'>{Number(getValue()).toCurrency()}</div>
+                    <div className='text-right font-semibold text-red-600'>{getValue<number>().toCurrency()}</div>
                 ),
             },
             {
@@ -84,7 +83,7 @@ function CartTable({ data }: { data: IOrderItem[] }) {
                 ),
                 cell: ({ getValue }) => (
                     <div className='text-center'>
-                        <CellRemoveItem id={Number(getValue())} />
+                        <CellRemoveItem id={getValue<number>()} />
                     </div>
                 ),
             },

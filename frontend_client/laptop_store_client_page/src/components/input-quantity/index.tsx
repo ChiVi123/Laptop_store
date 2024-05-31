@@ -2,7 +2,7 @@
 
 import { MinusIcon, PlusIcon } from '@radix-ui/react-icons';
 import clsx from 'clsx';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import styles from './input-quantity.module.css';
 
@@ -16,6 +16,10 @@ interface IProps {
 
 function InputQuantity({ id, quantity = 1, stock, onMinus, onPlus }: IProps) {
     const [value, setValue] = useState<number>(quantity);
+
+    useEffect(() => {
+        setValue((prev) => (prev !== quantity ? quantity : prev));
+    }, [quantity]);
 
     const handleMinus = () => {
         setValue((prev) => (prev > 1 ? prev - 1 : prev));

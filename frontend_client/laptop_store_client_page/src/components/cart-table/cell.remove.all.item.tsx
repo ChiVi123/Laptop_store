@@ -4,8 +4,10 @@ import { TrashIcon } from '@radix-ui/react-icons';
 import { useState } from 'react';
 
 import { cartServerAction } from '~/actions';
+import { Key } from '~/common/enums';
 import { useAppDispatch } from '~/hooks/redux';
 import { cartActions } from '~/libs/redux/features';
+import { storage } from '~/libs/utilities';
 
 import { Button } from '../ui/button';
 import {
@@ -24,8 +26,9 @@ function CellRemoveAllItem() {
     const dispatch = useAppDispatch();
 
     const handleClick = async () => {
-        const cart = await cartServerAction.removeAllItem();
-        dispatch(cartActions.update(cart.items.length));
+        const { items } = await cartServerAction.removeAllItem();
+        dispatch(cartActions.update(items.length));
+        storage.set(Key.CART, items.length);
         setOpenDialog(false);
     };
 

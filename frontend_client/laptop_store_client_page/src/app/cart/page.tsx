@@ -3,13 +3,13 @@ import { Fragment } from 'react';
 
 import '~/libs/extension.number';
 
+import { cartServerAction } from '~/actions';
 import { CartTable } from '~/components';
 import { Button } from '~/components/ui/button';
 import { Separator } from '~/components/ui/separator';
-import { getCart } from '~/services';
 
 async function CartPage() {
-    const { account, items, subTotal } = await getCart();
+    const { account, items, subTotal } = await cartServerAction.getCart();
     return (
         <Fragment>
             <h2 className='mb-2 text-xl'>Giỏ hàng</h2>

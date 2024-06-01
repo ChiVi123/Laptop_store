@@ -2,14 +2,18 @@ package chivi.laptopstore.services;
 
 import chivi.laptopstore.common.EntityStatus;
 import chivi.laptopstore.exception.NotFoundDataException;
+import chivi.laptopstore.helpers.CartTimer;
 import chivi.laptopstore.models.Account;
 import chivi.laptopstore.models.Cart;
 import chivi.laptopstore.models.OrderItem;
 import chivi.laptopstore.repositories.ICartRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -17,9 +21,13 @@ import java.util.stream.Stream;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CartService {
     private final ICartRepository repository;
+    private final CartTimer cartTimer;
+    private final TaskScheduler taskScheduler;
+    @Value("${app.cart.expired}" )
+    private long expireDuration;
 
     public Cart getByAccountEmail(String accountEmail) {
         return repository
@@ -28,8 +36,15 @@ public class CartService {
     }
 
     public Cart createAndAddItem(Account account, OrderItem item) {
-        Cart cart = new Cart(account, List.of(item), EntityStatus.ENABLED);
-        return repository.save(cart);
+        Instant expiration = Instant.now().plusMillis(expireDuration);
+        Cart cart = new Cart(account, List.of(item), expiration, EntityStatus.ENABLED);
+        Cart result = repository.save(cart);
+
+        cartTimer.setCartId(result.getId());
+        cartTimer.setRepository(repository);
+        taskScheduler.schedule(cartTimer, expiration);
+
+        return result;
     }
 
     public Cart addItemCartExist(Cart cart, OrderItem orderItem) {

@@ -1,6 +1,7 @@
 package chivi.laptopstore.models;
 
 
+import chivi.laptopstore.common.EntityNames;
 import chivi.laptopstore.common.EntityStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,27 +10,30 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "cart")
+@Table(name = EntityNames.TABLE_CART)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 public class Cart extends EntityStandard {
     @OneToOne
-    @JoinColumn(name = "account_id")
+    @JoinColumn(name = EntityNames.JOIN_COLUMN_ACCOUNT_ID)
     private Account account;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinTable(
-            name = "cart_item",
-            joinColumns = @JoinColumn(name = "cart_id"),
-            inverseJoinColumns = @JoinColumn(name = "item_id")
+            name = EntityNames.TABLE_CART_ITEM,
+            joinColumns = @JoinColumn(name = EntityNames.JOIN_COLUMN_CART_ID),
+            inverseJoinColumns = @JoinColumn(name = EntityNames.JOIN_COLUMN_ITEM_ID)
     )
     private List<OrderItem> items = new ArrayList<>();
+
+    private Instant expiration;
 
     private EntityStatus status;
 

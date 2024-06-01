@@ -1,6 +1,7 @@
 package chivi.laptopstore.models;
 
 
+import chivi.laptopstore.common.EntityNames;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,21 +12,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "order_tb")
+@Table(name = EntityNames.TABLE_ORDER)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 public class Order extends EntityStandard {
     @OneToOne
-    @JoinColumn(name = "account_id")
+    @JoinColumn(name = EntityNames.JOIN_COLUMN_ACCOUNT_ID)
     private Account account;
 
     @OneToMany(cascade = CascadeType.PERSIST)
     @JoinTable(
-            name = "order_order_item",
-            joinColumns = @JoinColumn(name = "order_id"),
-            inverseJoinColumns = @JoinColumn(name = "item_id")
+            name = EntityNames.TABLE_ORDER_ORDER_ITEM,
+            joinColumns = @JoinColumn(name = EntityNames.JOIN_COLUMN_ORDER_ID),
+            inverseJoinColumns = @JoinColumn(name = EntityNames.JOIN_COLUMN_ITEM_ID)
     )
     private List<OrderItem> items = new ArrayList<>();
 }

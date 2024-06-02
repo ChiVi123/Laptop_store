@@ -2,7 +2,6 @@ package chivi.laptopstore.services;
 
 import chivi.laptopstore.common.EntityStatus;
 import chivi.laptopstore.exception.NotFoundDataException;
-import chivi.laptopstore.helpers.CartTimer;
 import chivi.laptopstore.models.Account;
 import chivi.laptopstore.models.Cart;
 import chivi.laptopstore.models.OrderItem;
@@ -10,7 +9,6 @@ import chivi.laptopstore.repositories.ICartRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -24,9 +22,9 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class CartService {
     private final ICartRepository repository;
-    private final CartTimer cartTimer;
-    private final TaskScheduler taskScheduler;
-    @Value("${app.cart.expired}" )
+    //    private final CartTimer;
+//    private final TaskScheduler;
+    @Value("${app.cart.expired}")
     private long expireDuration;
 
     public Cart getByAccountEmail(String accountEmail) {
@@ -38,13 +36,10 @@ public class CartService {
     public Cart createAndAddItem(Account account, OrderItem item) {
         Instant expiration = Instant.now().plusMillis(expireDuration);
         Cart cart = new Cart(account, List.of(item), expiration, EntityStatus.ENABLED);
-        Cart result = repository.save(cart);
 
-        cartTimer.setCartId(result.getId());
-        cartTimer.setRepository(repository);
-        taskScheduler.schedule(cartTimer, expiration);
-
-        return result;
+//        cartTimer.setCartId(result.getId());
+//        taskScheduler.schedule(cartTimer, expiration);
+        return repository.save(cart);
     }
 
     public Cart addItemCartExist(Cart cart, OrderItem orderItem) {
@@ -62,6 +57,11 @@ public class CartService {
         return repository.save(cart);
     }
 
+    public Cart editStatus(Cart cart, EntityStatus status) {
+        cart.setStatus(status);
+        return repository.save(cart);
+    }
+
     public Cart removeItem(Cart cart, OrderItem item) {
         cart.removeItem(item);
         return repository.save(cart);
@@ -69,11 +69,6 @@ public class CartService {
 
     public Cart removeAll(Cart cart) {
         cart.removeAllItem();
-        return repository.save(cart);
-    }
-
-    public Cart editStatus(Cart cart, EntityStatus status) {
-        cart.setStatus(status);
         return repository.save(cart);
     }
 }

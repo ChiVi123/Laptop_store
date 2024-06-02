@@ -19,6 +19,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+
 @Slf4j
 @RestController
 @RequestMapping(RequestMaps.API_V1)
@@ -43,14 +47,16 @@ public class CartController {
         String email = account.getEmail();
         ProductInfo productInfo = productService.getInfoById(request.productId);
         OrderItem item = new OrderItem(productInfo, request.quantity);
-        Cart result;
+        int stock = productInfo.getQuantityStock() - request.quantity;
 
+        Cart result;
         try {
             Cart cart = cartService.getByAccountEmail(email);
             result = cartService.addItemCartExist(cart, item);
         } catch (Exception exception) {
             result = cartService.createAndAddItem(account, item);
         }
+        productService.updateStock(productInfo, stock);
 
         return new SuccessResponse(ResponseMessage.CREATE_SUCCESS, result);
     }
@@ -59,7 +65,11 @@ public class CartController {
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse incrementQuantity(@PathVariable Long orderItemId) {
         OrderItem item = orderItemService.getById(orderItemId);
+        ProductInfo productInfo = item.getProduct();
         int quantity = item.getQuantity() + 1;
+        int stock = productInfo.getQuantityStock() - 1;
+
+        productService.updateStock(productInfo, stock);
         return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, orderItemService.changeQuantity(item, quantity));
     }
 
@@ -67,7 +77,11 @@ public class CartController {
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse decrementQuantity(@PathVariable Long orderItemId) {
         OrderItem item = orderItemService.getById(orderItemId);
+        ProductInfo productInfo = item.getProduct();
         int quantity = item.getQuantity() - 1;
+        int stock = productInfo.getQuantityStock() + 1;
+
+        productService.updateStock(productInfo, stock);
         return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, orderItemService.changeQuantity(item, quantity));
     }
 
@@ -78,6 +92,10 @@ public class CartController {
         String email = account.getEmail();
         Cart cart = cartService.getByAccountEmail(email);
         OrderItem item = orderItemService.getById(orderItemId);
+        ProductInfo productInfo = item.getProduct();
+        int stock = productInfo.getQuantityStock() + item.getQuantity();
+
+        productService.updateStock(productInfo, stock);
         return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, cartService.removeItem(cart, item));
     }
 
@@ -87,6 +105,11 @@ public class CartController {
         Account account = this.getAccountFromSecurityContext();
         String email = account.getEmail();
         Cart cart = cartService.getByAccountEmail(email);
+        Stream<OrderItem> items = cart.getItems().stream();
+        List<Map<String, Object>> mapList = items
+                .map(item -> Map.of("info", item.getProduct(), "quantity", item.getQuantity()))
+                .toList();
+        productService.restoreAllStock(mapList);
         return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, cartService.removeAll(cart));
     }
 

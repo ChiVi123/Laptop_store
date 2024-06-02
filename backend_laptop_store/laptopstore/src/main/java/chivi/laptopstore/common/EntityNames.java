@@ -11,7 +11,7 @@ public class EntityNames {
     public static final String TABLE_PRODUCT_DETAIL = "product_detail";
     public static final String TABLE_ATTRIBUTE = "attribute";
     public static final String TABLE_IMAGE = "image";
-    public static final String TABLE_ORDER = "order_tb";
+    public static final String TABLE_ORDER = "order_detail";
     public static final String TABLE_ORDER_ITEM = "order_item";
     public static final String TABLE_ORDER_ORDER_ITEM = "order_order_item";
     public static final String TABLE_REFRESH_TOKEN = "refresh_token";
@@ -39,8 +39,6 @@ public class EntityNames {
     public static final String COLUMN_IMAGE_PUBLIC_ID = "public_id";
     public static final String COLUMN_IMAGE_SECURE_URL = "secure_url";
 
-
-    public static final String JOIN_COLUMN_ACCOUNT_ID = "account_id";
     public static final String JOIN_COLUMN_ATTRIBUTE_ID = "attribute_id";
     public static final String JOIN_COLUMN_PRODUCT_ID = "product_id";
     public static final String JOIN_COLUMN_PRODUCT_INFO_ID = "product_info_id";

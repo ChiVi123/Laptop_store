@@ -18,8 +18,7 @@ import java.util.List;
 @Getter
 @Setter
 public class Order extends EntityStandard {
-    @OneToOne
-    @JoinColumn(name = EntityNames.JOIN_COLUMN_ACCOUNT_ID)
+    @ManyToOne
     private Account account;
 
     @OneToMany(cascade = CascadeType.PERSIST)

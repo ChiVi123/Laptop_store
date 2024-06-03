@@ -36,14 +36,18 @@ function ButtonLogin() {
 
     const handleOnSubmit: SubmitHandler<loginTypeSchema> = async (data) => {
         const result = await authServerAction.login(data);
-        const { account, items } = await cartServerAction.getCart();
 
         if (result.accessToken) {
-            toast.success('Đăng nhập thành công');
+            const { account, items } = await cartServerAction.getCart();
+
             dispatch(accountActions.update(account));
             dispatch(cartActions.update(items.length));
+
             storage.set(Key.ACCOUNT, account);
             storage.set(Key.CART, items.length);
+
+            toast.success('Đăng nhập thành công');
+
             setOpenDialog(false);
         } else {
             toast.error('Email hoặc mật khẩu đúng không');

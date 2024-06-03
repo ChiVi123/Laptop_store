@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Slf4j
@@ -112,6 +113,21 @@ public class ProductService {
         productInfo.setDiscount(discount);
         productInfo.setDiscountRate(rate.round(mathContext).floatValue());
         return productInfoRepository.save(productInfo);
+    }
+
+    public void updateStock(ProductInfo productInfo, int stock) {
+        productInfo.setQuantityStock(stock);
+        productInfoRepository.save(productInfo);
+    }
+
+    public void restoreAllStock(List<Map<String, Object>> mapList) {
+        List<ProductInfo> infoList = mapList.stream().map(item -> {
+            ProductInfo info = (ProductInfo) item.get("info");
+            int stock = info.getQuantityStock() + (int) item.get("quantity");
+            info.setQuantityStock(stock);
+            return info;
+        }).toList();
+        productInfoRepository.saveAll(infoList);
     }
 
     public void removeAttribute(ProductDetail productDetail, Attribute attribute) {

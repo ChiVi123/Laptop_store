@@ -1,5 +1,6 @@
 package chivi.laptopstore.models;
 
+import chivi.laptopstore.common.EntityNames;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,7 +9,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "order_item")
+@Table(name = EntityNames.TABLE_ORDER_ITEM)
 @NoArgsConstructor
 @Getter
 @Setter
@@ -18,7 +19,7 @@ public class OrderItem {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "product_id", referencedColumnName = "id")
+    @JoinColumn(name = EntityNames.JOIN_COLUMN_PRODUCT_ID, referencedColumnName = "id" )
     private ProductInfo product;
 
     private int quantity;

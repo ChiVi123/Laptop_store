@@ -3,12 +3,17 @@ package chivi.laptopstore.common;
 public class EntityNames {
     // Table name
     public static final String TABLE_ACCOUNT = "account";
+    public static final String TABLE_CART = "cart";
+    public static final String TABLE_CART_ITEM = "cart_item";
     public static final String TABLE_CATEGORY_INFO = "category_info";
     public static final String TABLE_CATEGORY_NODE = "category_node";
     public static final String TABLE_PRODUCT_INFO = "product_info";
     public static final String TABLE_PRODUCT_DETAIL = "product_detail";
     public static final String TABLE_ATTRIBUTE = "attribute";
     public static final String TABLE_IMAGE = "image";
+    public static final String TABLE_ORDER = "order_detail";
+    public static final String TABLE_ORDER_ITEM = "order_item";
+    public static final String TABLE_ORDER_ORDER_ITEM = "order_order_item";
     public static final String TABLE_REFRESH_TOKEN = "refresh_token";
     public static final String TABLE_VERIFICATION_TOKEN = "verify_token";
     public static final String TABLE_PRODUCT_CATEGORY = "product_category";
@@ -34,14 +39,16 @@ public class EntityNames {
     public static final String COLUMN_IMAGE_PUBLIC_ID = "public_id";
     public static final String COLUMN_IMAGE_SECURE_URL = "secure_url";
 
-
     public static final String JOIN_COLUMN_ATTRIBUTE_ID = "attribute_id";
     public static final String JOIN_COLUMN_PRODUCT_ID = "product_id";
     public static final String JOIN_COLUMN_PRODUCT_INFO_ID = "product_info_id";
+    public static final String JOIN_COLUMN_CART_ID = "cart_id";
+    public static final String JOIN_COLUMN_ITEM_ID = "item_id";
     public static final String JOIN_COLUMN_CATEGORY_ID = "category_id";
     public static final String JOIN_COLUMN_CATEGORY_INFO_ID = "category_info_id";
     public static final String JOIN_COLUMN_IMAGE_ID = "image_id";
     public static final String JOIN_COLUMN_PARENT_ID = "parent_id";
+    public static final String JOIN_COLUMN_ORDER_ID = "order_id";
 
     public static final String COLUMN_CREATED_AT = "created_at";
     public static final String COLUMN_UPDATED_AT = "updated_at";

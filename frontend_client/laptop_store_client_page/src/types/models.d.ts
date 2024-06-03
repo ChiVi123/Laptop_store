@@ -42,7 +42,7 @@ export interface IProductDetail extends IEntity, IEntityDateTime {
     info: IProductInfo;
     categories: ICategoryInfo[];
     images: IImage[];
-    attributes: IAttribute[];
+    attributes: IAttribute[] | undefined;
 }
 export interface IAccount extends IEntity, IEntityDateTime {
     username: string;

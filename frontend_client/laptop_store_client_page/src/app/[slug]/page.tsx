@@ -1,10 +1,9 @@
-import '~/libs/extension.number';
-import style from './style.module.css';
-
 import { HomeIcon } from '@radix-ui/react-icons';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Fragment } from 'react';
+
+import '~/libs/extension.number';
 
 import { CarouselImage } from '~/components/product-detail';
 import {
@@ -19,6 +18,8 @@ import { Button } from '~/components/ui/button';
 import { Separator } from '~/components/ui/separator';
 import { getProductBySlug } from '~/services';
 
+import style from './style.module.css';
+
 interface IProps {
     params: { slug: string };
 }
@@ -27,6 +28,7 @@ async function ProductDetailPage({ params: { slug } }: IProps) {
     const productDetail = await getProductBySlug(slug);
     const { info: productInfo, images, attributes } = productDetail;
     const [category] = productDetail.categories;
+
     return (
         <Fragment>
             <Breadcrumb className='mb-3'>
@@ -79,15 +81,16 @@ async function ProductDetailPage({ params: { slug } }: IProps) {
                             </div>
 
                             <ul>
-                                {attributes.map((attribute) => (
-                                    <li
-                                        key={attribute.id}
-                                        className='grid grid-cols-[25%_75%] gap-1 p-1 even:bg-cv-gray-10'
-                                    >
-                                        <span className='text-cv-gray-90'>{attribute.key}</span>
-                                        <span>{attribute.value}</span>
-                                    </li>
-                                ))}
+                                {attributes &&
+                                    attributes.map((attribute) => (
+                                        <li
+                                            key={attribute.id}
+                                            className='grid grid-cols-[25%_75%] gap-1 p-1 even:bg-cv-gray-10'
+                                        >
+                                            <span className='text-cv-gray-90'>{attribute.key}</span>
+                                            <span>{attribute.value}</span>
+                                        </li>
+                                    ))}
                             </ul>
                         </div>
                     </div>

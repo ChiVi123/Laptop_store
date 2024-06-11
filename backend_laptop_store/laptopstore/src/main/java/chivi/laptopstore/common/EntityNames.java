@@ -2,23 +2,23 @@ package chivi.laptopstore.common;
 
 public class EntityNames {
     // Table name
-    public static final String TABLE_ACCOUNT = "account";
-    public static final String TABLE_CART = "cart";
-    public static final String TABLE_CART_ITEM = "cart_item";
-    public static final String TABLE_CATEGORY_INFO = "category_info";
-    public static final String TABLE_CATEGORY_NODE = "category_node";
-    public static final String TABLE_PRODUCT_INFO = "product_info";
-    public static final String TABLE_PRODUCT_DETAIL = "product_detail";
-    public static final String TABLE_ATTRIBUTE = "attribute";
-    public static final String TABLE_IMAGE = "image";
-    public static final String TABLE_ORDER = "order_detail";
-    public static final String TABLE_ORDER_ITEM = "order_item";
-    public static final String TABLE_ORDER_ORDER_ITEM = "order_order_item";
-    public static final String TABLE_REFRESH_TOKEN = "refresh_token";
-    public static final String TABLE_VERIFICATION_TOKEN = "verify_token";
-    public static final String TABLE_PRODUCT_CATEGORY = "product_category";
-    public static final String TABLE_PRODUCT_IMAGE = "product_image";
-    public static final String TABLE_PRODUCT_ATTRIBUTE = "product_attribute";
+    public static final String TABLE_ACCOUNT = "account_tb";
+    public static final String TABLE_CART = "cart_tb";
+    public static final String TABLE_CART_ITEM = "cart_item_tb";
+    public static final String TABLE_CATEGORY_INFO = "category_info_tb";
+    public static final String TABLE_CATEGORY_NODE = "category_node_tb";
+    public static final String TABLE_PRODUCT_INFO = "product_info_tb";
+    public static final String TABLE_PRODUCT_DETAIL = "product_detail_tb";
+    public static final String TABLE_ATTRIBUTE = "attribute_tb";
+    public static final String TABLE_IMAGE = "image_tb";
+    public static final String TABLE_ORDER = "order_detail_tb";
+    public static final String TABLE_ORDER_ITEM = "order_item_tb";
+    public static final String TABLE_ORDER_ORDER_ITEM = "order_order_item_tb";
+    public static final String TABLE_REFRESH_TOKEN = "refresh_token_tb";
+    public static final String TABLE_VERIFICATION_TOKEN = "verify_token_tb";
+    public static final String TABLE_PRODUCT_CATEGORY = "product_category_tb";
+    public static final String TABLE_PRODUCT_IMAGE = "product_image_tb";
+    public static final String TABLE_PRODUCT_ATTRIBUTE = "product_attribute_tb";
 
     // Column name
     public static final String COLUMN_ACCOUNT_ID = "account_id";

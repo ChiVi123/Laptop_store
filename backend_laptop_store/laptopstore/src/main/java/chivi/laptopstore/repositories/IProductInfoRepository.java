@@ -19,9 +19,9 @@ public interface IProductInfoRepository extends JpaRepository<ProductInfo, Long>
             "pro_in.id, pro_in.name, pro_in.slug, pro_in.thumbnail_url, pro_in.description, pro_in.price, " +
             "pro_in.discount, pro_in.quantity_stock, pro_in.discount_rate, pro_in.quantity_sold, " +
             "pro_in.rating_average, pro_in.review_count, pro_in.status, pro_in.created_at, pro_in.updated_at " +
-            "FROM product_category pro_cate " +
-            "JOIN product_detail pro_dt ON pro_cate.product_id=pro_dt.id " +
-            "JOIN product_info pro_in ON pro_dt.product_info_id=pro_in.id " +
+            "FROM product_category_tb pro_cate " +
+            "JOIN product_detail_tb pro_dt ON pro_cate.product_id=pro_dt.id " +
+            "JOIN product_info_tb pro_in ON pro_dt.product_info_id=pro_in.id " +
             "WHERE pro_cate.category_id IN (?1) " +
             "ORDER BY pro_in.created_at desc",
             nativeQuery = true

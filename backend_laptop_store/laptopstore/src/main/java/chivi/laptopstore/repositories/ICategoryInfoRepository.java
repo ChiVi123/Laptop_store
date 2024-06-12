@@ -19,7 +19,7 @@ public interface ICategoryInfoRepository extends JpaRepository<CategoryInfo, Lon
     @Query(value = "SELECT name FROM category_info WHERE code=?1", nativeQuery = true)
     Optional<String> findNameByCode(String code);
 
-    @Query(value = "SELECT id FROM category_info WHERE code LIKE CONCAT('%', ?1, '%') AND is_leaf=?2", nativeQuery = true)
+    @Query(value = "SELECT id FROM category_info_tb WHERE code LIKE CONCAT('%', ?1, '%') AND is_leaf=?2", nativeQuery = true)
     List<Long> findAllIdByCodeLikeAndLeaf(String code, boolean leaf);
 
     boolean existsByName(String name);

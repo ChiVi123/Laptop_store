@@ -7,7 +7,6 @@ import { authServerAction } from '~/actions';
 import { EPath } from '~/common/enums';
 import { registerDefaultValues } from '~/common/values';
 import { StyleContainer, StyleField, StyleLabel, StyleLink } from '~/components/auth/styles';
-import logger from '~/libs/logger';
 import { registerResolver } from '~/resolvers';
 import { registerFormData } from '~/types/form.data';
 
@@ -63,8 +62,7 @@ function RegisterPage() {
 
     const handleOnSubmit: SubmitHandler<registerFormData> = async (data) => {
         setDisabled(true);
-        const result = await authServerAction.register(data);
-        logger.info('register::', result);
+        await authServerAction.register(data);
         setDisabled(false);
     };
 

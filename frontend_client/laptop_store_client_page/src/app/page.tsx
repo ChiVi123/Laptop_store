@@ -7,7 +7,7 @@ import { CarouselItem } from '~/components/ui/carousel';
 import { getDataHomePage } from '~/services';
 
 async function HomePage() {
-    const result = await getDataHomePage([8, 15]);
+    const result = await getDataHomePage([3, 5]);
     return (
         <Fragment>
             {result.map((section, index) => (

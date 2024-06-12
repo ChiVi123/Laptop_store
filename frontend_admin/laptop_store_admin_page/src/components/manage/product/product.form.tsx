@@ -18,7 +18,6 @@ import { productServerAction, uploadFileServerAction } from '~/actions';
 import { EKeys, EStatus, EText } from '~/common/enums';
 import { productDefaultValues } from '~/common/values';
 import { useEntityStatus } from '~/hooks';
-import logger from '~/libs/logger';
 import { productResolver } from '~/resolvers';
 import { productFormData } from '~/types/form.data';
 import { ICategoryNode, IImage, IProductDetail } from '~/types/models';
@@ -87,8 +86,6 @@ function ProductForm({ product, categories }: IProps) {
             data.images = await uploadFileServerAction.multiple(EKeys.IMAGE, formData);
         }
         product ? await productServerAction.edit(product.id, data) : await productServerAction.create(data);
-
-        logger.info('data::', data);
 
         setLoading(false);
     };

@@ -27,12 +27,12 @@ async function EditProductPage({ params: { slug } }: IProps) {
                         Trang chủ
                     </LinkMUI>
                     <Typography color='text.primary' component='span'>
-                        Chinh sua sản phẩm
+                        Chỉnh sửa sản phẩm
                     </Typography>
                 </Breadcrumbs>
 
                 <Typography variant='h2' mt={2}>
-                    Chinh sua sản phẩm
+                    Chỉnh sửa sản phẩm
                 </Typography>
             </Box>
 

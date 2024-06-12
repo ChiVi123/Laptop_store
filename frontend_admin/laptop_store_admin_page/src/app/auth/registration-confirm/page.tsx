@@ -3,7 +3,6 @@
 import { useEffect, useRef } from 'react';
 import { authServerAction } from '~/actions';
 import { StyleContainer } from '~/components/auth/styles';
-import logger from '~/libs/logger';
 
 interface IProps {
     searchParams: { [key: string]: string | undefined };
@@ -14,8 +13,7 @@ function RegistrationConfirmPage({ searchParams }: IProps) {
 
     useEffect(() => {
         async function fetchApi(token: string) {
-            const result = await authServerAction.verifyByToken(token);
-            logger.info('registration confirm::', result);
+            await authServerAction.verifyByToken(token);
         }
 
         if (searchParams.token && ignoreRef.current) {

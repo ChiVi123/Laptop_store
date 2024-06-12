@@ -11,7 +11,6 @@ import { EPath } from '~/common/enums';
 import { loginDefaultValues } from '~/common/values';
 import PasswordField from '~/components/auth/password.field';
 import { StyleButtonLoginWithGoogle, StyleContainer, StyleLine, StyleLink } from '~/components/auth/styles';
-import logger from '~/libs/logger';
 import { loginResolver } from '~/resolvers';
 import { loginFormData } from '~/types/form.data';
 
@@ -25,8 +24,7 @@ function LoginPage() {
 
     const handleOnSubmit: SubmitHandler<loginFormData> = async (data) => {
         setDisabled(true);
-        const result = await authServerAction.login(data);
-        logger.info('login::', result);
+        await authServerAction.login(data);
         setDisabled(false);
     };
 

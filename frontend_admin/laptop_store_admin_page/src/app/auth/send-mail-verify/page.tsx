@@ -6,7 +6,6 @@ import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { authServerAction } from '~/actions';
 import { EPath } from '~/common/enums';
 import { StyleContainer, StyleLink } from '~/components/auth/styles';
-import logger from '~/libs/logger';
 import { sendMailResolver } from '~/resolvers';
 import { sendMailFormData } from '~/types/form.data';
 
@@ -23,8 +22,7 @@ function SendEmailVerifyPage() {
 
     const handleOnSubmit: SubmitHandler<sendMailFormData> = async (data) => {
         setDisabled(true);
-        const result = await authServerAction.sendEmailVerify(data.email);
-        logger.info('send mail verify::', result);
+        await authServerAction.sendEmailVerify(data.email);
         setDisabled(false);
     };
 

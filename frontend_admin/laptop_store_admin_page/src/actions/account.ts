@@ -26,7 +26,7 @@ export async function profile() {
         .auth(accessToken)
         .get('private/accounts/profile')
         .unauthorized(async (error, request) => {
-            logger.anger('profile::', error.status, error.json);
+            logger.error('profile::', error.status, error.json);
 
             const resultRefresh = await handleRefetch(request);
             return resultRefresh ?? ({ message: error.json?.message, payload: accountPayload } as IAccountBodyResponse);

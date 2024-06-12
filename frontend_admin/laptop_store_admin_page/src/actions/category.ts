@@ -31,7 +31,7 @@ export async function root() {
     const { payload } = await apiRequest
         .get('public/categories/root', { next: { tags: [EKeys.ROOT_CATEGORY] } })
         .fetchError((error) => {
-            logger.anger('root category::', error.status, error.json);
+            logger.error('root category::', error.status, error.json);
             return { payload: rawCategoryNode } as ICategoryNodeBodyResponse;
         })
         .json<ICategoryNodeBodyResponse>();
@@ -41,7 +41,7 @@ export async function getInfoById(id: number) {
     const { payload } = await apiRequest
         .get(`public/categories/${id}/info`, { cache: 'no-cache' })
         .fetchError((error) => {
-            logger.anger('category info::', error.status, error.json);
+            logger.error('category info::', error.status, error.json);
             return { payload: rawCategoryInfo } as ICategoryInfoBodyResponse;
         })
         .json<ICategoryInfoBodyResponse>();
@@ -51,7 +51,7 @@ export async function getNodeByInfoId(id: number) {
     const { payload } = await apiRequest
         .get(`public/categories/info-id/${id}`, { cache: 'no-cache' })
         .fetchError((error) => {
-            logger.anger('node category by info id::', error.status, error.json);
+            logger.error('node category by info id::', error.status, error.json);
             return { payload: rawCategoryNode } as ICategoryNodeBodyResponse;
         })
         .json<ICategoryNodeBodyResponse>();
@@ -64,12 +64,12 @@ export async function create(data: categoryFormData) {
         .body(data)
         .post('admin/categories/create')
         .unauthorized(async (error, request) => {
-            logger.anger('create category::', error.status, error.json);
+            logger.error('create category::', error.status, error.json);
             const resultRefresh = await handleRefetch(request);
             return resultRefresh ?? ({ payload: rawCategoryNode } as ICategoryNodeBodyResponse);
         })
         .fetchError((error) => {
-            logger.anger('create category::', error.status, error.json);
+            logger.error('create category::', error.status, error.json);
             return { payload: rawCategoryNode } as ICategoryNodeBodyResponse;
         })
         .json<ICategoryNodeBodyResponse>();
@@ -83,12 +83,12 @@ export async function edit(id: number, data: categoryFormData) {
         .body(data)
         .put(`admin/categories/${id}/edit`)
         .unauthorized(async (error, request) => {
-            logger.anger('edit category::', error.status, error.json);
+            logger.error('edit category::', error.status, error.json);
             const resultRefresh = await handleRefetch(request);
             return resultRefresh ?? ({ payload: rawCategoryNode } as ICategoryNodeBodyResponse);
         })
         .fetchError((error) => {
-            logger.anger('edit category::', error.status, error.json);
+            logger.error('edit category::', error.status, error.json);
             return { payload: rawCategoryNode } as ICategoryNodeBodyResponse;
         })
         .json<ICategoryNodeBodyResponse>();
@@ -101,12 +101,12 @@ export async function move(fromId: number, toId: number) {
         .auth(token)
         .put(`admin/categories/${fromId}/move/${toId}`)
         .unauthorized(async (error, request) => {
-            logger.anger('move category::', error.status, error.json);
+            logger.error('move category::', error.status, error.json);
             const resultRefresh = await handleRefetch(request);
             return resultRefresh ?? ({ payload: '' } as IBodyResponse);
         })
         .fetchError((error) => {
-            logger.anger('category move::', error.json);
+            logger.error('category move::', error.json);
             return { payload: '' } as IBodyResponse;
         })
         .json<IBodyResponse>();
@@ -120,7 +120,7 @@ export async function destroy(id: number) {
         .auth(token)
         .delete(`admin/categories/${id}/delete`)
         .unauthorized(async (error, request) => {
-            logger.anger('destroy category::', error.status, error.json);
+            logger.error('destroy category::', error.status, error.json);
             const resultRefresh = await handleRefetch(request);
             return resultRefresh ?? ({ payload: rawCategoryNode } as ICategoryNodeBodyResponse);
         })

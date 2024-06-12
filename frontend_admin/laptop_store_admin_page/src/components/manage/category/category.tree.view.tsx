@@ -11,7 +11,6 @@ import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { categoryServerAction } from '~/actions';
 import { ELabel, EPath, EStatus, EText } from '~/common/enums';
 import { useEntityStatus } from '~/hooks';
-import logger from '~/libs/logger';
 import { categoryResolver } from '~/resolvers';
 import { categoryFormData } from '~/types/form.data';
 import { ICategoryNode } from '~/types/models';
@@ -94,8 +93,7 @@ function CategoryTreeView({ categoryTree, categoryNode, parentCategoryNode }: IP
     const handleDragEnd = async () => {
         const { dragFrom, dropTo } = dragAndDrop;
         if (dragFrom !== null && dropTo !== null && dragFrom !== dropTo) {
-            const result = await categoryServerAction.move(dragFrom, dropTo);
-            logger.info('handle drag::', result);
+            await categoryServerAction.move(dragFrom, dropTo);
         }
         setDragAndDrop(initDragAndDrop());
     };

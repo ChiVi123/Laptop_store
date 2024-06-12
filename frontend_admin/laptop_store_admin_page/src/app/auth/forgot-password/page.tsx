@@ -6,7 +6,6 @@ import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { authServerAction } from '~/actions';
 import { EPath } from '~/common/enums';
 import { StyleContainer, StyleLink } from '~/components/auth/styles';
-import logger from '~/libs/logger';
 import { sendMailResolver } from '~/resolvers';
 import { sendMailFormData } from '~/types/form.data';
 
@@ -24,7 +23,6 @@ function ForgotPasswordPage() {
     const handleOnSubmit: SubmitHandler<sendMailFormData> = async ({ email }) => {
         setDisabled(true);
         const result = await authServerAction.sendEmailResetPassword(email);
-        logger.info('forgot password::', result);
         setDisabled(false);
     };
 

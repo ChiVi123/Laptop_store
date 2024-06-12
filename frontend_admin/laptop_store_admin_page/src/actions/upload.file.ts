@@ -36,7 +36,7 @@ async function fetchUploadImage(file: File) {
                     const resultUpload: IImage = transformCloudinaryToImage(uploadSuccess);
                     return resolve(resultUpload);
                 } else {
-                    logger.anger('upload image::', uploadError);
+                    logger.error('upload image::', uploadError);
                 }
             })
             .end(buffer);

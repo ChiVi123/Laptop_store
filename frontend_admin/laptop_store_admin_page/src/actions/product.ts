@@ -48,7 +48,7 @@ export async function all() {
         .auth(token)
         .get('admin/products/all', { next: { tags: [EKeys.PRODUCT_LIST] } })
         .unauthorized(async (error, request) => {
-            logger.anger('all product::', error.status, error.json);
+            logger.error('all product::', error.status, error.json);
             const resultRefresh = await handleRefetch(request);
             return resultRefresh ?? ({ payload: new Array() } as IListProductResponse);
         })
@@ -59,7 +59,7 @@ export async function bySlug(slug: string) {
     const { payload } = await apiRequest
         .get(`public/products/${slug}`, { cache: 'no-store' })
         .fetchError((error) => {
-            logger.anger('product by slug::', error.status, error.json);
+            logger.error('product by slug::', error.status, error.json);
             return { payload: rawProductDetail } as IProductDetailBodyResponse;
         })
         .json<IProductDetailBodyResponse>();
@@ -72,7 +72,7 @@ export async function create(data: productFormData) {
         .body(data)
         .post('admin/products/create')
         .unauthorized(async (error, request) => {
-            logger.anger('create product::', error.status, error.json);
+            logger.error('create product::', error.status, error.json);
             const resultRefresh = await handleRefetch(request);
             return resultRefresh ?? ({ payload: rawProductDetail } as IProductDetailBodyResponse);
         })
@@ -88,12 +88,12 @@ export async function edit(id: number, data: productFormData) {
         .body(data)
         .put(`admin/products/${id}/edit`)
         .unauthorized(async (error, request) => {
-            logger.anger('edit product::', error.status, error.json);
+            logger.error('edit product::', error.status, error.json);
             const resultRefresh = await handleRefetch(request);
             return resultRefresh ?? ({ payload: rawProductDetail } as IProductDetailBodyResponse);
         })
         .fetchError((error) => {
-            logger.anger('edit product::', error.status, error.json);
+            logger.error('edit product::', error.status, error.json);
             return { payload: rawProductDetail } as IProductDetailBodyResponse;
         })
         .json<IProductDetailBodyResponse>();
@@ -107,7 +107,7 @@ export async function removeImage(productId: number, imageId: number) {
         .auth(token)
         .delete(`admin/products/${productId}/remove-image/${imageId}`)
         .unauthorized(async (error, request) => {
-            logger.anger('remove image product::', error.status, error.json);
+            logger.error('remove image product::', error.status, error.json);
             await handleRefetch(request);
         })
         .json<IListImageResponse>();
@@ -118,7 +118,7 @@ export async function removeAttribute(productId: number, attributeId: number) {
         .auth(token)
         .delete(`admin/products/${productId}/remove-attribute/${attributeId}`)
         .fetchError((error) => {
-            logger.anger('remove attribute::', error.status, error.json);
+            logger.error('remove attribute::', error.status, error.json);
             return { payload: rawProductDetail } as IProductDetailBodyResponse;
         })
         .json();
@@ -129,7 +129,7 @@ export async function destroy(id: number) {
         .auth(token)
         .delete(`admin/products/${id}/delete`)
         .unauthorized(async (error, request) => {
-            logger.anger('destroy product::', error.status, error.json);
+            logger.error('destroy product::', error.status, error.json);
             await handleRefetch(request);
         })
         .json<IBodyResponse>();

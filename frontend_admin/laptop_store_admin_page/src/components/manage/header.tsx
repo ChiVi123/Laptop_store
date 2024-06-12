@@ -97,9 +97,9 @@ function Header({ width }: { width: number }) {
                     }}
                     sx={{ mt: 1.5, '& .MuiPaper-root': { minWidth: 180 } }}
                 >
-                    <MenuItem onClick={handleProfile}>Tai khoan</MenuItem>
+                    <MenuItem onClick={handleProfile}>Tài khoản</MenuItem>
                     <Divider />
-                    <MenuItem onClick={handleLogout}>Dang xuat</MenuItem>
+                    <MenuItem onClick={handleLogout}>Đăng xuất</MenuItem>
                 </Menu>
             </Toolbar>
         </AppBar>

@@ -19,7 +19,7 @@ export async function middleware(request: NextRequest) {
     const refreshToken = cookieStore.get(EKeys.REFRESH_TOKEN)?.value;
     let accessToken = cookieStore.get(EKeys.ACCESS_TOKEN)?.value;
 
-    logger.coffee('middleware request::', method, pathname);
+    logger.info('middleware request::', method, pathname);
 
     if (!accessToken && refreshToken) {
         try {
@@ -34,7 +34,7 @@ export async function middleware(request: NextRequest) {
             responseRedirectProductList.cookies.set(cookieAccessToken);
             accessToken = payload;
         } catch (error) {
-            logger.anger('middleware error::', error);
+            logger.error('middleware error::', error);
         }
     }
     if (pathname.startsWith('/auth') && accessToken) {

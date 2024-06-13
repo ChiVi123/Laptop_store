@@ -31,7 +31,7 @@ async function ProductDetailPage({ params: { slug } }: IProps) {
 
     return (
         <Fragment>
-            <Breadcrumb className='mb-3'>
+            <Breadcrumb className='hidden md:block mb-3'>
                 <BreadcrumbList>
                     <BreadcrumbItem>
                         <BreadcrumbLink href='/' title='Trang chủ'>
@@ -53,11 +53,11 @@ async function ProductDetailPage({ params: { slug } }: IProps) {
                 </BreadcrumbList>
             </Breadcrumb>
 
-            <div className='flex gap-6'>
-                <div className='w-[75%] space-y-10'>
-                    <div className='flex justify-between gap-6'>
+            <div className='flex gap-2 lg:gap-6'>
+                <div className='md:w-[86%] lg:w-[75%] space-y-6 lg:space-y-10'>
+                    <div className='md:flex justify-between gap-2 lg:gap-6'>
                         {/* Image */}
-                        <div className='w-[22rem] p-4 rounded-md bg-white'>
+                        <div className='md:w-60 lg:w-[22rem] p-2 lg:p-4 rounded-md bg-white'>
                             <CarouselImage alt={productInfo.name} images={images} />
                         </div>
 
@@ -105,8 +105,8 @@ async function ProductDetailPage({ params: { slug } }: IProps) {
                     </div>
                 </div>
 
-                <div className='flex-1 relative'>
-                    <div className='sticky top-[4.625rem] right-0 h-auto p-4 rounded-md bg-white space-y-3'>
+                <div className='hidden md:block flex-1 relative'>
+                    <div className='sticky top-[4.625rem] right-0 p-2 lg:p-4 rounded-md bg-white space-y-3'>
                         <Button size='lg' className='w-full'>
                             Mua ngay
                         </Button>

@@ -15,19 +15,15 @@ const getRawOrderItemBodyResponse = (message: string): IOrderItemBodyResponse =>
 
 export async function getCart() {
     const accessToken = cookies().get(Key.ACCESS_TOKEN)?.value;
-    if (accessToken) {
-        const { payload } = await apiRequest
-            .auth(accessToken)
-            .get('private/cart', { next: { tags: [Key.CART] } })
-            .fetchError((error) => {
-                logger.error('get cart::', error.status, error.json);
-                return getRawCartBodyResponse(error.json?.message ?? '');
-            })
-            .json<ICartBodyResponse>();
-        return payload;
-    } else {
-        return RAW_CART;
-    }
+    const { payload } = await apiRequest
+        .auth(accessToken)
+        .get('private/cart', { next: { tags: [Key.CART] } })
+        .fetchError((error) => {
+            logger.error('get cart::', error.status, error.json);
+            return getRawCartBodyResponse(error.json?.message ?? '');
+        })
+        .json<ICartBodyResponse>();
+    return payload;
 }
 export async function add(data: { productId: number; quantity: number }) {
     const accessToken = cookies().get(Key.ACCESS_TOKEN)?.value;

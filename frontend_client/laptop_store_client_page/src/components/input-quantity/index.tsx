@@ -35,15 +35,15 @@ function InputQuantity({ id, quantity = 1, stock, onMinus, onPlus }: IProps) {
     };
 
     return (
-        <div className='flex justify-center gap-1 w-fit mx-auto border border-cv-gray-40 rounded-sm'>
+        <div className='flex justify-start w-fit border border-cv-gray-40 rounded-sm'>
             <button
                 type='button'
                 aria-label='btn-minus-qty'
                 disabled={value === 1}
                 onClick={handleMinus}
-                className={clsx('flex justify-center items-center w-9 h-9 p-1', { 'opacity-50': value === 1 })}
+                className={clsx('flex justify-center items-center size-6 p-1', { 'opacity-50': value === 1 })}
             >
-                <MinusIcon className='w-3 h-3' />
+                <MinusIcon className='size-3' />
             </button>
             <input
                 type='number'
@@ -52,7 +52,7 @@ function InputQuantity({ id, quantity = 1, stock, onMinus, onPlus }: IProps) {
                 value={value}
                 placeholder='1'
                 disabled
-                className={styles['input-quantity'] + ' w-9 h-9 p-1 bg-cv-gray-10 text-center'}
+                className={styles['input-quantity'] + ' size-6 p-1 bg-cv-gray-10 text-center'}
                 onChange={() => setValue((prev) => prev)}
             />
             <button
@@ -60,9 +60,9 @@ function InputQuantity({ id, quantity = 1, stock, onMinus, onPlus }: IProps) {
                 aria-label='btn-plus-qty'
                 disabled={value === stock}
                 onClick={handlePlus}
-                className={clsx('flex justify-center items-center w-9 h-9 p-1', { 'opacity-50': value === stock })}
+                className={clsx('flex justify-center items-center size-6 p-1', { 'opacity-50': value === stock })}
             >
-                <PlusIcon className='w-3 h-3' />
+                <PlusIcon className='size-3' />
             </button>
         </div>
     );

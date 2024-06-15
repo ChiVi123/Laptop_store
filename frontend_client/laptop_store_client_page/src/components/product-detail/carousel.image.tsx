@@ -2,7 +2,7 @@
 
 import clsx from 'clsx';
 import Image from 'next/image';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { IImage } from '~/types/models';
 import { AspectRatio } from '../ui/aspect-ratio';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '../ui/carousel';
@@ -16,8 +16,8 @@ function CarouselImage({ alt, images }: IProps) {
     const [src, setSrc] = useState(images[0].secureUrl);
 
     return (
-        <div>
-            <AspectRatio ratio={1} className='mb-2 border border-border rounded-t-md'>
+        <Fragment>
+            <AspectRatio ratio={1} className='p-4 mb-2 border border-border rounded-t-md'>
                 <Image src={src} alt={alt} width={200} height={200} priority className='w-full h-full' />
             </AspectRatio>
 
@@ -26,7 +26,7 @@ function CarouselImage({ alt, images }: IProps) {
                     {images.map((image) => (
                         <CarouselItem
                             key={image.publicId}
-                            className='pl-2.5 basis-1/5 cursor-pointer'
+                            className='pl-2.5 basis-1/3 lg:basis-1/5 cursor-pointer'
                             onClick={() => setSrc(image.secureUrl)}
                         >
                             <AspectRatio
@@ -52,7 +52,7 @@ function CarouselImage({ alt, images }: IProps) {
                 <CarouselPrevious type='button' aria-label='crs-btn-prev' className='left-0' />
                 <CarouselNext type='button' aria-label='crs-btn-next' className='right-0' />
             </Carousel>
-        </div>
+        </Fragment>
     );
 }
 

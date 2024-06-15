@@ -34,10 +34,12 @@ function CellRemoveAllItem() {
 
     return (
         <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-            <DialogTrigger asChild>
-                <Button variant='ghost' aria-label='btn-remove-all-cart-item' title='Xoá tất cả'>
-                    <TrashIcon className='w-4 h-4' />
-                </Button>
+            <DialogTrigger
+                aria-label='btn-remove-all-cart-item'
+                title='Xoá tất cả'
+                className='flex justify-center items-center w-full'
+            >
+                <TrashIcon className='size-5' />
             </DialogTrigger>
 
             <DialogContent>

@@ -8,6 +8,7 @@ import { Key } from '~/common/enums';
 import { useAppDispatch } from '~/hooks/redux';
 import { cartActions } from '~/libs/redux/features';
 import { storage } from '~/libs/utilities';
+import { cn } from '~/libs/utils';
 
 import { Button } from '../ui/button';
 import {
@@ -21,7 +22,7 @@ import {
     DialogTrigger,
 } from '../ui/dialog';
 
-function CellRemoveItem({ id }: { id: number }) {
+function CellRemoveItem({ id, className }: { id: number; className?: string }) {
     const [openDialog, setOpenDialog] = useState<boolean>(false);
     const dispatch = useAppDispatch();
 
@@ -33,10 +34,11 @@ function CellRemoveItem({ id }: { id: number }) {
     };
     return (
         <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-            <DialogTrigger asChild>
-                <Button variant='ghost' aria-label={`btn-remove-${id}-cart-item`}>
-                    <TrashIcon className='w-5 h-5' />
-                </Button>
+            <DialogTrigger
+                aria-label={`btn-remove-${id}-cart-item`}
+                className={cn('flex justify-center items-center w-full p-2', className)}
+            >
+                <TrashIcon className='size-5' />
             </DialogTrigger>
 
             <DialogContent>

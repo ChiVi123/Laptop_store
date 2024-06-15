@@ -1,8 +1,8 @@
 'use client';
 
 import { ColumnDef, Header, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
-import clsx from 'clsx';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useCallback, useMemo } from 'react';
 
 import '~/libs/extension.number';
@@ -11,44 +11,70 @@ import { cartServerAction } from '~/actions';
 import { IOrderItem, IProductInfo } from '~/types/models';
 
 import InputQuantity from '../input-quantity';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
+import { Button } from '../ui/button';
 
 import CellRemoveAllItem from './cell.remove.all.item';
 import CellRemoveItem from './cell.remove.item';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './table';
 
 function CartTable({ data }: { data: IOrderItem[] }) {
     const columns = useMemo<ColumnDef<IOrderItem>[]>(
         () => [
             {
                 id: 'thumbnail-name',
-                accessorKey: 'product',
-                header: ({ table }) => (
-                    <div className='text-left'>Tất cả ({table.getRowModel().rows.length} sản phẩm)</div>
-                ),
+                accessorFn: (orderItem) => orderItem,
+                header: ({ table }) => `Tất cả (${table.getRowModel().rows.length} sản phẩm)`,
                 cell: ({ getValue }) => {
-                    const { thumbnailUrl, name } = getValue<IProductInfo>();
+                    const {
+                        id,
+                        quantity,
+                        subTotal,
+                        product: { thumbnailUrl, name, price, quantityStock },
+                    } = getValue<IOrderItem>();
                     return (
-                        <div className='flex items-center gap-2'>
-                            <Image src={thumbnailUrl} alt={name} width={60} height={60} />
-                            <span className='text-base text-cv-gray-100 font-normal break-words line-clamp-2'>
-                                {name}
-                            </span>
+                        <div className='flex items-start gap-2'>
+                            <Image
+                                src={thumbnailUrl}
+                                alt={name}
+                                width={84}
+                                height={84}
+                                className='size-20 lg:size-16'
+                            />
+                            <div className='flex-1 space-y-2'>
+                                <div className='flex items-center'>
+                                    <span className='w-full text-base text-cv-gray-100 font-normal break-words line-clamp-2'>
+                                        {name}
+                                    </span>
+                                    <CellRemoveItem id={id} className='flex lg:hidden w-fit lg:w-full' />
+                                </div>
+                                <div className='block lg:hidden font-semibold'>{price.toCurrency()}</div>
+                                <div className='flex lg:hidden items-center justify-between'>
+                                    <InputQuantity
+                                        id={id}
+                                        quantity={quantity}
+                                        stock={quantityStock}
+                                        onMinus={async () => void (await cartServerAction.minus(id))}
+                                        onPlus={async () => void (await cartServerAction.plus(id))}
+                                    />
+                                    <div className='font-semibold text-red-600'>{subTotal.toCurrency()}</div>
+                                </div>
+                            </div>
                         </div>
                     );
                 },
             },
             {
                 accessorKey: 'product',
-                header: () => <div className='text-right'>Đơn giá</div>,
+                header: 'Đơn giá',
                 cell: ({ getValue }) => {
                     const { price } = getValue<IProductInfo>();
-                    return <div className='text-right font-semibold'>{price.toCurrency()}</div>;
+                    return <div className='font-semibold'>{price.toCurrency()}</div>;
                 },
             },
             {
                 id: 'quantity',
                 accessorFn: (orderItem) => orderItem,
-                header: () => <div className='text-center'>Số lượng</div>,
+                header: 'Số lượng',
                 cell: ({ getValue }) => {
                     const {
                         id,
@@ -68,26 +94,22 @@ function CartTable({ data }: { data: IOrderItem[] }) {
             },
             {
                 accessorKey: 'subTotal',
-                header: () => <div className='text-right'>Thành tiền</div>,
+                header: 'Thành tiền',
                 cell: ({ getValue }) => (
-                    <div className='text-right font-semibold text-red-600'>{getValue<number>().toCurrency()}</div>
+                    <div className='font-semibold text-red-600'>{getValue<number>().toCurrency()}</div>
                 ),
             },
             {
                 id: 'remove-cart-item',
                 accessorKey: 'id',
-                header: () => (
-                    <div className='text-center'>
-                        <CellRemoveAllItem />
-                    </div>
-                ),
-                cell: ({ getValue }) => (
-                    <div className='text-center'>
-                        <CellRemoveItem id={getValue<number>()} />
-                    </div>
-                ),
+                header: () => <CellRemoveAllItem />,
+                cell: ({ getValue }) => <CellRemoveItem id={getValue<number>()} />,
             },
         ],
+        [],
+    );
+    const gridItems = useMemo(
+        () => ['', 'hidden lg:block', 'hidden lg:block', 'hidden lg:block', 'hidden lg:block'],
         [],
     );
 
@@ -100,42 +122,35 @@ function CartTable({ data }: { data: IOrderItem[] }) {
     );
 
     return (
-        <Table className={clsx({ 'h-full': !table.getRowModel().rows.length })}>
-            <TableHeader className='bg-white border rounded-sm'>
+        <Table className='flex flex-col'>
+            <TableHeader className='hidden lg:block bg-white border rounded-sm'>
                 {headerGroups.map((headerGroup) => (
-                    <TableRow key={headerGroup.id} className=''>
+                    <TableRow key={headerGroup.id} className='h-10 px-4'>
                         {headerGroup.headers.map((header) => (
                             <TableHead key={header.id}>{renderHeaderCell(header)}</TableHead>
                         ))}
                     </TableRow>
                 ))}
             </TableHeader>
-            <TableBody className='rounded-sm before:content-[""] before:block before:w-full before:h-4'>
+            <TableBody className='lg:mt-4 rounded-sm flex-1'>
                 {table.getRowModel().rows.length ? (
                     table.getRowModel().rows.map((row) => (
-                        <TableRow key={row.id} className='bg-white border'>
-                            {row.getVisibleCells().map((cell) => (
-                                <TableCell key={cell.id}>
+                        <TableRow key={row.id} className='p-4 bg-white'>
+                            {row.getVisibleCells().map((cell, indexCell) => (
+                                <TableCell key={cell.id} className={gridItems[indexCell]}>
                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                 </TableCell>
                             ))}
                         </TableRow>
                     ))
                 ) : (
-                    <TableRow className='h-full bg-white'>
-                        <TableCell colSpan={columns.length} className='text-center'>
-                            <div className='flex flex-col items-center justify-center h-full'>
-                                <Image
-                                    src='/empty_cart.png'
-                                    alt='empty cart'
-                                    width={80}
-                                    height={80}
-                                    className='w-20 h-20'
-                                />
-                                <span>Giỏ hàng chưa có sản phẩm nào.</span>
-                            </div>
-                        </TableCell>
-                    </TableRow>
+                    <div className='flex flex-col items-center justify-center h-full pt-1 pb-5 px-5 space-y-4 bg-white'>
+                        <Image src='/empty_cart.png' alt='empty cart' width={80} height={80} className='size-20' />
+                        <span>Giỏ hàng chưa có sản phẩm nào.</span>
+                        <Button asChild>
+                            <Link href='/'>Mua sắm ngay</Link>
+                        </Button>
+                    </div>
                 )}
             </TableBody>
         </Table>

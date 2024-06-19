@@ -57,7 +57,7 @@ async function ProductDetailPage({ params: { slug } }: IProps) {
                 <div className='md:w-[86%] lg:w-[75%] space-y-6 lg:space-y-10'>
                     <div className='md:flex justify-between gap-2 lg:gap-6'>
                         {/* Image */}
-                        <div className='md:w-60 lg:w-[22rem] p-2 lg:p-4 rounded-md bg-white'>
+                        <div className='md:w-60 lg:w-80 p-2 lg:p-4 rounded-md bg-white'>
                             <CarouselImage alt={productInfo.name} images={images} />
                         </div>
 
@@ -105,12 +105,12 @@ async function ProductDetailPage({ params: { slug } }: IProps) {
                     </div>
                 </div>
 
-                <div className='hidden md:block flex-1 relative'>
-                    <div className='sticky top-[4.625rem] right-0 p-2 lg:p-4 rounded-md bg-white space-y-3'>
-                        <Button size='lg' className='w-full'>
+                <div className='fixed right-0 bottom-0 left-0 flex-1 md:relative'>
+                    <div className='md:sticky top-[4.625rem] right-0 grid grid-cols-2 items-center gap-4 md:block p-2 lg:p-4 rounded-md bg-white md:space-y-3'>
+                        <Button type='button' size='lg' className='w-full'>
                             Mua ngay
                         </Button>
-                        <Button variant='outline' size='lg' className='w-full'>
+                        <Button type='button' variant='outline' size='lg' className='w-full'>
                             Thêm vào giỏ hàng
                         </Button>
                     </div>

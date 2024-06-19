@@ -21,7 +21,7 @@
         "scope": "typescriptreact, typescript",
         "prefix": "ffcl",
         "body": [
-            "function $1Layout({ children }: $2Type) {",
+            "function $1Layout({ children }: PropsWithChildren$2) {",
             "    return (<div>{children}</div>)",
             "};",
             "",

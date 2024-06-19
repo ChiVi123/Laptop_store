@@ -3,6 +3,7 @@ import { Fragment } from 'react';
 
 import '~/libs/extension.number';
 
+import { Metadata } from 'next';
 import { cartServerAction } from '~/actions';
 import { CartTable } from '~/components';
 import { Button } from '~/components/ui/button';
@@ -50,4 +51,8 @@ async function CartPage() {
     );
 }
 
+export const metadata: Metadata = {
+    title: 'Laptop Store | Giỏ hàng',
+    description: 'Laptop Store',
+};
 export default CartPage;

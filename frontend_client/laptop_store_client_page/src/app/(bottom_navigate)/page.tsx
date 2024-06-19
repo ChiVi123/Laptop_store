@@ -11,13 +11,13 @@ async function HomePage() {
     return (
         <Fragment>
             {result.map((section, index) => (
-                <div key={index} className='p-1 md:p-4 mb-8 bg-white md:rounded-sm'>
+                <div key={index} className='px-4 py-1 md:py-4 mb-8 bg-white md:rounded-sm'>
                     <div className='flex justify-between items-center mb-3'>
                         <span className='text-lg font-semibold text-cv-gray-200'>{section.title}</span>
 
                         <Link href='' className='group flex items-center gap-0.5 text-cv-primary-100'>
                             <span className='text-inherit group-hover:underline'>Xem thêm</span>
-                            <ChevronRightIcon className='w-4 h-4 mt-0.5 group-hover:translate-x-1 transition-transform' />
+                            <ChevronRightIcon className='size-4 mt-0.5 group-hover:translate-x-1 transition-transform' />
                         </Link>
                     </div>
 

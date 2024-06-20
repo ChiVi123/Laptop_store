@@ -2,11 +2,10 @@
 
 import { HamburgerMenuIcon } from '@radix-ui/react-icons';
 
+import { Button } from '~/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '~/components/ui/dropdown-menu';
 import { useAppSelector } from '~/hooks/redux';
 import { categorySelectors } from '~/libs/redux/features';
-
-import { Button } from '../ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '../ui/dropdown-menu';
 
 import CategoryMenuItem from './category.menu.item';
 

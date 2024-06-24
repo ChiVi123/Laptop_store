@@ -4,19 +4,17 @@ import chivi.laptopstore.common.RequestMaps;
 import chivi.laptopstore.common.ResponseMessage;
 import chivi.laptopstore.communication.requests.OrderItemRequest;
 import chivi.laptopstore.communication.responses.SuccessResponse;
+import chivi.laptopstore.helpers.AuthContext;
 import chivi.laptopstore.models.Account;
 import chivi.laptopstore.models.Cart;
 import chivi.laptopstore.models.OrderItem;
 import chivi.laptopstore.models.ProductInfo;
-import chivi.laptopstore.security.account.AccountDetails;
 import chivi.laptopstore.services.CartService;
 import chivi.laptopstore.services.OrderItemService;
 import chivi.laptopstore.services.ProductService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,7 +33,7 @@ public class CartController {
     @GetMapping("private/cart")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse getCartByAccountId() {
-        Account account = this.getAccountFromSecurityContext();
+        Account account = AuthContext.getFromSecurityContext();
         String email = account.getEmail();
         return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, cartService.getByAccountEmail(email));
     }
@@ -43,7 +41,7 @@ public class CartController {
     @PostMapping("private/cart/add-item")
     @ResponseStatus(HttpStatus.CREATED)
     public SuccessResponse saveCart(@RequestBody OrderItemRequest request) {
-        Account account = this.getAccountFromSecurityContext();
+        Account account = AuthContext.getFromSecurityContext();
         String email = account.getEmail();
         ProductInfo productInfo = productService.getInfoById(request.productId);
         OrderItem item = new OrderItem(productInfo, request.quantity);
@@ -88,7 +86,7 @@ public class CartController {
     @DeleteMapping("private/cart/{orderItemId}/remove-item")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse deleteItem(@PathVariable Long orderItemId) {
-        Account account = this.getAccountFromSecurityContext();
+        Account account = AuthContext.getFromSecurityContext();
         String email = account.getEmail();
         Cart cart = cartService.getByAccountEmail(email);
         OrderItem item = orderItemService.getById(orderItemId);
@@ -102,7 +100,7 @@ public class CartController {
     @DeleteMapping("private/cart/remove-all")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse deleteAllItem() {
-        Account account = this.getAccountFromSecurityContext();
+        Account account = AuthContext.getFromSecurityContext();
         String email = account.getEmail();
         Cart cart = cartService.getByAccountEmail(email);
         Stream<OrderItem> items = cart.getItems().stream();
@@ -111,10 +109,5 @@ public class CartController {
                 .toList();
         productService.restoreAllStock(mapList);
         return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, cartService.removeAll(cart));
-    }
-
-    private Account getAccountFromSecurityContext() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return ((AccountDetails) authentication.getPrincipal()).getAccount();
     }
 }

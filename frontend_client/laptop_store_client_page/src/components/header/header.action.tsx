@@ -1,39 +1,26 @@
 'use client';
 
 import Link from 'next/link';
-import { Fragment, useEffect } from 'react';
+import { Fragment } from 'react';
 
-import { Key } from '~/common/enums';
-import { useAppDispatch, useAppSelector } from '~/hooks/redux';
-import { accountActions, accountSelectors, cartActions, cartSelectors } from '~/libs/redux/features';
-import { storage } from '~/libs/utilities';
-import { IAccount } from '~/types/models';
+import { useAuth } from '~/hooks/auth';
 
+import DialogLogin from '../dialog.login';
 import { CartIcon } from '../icons';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import { Separator } from '../ui/separator';
 
-import ButtonLogin from './button.login';
 import DropdownAccount from './dropdown.account';
 
 function HeaderAction() {
-    const account = useAppSelector(accountSelectors.selectAccount);
-    const cartSize = useAppSelector(cartSelectors.selectSize);
-    const dispatch = useAppDispatch();
-
-    useEffect(() => {
-        const localAccount = storage.get<IAccount | null>(Key.ACCOUNT, 'null');
-        const localCartSize = storage.get<number>(Key.CART, '0');
-        dispatch(accountActions.update(localAccount));
-        dispatch(cartActions.update(localCartSize));
-    }, [dispatch]);
+    const { account, cartSize } = useAuth();
 
     return (
         <Fragment>
             {account ? (
                 <div className='flex gap-1'>
-                    <DropdownAccount />
+                    <DropdownAccount account={account} />
                     <Separator orientation='vertical' />
                     <Button variant='ghost' size='icon' asChild>
                         <Link href='/cart' title='giỏ hàng' className='relative mr-1.5'>
@@ -45,7 +32,9 @@ function HeaderAction() {
                     </Button>
                 </div>
             ) : (
-                <ButtonLogin />
+                <DialogLogin>
+                    <Button variant='ghost'>Tài khoản</Button>
+                </DialogLogin>
             )}
         </Fragment>
     );

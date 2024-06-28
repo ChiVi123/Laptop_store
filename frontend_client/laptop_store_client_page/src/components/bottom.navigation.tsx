@@ -1,24 +1,35 @@
 'use client';
 
 import { CaretLeftIcon, CaretRightIcon, HomeIcon, PersonIcon, TokensIcon } from '@radix-ui/react-icons';
+import clsx from 'clsx';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Drawer as DrawerPrimitive } from 'vaul';
 
+import { useAuth, useLogout } from '~/hooks/auth';
 import { useAppSelector } from '~/hooks/redux';
 import { categorySelectors } from '~/libs/redux/features';
 
-import clsx from 'clsx';
+import DialogLogin from './dialog.login';
 import { CartIcon } from './icons';
+import { Badge } from './ui/badge';
 import { Button } from './ui/button';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTrigger } from './ui/drawer';
+import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger } from './ui/drawer';
+import { Separator } from './ui/separator';
 
 function BottomNavigation() {
+    const { account, cartSize } = useAuth();
     const { children: categories } = useAppSelector(categorySelectors.selectDefault);
     const [indexCategory, setIndexCategory] = useState<number>(0);
     const router = useRouter();
     const pathname = usePathname();
+    const logout = useLogout();
+
+    const navItems = [
+        { path: '/account/profile', content: 'Thông tin tài khoản' },
+        { path: '/account/address', content: 'Sổ địa chỉ' },
+    ];
 
     const handleRouteBack = () => router.back();
     const handleRouteForward = () => router.forward();
@@ -37,12 +48,22 @@ function BottomNavigation() {
                 <CaretLeftIcon className='size-6' />
             </Button>
 
-            <Button type='button' aria-label='btn-nav-home' variant='ghost' size='icon' className='size-10' asChild>
+            <Button
+                type='button'
+                aria-label='btn-nav-home'
+                variant='ghost'
+                size='icon'
+                className={clsx('size-10', {
+                    'text-cv-primary-100 hover:text-cv-primary-100': pathname === '/',
+                })}
+                asChild
+            >
                 <Link href='/'>
                     <HomeIcon className='size-6' />
                 </Link>
             </Button>
 
+            {/* Category button */}
             <Drawer handleOnly>
                 <DrawerTrigger asChild>
                     <Button type='button' aria-label='btn-nav-cate' variant='ghost' size='icon' className='size-10'>
@@ -52,7 +73,10 @@ function BottomNavigation() {
 
                 <DrawerContent className='border-0'>
                     <DrawerPrimitive.Handle />
-                    <DrawerHeader className='border border-r-2'>Danh mục sản phẩm</DrawerHeader>
+                    <DrawerHeader className='border border-r-2'>
+                        <DrawerTitle>Danh mục sản phẩm</DrawerTitle>
+                        <DrawerDescription></DrawerDescription>
+                    </DrawerHeader>
                     <div className='grid grid-cols-[25%_75%] h-96 pt-1 bg-border'>
                         <div className='h-[inherit] overflow-y-auto'>
                             {categories.map((category, index) => (
@@ -85,36 +109,87 @@ function BottomNavigation() {
                                     </div>
                                 </div>
                             ))}
-                            {categories[indexCategory].children.map((category) => (
-                                <div key={'bottom-nav-content-' + category.id} className='space-y-2'>
-                                    <div className='font-semibold text-cv-primary-100'>{category.info.name}</div>
-                                    <div className='grid grid-cols-2 gap-3'>
-                                        {category.children.map((item) => (
-                                            <Button
-                                                key={'bottom-nav-sub-' + item.id}
-                                                variant='outline'
-                                                className='w-full h-full font-normal text-wrap'
-                                            >
-                                                {item.info.name}
-                                            </Button>
-                                        ))}
-                                    </div>
-                                </div>
-                            ))}
                         </div>
                     </div>
                 </DrawerContent>
             </Drawer>
 
-            <Button type='button' aria-label='btn-nav-cart' variant='ghost' size='icon' className='size-10' asChild>
+            <Button
+                type='button'
+                aria-label='btn-nav-cart'
+                variant='ghost'
+                size='icon'
+                className='relative size-10'
+                asChild
+            >
                 <Link href='/cart'>
-                    <CartIcon className='size-6' />
+                    <CartIcon
+                        className={clsx('size-6', {
+                            'text-cv-primary-100 hover:text-cv-primary-100': pathname === '/cart',
+                        })}
+                    />
+                    {Boolean(account) && (
+                        <Badge variant='destructive' className='absolute -top-1 -right-2 px-1.5 rounded-full'>
+                            {cartSize}
+                        </Badge>
+                    )}
                 </Link>
             </Button>
 
-            <Button type='button' aria-label='btn-nav-acc' variant='ghost' size='icon' className='size-10'>
-                <PersonIcon className='size-6' />
-            </Button>
+            {account ? (
+                <Drawer>
+                    <DrawerTrigger asChild>
+                        <Button
+                            type='button'
+                            aria-label='btn-nav-acc'
+                            variant='ghost'
+                            size='icon'
+                            className={clsx('size-10', {
+                                'text-cv-primary-100 hover:text-cv-primary-100': pathname.includes('/account'),
+                            })}
+                        >
+                            <PersonIcon className='size-6' />
+                        </Button>
+                    </DrawerTrigger>
+
+                    <DrawerContent>
+                        <DrawerHeader className='border border-r-2'>
+                            <DrawerTitle>Quản Lý Tài Khoản</DrawerTitle>
+                            <DrawerDescription></DrawerDescription>
+                        </DrawerHeader>
+                        <div className='py-4'>
+                            {navItems.map((item) => (
+                                <Link
+                                    key={item.path}
+                                    href={item.path}
+                                    className='flex justify-between px-5 py-2 bg-white'
+                                >
+                                    {item.content}
+                                    <CaretRightIcon className='size-6' />
+                                </Link>
+                            ))}
+
+                            <Separator />
+
+                            <div className='px-5 mt-2'>
+                                <Button
+                                    variant='outline'
+                                    className='w-full border-cv-primary-100 text-cv-primary-100'
+                                    onClick={logout}
+                                >
+                                    Đăng xuất
+                                </Button>
+                            </div>
+                        </div>
+                    </DrawerContent>
+                </Drawer>
+            ) : (
+                <DialogLogin>
+                    <Button type='button' aria-label='btn-nav-acc' variant='ghost' size='icon' className='size-10'>
+                        <PersonIcon className='size-6' />
+                    </Button>
+                </DialogLogin>
+            )}
 
             <Button
                 type='button'

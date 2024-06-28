@@ -6,6 +6,7 @@ export enum Key {
     LOGO = 'logo',
     REFRESH_TOKEN = 'refresh_token',
     ROOT_CATEGORY = 'root-category',
+    X_URL = 'x_url',
 }
 export enum Invalid {
     FULL_NAME_REQUIRED = 'Hãy nhập họ tên',

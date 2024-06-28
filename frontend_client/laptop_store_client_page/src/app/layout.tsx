@@ -2,8 +2,8 @@ import './globals.css';
 
 import type { Metadata } from 'next';
 import { PropsWithChildren } from 'react';
-import { Header } from '~/components';
 
+import { BottomNavigation, Header } from '~/components';
 import { Toaster } from '~/components/ui/sonner';
 import ReduxProvider from '~/provider/redux.provider';
 
@@ -15,6 +15,7 @@ async function RootLayout({ children }: PropsWithChildren) {
                 <ReduxProvider>
                     <Header />
                     {children}
+                    <BottomNavigation />
                 </ReduxProvider>
                 <footer className='hidden lg:block'>Footer</footer>
             </body>

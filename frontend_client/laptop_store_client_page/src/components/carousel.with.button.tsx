@@ -2,12 +2,13 @@ import { PropsWithChildren } from 'react';
 import { Carousel, CarouselContent, CarouselNext, CarouselPrevious } from './ui/carousel';
 
 interface IProps {
+    dragFree?: boolean;
     className?: { root?: string; content?: string };
 }
 
-function CarouselWithButton({ children, className }: PropsWithChildren<IProps>) {
+function CarouselWithButton({ dragFree, children, className }: PropsWithChildren<IProps>) {
     return (
-        <Carousel className={className?.root}>
+        <Carousel opts={{ dragFree }} className={className?.root}>
             <CarouselContent className={className?.content}>{children}</CarouselContent>
 
             {/* Buttons */}

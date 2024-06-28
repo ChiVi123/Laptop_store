@@ -1,15 +1,14 @@
 import { ChevronRightIcon } from '@radix-ui/react-icons';
 import Link from 'next/link';
-import { Fragment } from 'react';
 
-import { CarouselWithButton, ProductCard } from '~/components';
+import { CarouselWithButton, Container, ProductCard } from '~/components';
 import { CarouselItem } from '~/components/ui/carousel';
 import { getDataHomePage } from '~/services';
 
 async function HomePage() {
     const result = await getDataHomePage([3, 5]);
     return (
-        <Fragment>
+        <Container component='main' className='px-0 md:px-4 pt-[3.875rem] pb-8 md:py-[4.625rem]'>
             {result.map((section, index) => (
                 <div key={index} className='px-4 py-1 md:py-4 mb-8 bg-white md:rounded-sm'>
                     <div className='flex justify-between items-center mb-3'>
@@ -21,7 +20,7 @@ async function HomePage() {
                         </Link>
                     </div>
 
-                    <CarouselWithButton className={{ content: '-ml-2.5' }}>
+                    <CarouselWithButton dragFree className={{ content: '-ml-2.5' }}>
                         {section.list.map((item) => (
                             <CarouselItem
                                 key={`${section.title}-${item.id}`}
@@ -33,7 +32,7 @@ async function HomePage() {
                     </CarouselWithButton>
                 </div>
             ))}
-        </Fragment>
+        </Container>
     );
 }
 export default HomePage;

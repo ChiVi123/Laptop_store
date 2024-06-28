@@ -1,12 +1,10 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
-import { Key } from '~/common/enums';
-import { useAppDispatch } from '~/hooks/redux';
-import { apiRequest } from '~/libs';
-import { accountActions, cartActions } from '~/libs/redux/features';
-import { storage } from '~/libs/utilities';
+import { useLogout } from '~/hooks/auth';
+import { cn } from '~/libs/utils';
+import { IAccount } from '~/types/models';
 
 import { Button } from '../ui/button';
 import {
@@ -17,35 +15,30 @@ import {
     DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 
-function DropdownAccount() {
-    const dispatch = useAppDispatch();
-    const router = useRouter();
+interface IProps {
+    account: IAccount;
+    className?: string;
+}
 
-    const handleLogout = async () => {
-        const response = await apiRequest
-            .get('api/logout', { baseURL: '' })
-            .json<{ message: string; success: boolean }>();
-        if (response.success) {
-            dispatch(accountActions.logout());
-            dispatch(cartActions.reset());
-            storage.set(Key.ACCOUNT, null);
-            storage.set(Key.CART, 0);
-            router.push('/');
-        }
-    };
+function DropdownAccount({ account, className }: IProps) {
+    const logout = useLogout();
 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant='ghost' className='gap-2'>
-                    <span className='mb-0.5 text-center font-medium text-cv-gray-70'>Tài khoản</span>
+                <Button variant='ghost' className={cn('gap-2', className)}>
+                    <span className='mb-0.5 text-center font-medium text-cv-gray-70'>{account.fullName}</span>
                 </Button>
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align='end' className='w-56'>
-                <DropdownMenuItem>Thông tin tài khoản</DropdownMenuItem>
+                <DropdownMenuItem asChild className='cursor-pointer'>
+                    <Link href='/account/profile'>Thông tin tài khoản</Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>Đăng xuất</DropdownMenuItem>
+                <DropdownMenuItem onClick={logout} className='cursor-pointer'>
+                    Đăng xuất
+                </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     );

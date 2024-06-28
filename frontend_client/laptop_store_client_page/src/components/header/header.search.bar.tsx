@@ -15,7 +15,7 @@ function HeaderSearchBar() {
 
     return (
         <Fragment>
-            <MagnifyingGlassIcon width='1.25rem' height='1.25rem' />
+            <MagnifyingGlassIcon className='size-5' />
             <input
                 id='input-search'
                 type='text'
@@ -24,14 +24,7 @@ function HeaderSearchBar() {
                 value={inputSearch}
                 onChange={handleSearchChange}
             />
-            {Boolean(inputSearch) && (
-                <Cross2Icon
-                    width='1.25rem'
-                    height='1.25rem'
-                    className='cursor-pointer'
-                    onClick={handleClearInputSearch}
-                />
-            )}
+            {Boolean(inputSearch) && <Cross2Icon className='size-5 cursor-pointer' onClick={handleClearInputSearch} />}
         </Fragment>
     );
 }

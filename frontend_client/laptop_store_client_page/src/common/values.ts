@@ -11,7 +11,9 @@ import { AccountRole, AccountStatus, EntityStatus } from './enums';
 
 // Common
 export const LOGO_URL =
-    'https://res.cloudinary.com/dat2lyvva/image/upload/v1706627664/laptop_store/logo/logo-text_bcpcxs.png';
+    'https://res.cloudinary.com/dat2lyvva/image/upload/v1719210389/laptop_store/logo/laptop-high-resolution-logo-icon-transparent_w9g3ha.png';
+export const LOGO_TEXT_URL =
+    'https://res.cloudinary.com/dat2lyvva/image/upload/v1719210237/laptop_store/logo/laptop-high-resolution-logo-transparent_f9iwgk.png';
 export const MILLISECOND = 1000;
 
 // Raw value

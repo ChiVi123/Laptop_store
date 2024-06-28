@@ -18,7 +18,7 @@ function CarouselImage({ alt, images }: IProps) {
     return (
         <Fragment>
             <AspectRatio ratio={1} className='p-4 mb-2 border border-border rounded-t-md'>
-                <Image src={src} alt={alt} width={200} height={200} priority className='w-full h-full' />
+                <Image src={src} alt={alt} width={200} height={200} priority className='size-full' />
             </AspectRatio>
 
             <Carousel>
@@ -41,7 +41,7 @@ function CarouselImage({ alt, images }: IProps) {
                                     width={60}
                                     height={60}
                                     priority
-                                    className='w-full h-full'
+                                    className='size-full'
                                 />
                             </AspectRatio>
                         </CarouselItem>

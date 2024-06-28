@@ -7,7 +7,6 @@ import chivi.laptopstore.communication.responses.SuccessResponse;
 import chivi.laptopstore.helpers.AuthContext;
 import chivi.laptopstore.models.Account;
 import chivi.laptopstore.services.AccountService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +35,7 @@ public class AccountController {
 
     @PutMapping(RequestMaps.ACCOUNT_PATHNAME_PRIVATE + "edit")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse editAccount(@Valid @RequestBody AccountRequest accountRequest, HttpServletRequest httpServletRequest) {
+    public SuccessResponse editAccount(@Valid @RequestBody AccountRequest accountRequest) {
         Account account = AuthContext.getFromSecurityContext();
         Account result = accountService.editInfo(account, accountRequest);
         return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, result);

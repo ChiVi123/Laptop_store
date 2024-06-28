@@ -5,7 +5,7 @@ import { Fragment } from 'react';
 
 import '~/libs/extension.number';
 
-import { CarouselImage } from '~/components/product-detail';
+import { ButtonAddCart, CarouselImage } from '~/components/product-detail';
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -35,7 +35,7 @@ async function ProductDetailPage({ params: { slug } }: IProps) {
                 <BreadcrumbList>
                     <BreadcrumbItem>
                         <BreadcrumbLink href='/' title='Trang chủ'>
-                            <HomeIcon className='w-5 h-5' />
+                            <HomeIcon className='size-5' />
                         </BreadcrumbLink>
                     </BreadcrumbItem>
 
@@ -105,14 +105,12 @@ async function ProductDetailPage({ params: { slug } }: IProps) {
                     </div>
                 </div>
 
-                <div className='fixed right-0 bottom-0 left-0 flex-1 md:relative'>
+                <div className='fixed right-0 bottom-[3.625rem] left-0 flex-1 md:relative'>
                     <div className='md:sticky top-[4.625rem] right-0 grid grid-cols-2 items-center gap-4 md:block p-2 lg:p-4 rounded-md bg-white md:space-y-3'>
                         <Button type='button' size='lg' className='w-full'>
                             Mua ngay
                         </Button>
-                        <Button type='button' variant='outline' size='lg' className='w-full'>
-                            Thêm vào giỏ hàng
-                        </Button>
+                        <ButtonAddCart productId={productInfo.id} />
                     </div>
                 </div>
             </div>

@@ -1,16 +1,20 @@
+import { Metadata } from 'next';
+import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { Fragment } from 'react';
 
 import '~/libs/extension.number';
 
-import { Metadata } from 'next';
 import { cartServerAction } from '~/actions';
+import { Key } from '~/common/enums';
+import { RAW_CART } from '~/common/values';
 import { CartTable } from '~/components';
 import { Button } from '~/components/ui/button';
 import { Separator } from '~/components/ui/separator';
 
 async function CartPage() {
-    const { account, items, subTotal } = await cartServerAction.getCart();
+    const accessToken = cookies().get(Key.ACCESS_TOKEN)?.value;
+    const { account, items, subTotal } = accessToken ? await cartServerAction.getCart() : RAW_CART;
 
     return (
         <Fragment>

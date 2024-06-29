@@ -8,7 +8,7 @@ import { JwtType } from './libs/utilities';
 import { createAccessTokenByRefreshToken } from './services/auth';
 
 export async function middleware(request: NextRequest) {
-    const { headers, nextUrl, method } = request;
+    const { headers, nextUrl } = request;
     const { pathname } = nextUrl;
     const nextResponse = NextResponse.next({ request: { headers: new Headers(headers) } });
     const cookieStore = cookies();

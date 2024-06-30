@@ -52,6 +52,9 @@ public class JwtUtils {
     public String createTokenFromAccount(Account account) {
         return Jwts.builder()
                 .subject(account.getEmail())
+                .claim("username", account.getUsername())
+                .claim("fullName", account.getFullName())
+                .claim("phone", account.getPhone())
                 .issuedAt(new Date())
                 .issuer(issuer)
                 .expiration(new Date(System.currentTimeMillis() + jwtExpiration))

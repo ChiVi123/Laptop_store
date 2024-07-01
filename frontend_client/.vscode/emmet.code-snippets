@@ -31,7 +31,7 @@
     },
     "Logger": {
         "scope": "typescriptreact, typescript",
-        "prefix": "logger",
+        "prefix": "lif",
         "body": ["logger$1.info('$2::', $3);"],
         "description": "Use state"
     },

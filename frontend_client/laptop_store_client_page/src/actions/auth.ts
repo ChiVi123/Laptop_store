@@ -5,7 +5,7 @@ import { cookies } from 'next/headers';
 import { Key } from '~/common/enums';
 import { apiRequest, logger } from '~/libs';
 import { createResponseCookie, decodeJwt } from '~/libs/helper';
-import { JwtType } from '~/libs/utilities';
+import { JwtPayload } from '~/libs/utilities';
 import { ILoginBodyResponse } from '~/types/body.responses';
 import { loginTypeSchema } from '~/types/schemas';
 
@@ -24,7 +24,7 @@ export async function login(data: loginTypeSchema) {
         })
         .json<ILoginBodyResponse>();
     const { accessToken, refreshToken, expiration } = payload;
-    const jwt = decodeJwt<JwtType>(accessToken);
+    const jwt = decodeJwt<JwtPayload>(accessToken);
     const cookieAccessToken = createResponseCookie(Key.ACCESS_TOKEN, accessToken, jwt.exp);
     const cookieRefreshToken = createResponseCookie(Key.REFRESH_TOKEN, refreshToken, expiration);
 

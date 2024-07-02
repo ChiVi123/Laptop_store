@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { Key } from './common/enums';
 import { createResponseCookie, decodeJwt } from './libs/helper';
-import { JwtType } from './libs/utilities';
+import { JwtPayload } from './libs/utilities';
 import { createAccessTokenByRefreshToken } from './services/auth';
 
 export async function middleware(request: NextRequest) {
@@ -17,7 +17,7 @@ export async function middleware(request: NextRequest) {
     if (refreshToken && !accessToken) {
         accessToken = (await createAccessTokenByRefreshToken()).payload;
         if (accessToken) {
-            const jwt = decodeJwt<JwtType>(accessToken);
+            const jwt = decodeJwt<JwtPayload>(accessToken);
             const cookieAccessToken = createResponseCookie(Key.ACCESS_TOKEN, accessToken, jwt.exp);
             nextResponse.cookies.set(cookieAccessToken);
         }

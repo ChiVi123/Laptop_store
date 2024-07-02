@@ -1,6 +1,7 @@
 'use server';
 
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 import { Key } from '~/common/enums';
 import { IBodyResponse } from '~/types/body.responses';
@@ -11,7 +12,7 @@ import { FetchainError, HttpStatus, IFetchain } from '../fetchain';
 export const handleRefetch = async (request: IFetchain) => {
     const refreshToken = cookies().get(Key.REFRESH_TOKEN)?.value;
     if (!refreshToken) {
-        return;
+        redirect('/logout');
     }
     const { payload } = await apiRequest.body({ refreshToken }).post('auth/refresh-token').json<IBodyResponse>();
     return request.auth(payload).recall().json();

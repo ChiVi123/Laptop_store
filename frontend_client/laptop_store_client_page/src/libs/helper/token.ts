@@ -12,5 +12,5 @@ export function decodeJwt<Payload = jwt.JwtPayload>(token: string) {
     return payload as Payload;
 }
 export function createResponseCookie(name: Key, value: string, expires: number, path: string = '/'): ResponseCookie {
-    return { name, value, expires, path, httpOnly: true, secure: true };
+    return { name, value, expires, path, httpOnly: true, secure: process.env.NODE_ENV === 'production' };
 }

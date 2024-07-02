@@ -54,6 +54,11 @@ export interface IAccount extends IEntity, IEntityDateTime {
     role: AccountRole;
     status: AccountStatus;
 }
+export interface IAccountToken {
+    accessToken: string;
+    refreshToken: string;
+    expiration: number;
+}
 export interface IImage {
     id?: number;
     publicId: string;

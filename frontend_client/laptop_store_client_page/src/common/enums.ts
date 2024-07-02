@@ -7,6 +7,7 @@ export enum Key {
     LOGO = 'logo',
     REFRESH_TOKEN = 'refresh-token',
     ROOT_CATEGORY = 'root-category',
+    X_IS_AUTHENTICATED = 'x-is-authenticated',
     X_URL = 'x-url',
 }
 export enum Invalid {

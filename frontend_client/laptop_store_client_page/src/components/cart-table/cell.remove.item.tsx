@@ -4,10 +4,8 @@ import { TrashIcon } from '@radix-ui/react-icons';
 import { useState } from 'react';
 
 import { cartServerAction } from '~/actions';
-import { Key } from '~/common/enums';
 import { useAppDispatch } from '~/hooks/redux';
-import { cartActions } from '~/libs/redux/features';
-import { storage } from '~/libs/utilities';
+import { setCartSize } from '~/libs/redux/features';
 import { cn } from '~/libs/utils';
 
 import { Button } from '../ui/button';
@@ -28,8 +26,7 @@ function CellRemoveItem({ id, className }: { id: number; className?: string }) {
 
     const handleClick = async () => {
         const { items } = await cartServerAction.removeItem(id);
-        dispatch(cartActions.update(items.length));
-        storage.set(Key.CART, items.length);
+        dispatch(setCartSize(items.length));
         setOpenDialog(false);
     };
     return (

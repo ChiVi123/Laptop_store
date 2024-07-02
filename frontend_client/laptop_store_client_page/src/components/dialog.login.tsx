@@ -13,13 +13,11 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
 import { authServerAction, cartServerAction } from '~/actions';
-import { Key } from '~/common/enums';
-import { useAppDispatch } from '~/hooks/redux';
-import { accountActions, cartActions } from '~/libs/redux/features';
-import { storage } from '~/libs/utilities';
 import { loginSchema } from '~/schemas';
 import { loginTypeSchema } from '~/types/schemas';
 
+import { useAppDispatch } from '~/hooks/redux';
+import { setAccountToken, setCartSize } from '~/libs/redux/features';
 import { Button } from './ui/button';
 import {
     Dialog,
@@ -48,7 +46,6 @@ function DialogLogin({ children }: PropsWithChildren) {
         resolver: zodResolver(loginSchema),
         defaultValues: { email: '', password: '' },
     });
-    const dispatch = useAppDispatch();
     const fields = useMemo<FieldType[]>(
         () => [
             {
@@ -70,21 +67,18 @@ function DialogLogin({ children }: PropsWithChildren) {
         ],
         [],
     );
+    const dispatch = useAppDispatch();
 
     const handleOnSubmit: SubmitHandler<loginTypeSchema> = async (data) => {
         const result = await authServerAction.login(data);
 
         if (result.accessToken) {
-            const { account, items } = await cartServerAction.getCart();
+            const { items } = await cartServerAction.getCart();
 
-            dispatch(accountActions.update(account));
-            dispatch(cartActions.update(items.length));
-
-            storage.set(Key.ACCOUNT, account);
-            storage.set(Key.CART, items.length);
+            dispatch(setAccountToken(result));
+            dispatch(setCartSize(items.length));
 
             toast.success('Đăng nhập thành công');
-
             setOpenDialog(false);
         } else {
             toast.error('Email hoặc mật khẩu đúng không');

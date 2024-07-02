@@ -3,7 +3,10 @@
 import Link from 'next/link';
 import { Fragment } from 'react';
 
-import { useAuth } from '~/hooks/auth';
+import { useAuthenticated } from '~/hooks/auth';
+import { useAppSelector } from '~/hooks/redux';
+import { logger } from '~/libs';
+import { selectAccountToken, selectCartSize } from '~/libs/redux/features';
 
 import DialogLogin from '../dialog.login';
 import { CartIcon } from '../icons';
@@ -14,13 +17,21 @@ import { Separator } from '../ui/separator';
 import DropdownAccount from './dropdown.account';
 
 function HeaderAction() {
-    const { account, cartSize } = useAuth();
+    const accountToken = useAppSelector(selectAccountToken);
+    const cartSize = useAppSelector(selectCartSize);
+    const isExpired = useAuthenticated();
+
+    logger.info('isExpired::', isExpired);
 
     return (
         <Fragment>
-            {account ? (
+            {isExpired ? (
+                <DialogLogin>
+                    <Button variant='ghost'>Tài khoản</Button>
+                </DialogLogin>
+            ) : (
                 <div className='flex gap-1'>
-                    <DropdownAccount account={account} />
+                    <DropdownAccount accountToken={accountToken} />
                     <Separator orientation='vertical' />
                     <Button variant='ghost' size='icon' asChild>
                         <Link href='/cart' title='giỏ hàng' className='relative mr-1.5'>
@@ -31,10 +42,6 @@ function HeaderAction() {
                         </Link>
                     </Button>
                 </div>
-            ) : (
-                <DialogLogin>
-                    <Button variant='ghost'>Tài khoản</Button>
-                </DialogLogin>
             )}
         </Fragment>
     );

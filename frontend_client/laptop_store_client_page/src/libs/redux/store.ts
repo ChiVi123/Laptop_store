@@ -4,20 +4,22 @@ import { combineSlices, configureStore, createListenerMiddleware } from '@reduxj
 
 import { categoryServerAction } from '~/actions';
 
+import { loadState } from '../helper';
 import logger from '../logger';
 
 import { categoryActions } from './features';
-import accountSlice from './features/account';
+import accountTokenSlice from './features/account.token';
 import cartSlice from './features/cart';
 import categorySlice from './features/category';
 
-const rootReducer = combineSlices(accountSlice, cartSlice, categorySlice);
+const rootReducer = combineSlices(accountTokenSlice, cartSlice, categorySlice);
 const listenerMiddleware = createListenerMiddleware();
 
 export const makeStore = () =>
     configureStore({
         reducer: rootReducer,
         middleware: (getDefaultMiddleware) => getDefaultMiddleware().prepend(listenerMiddleware.middleware),
+        preloadedState: loadState(),
     });
 
 export type RootState = ReturnType<typeof rootReducer>;

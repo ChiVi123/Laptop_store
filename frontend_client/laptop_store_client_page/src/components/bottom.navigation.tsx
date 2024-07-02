@@ -7,9 +7,9 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Drawer as DrawerPrimitive } from 'vaul';
 
-import { useAuth, useLogout } from '~/hooks/auth';
+import { useAuthenticated, useLogout } from '~/hooks/auth';
 import { useAppSelector } from '~/hooks/redux';
-import { categorySelectors } from '~/libs/redux/features';
+import { categorySelectors, selectCartSize } from '~/libs/redux/features';
 
 import DialogLogin from './dialog.login';
 import { CartIcon } from './icons';
@@ -19,9 +19,10 @@ import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, Dr
 import { Separator } from './ui/separator';
 
 function BottomNavigation() {
-    const { account, cartSize } = useAuth();
+    const cartSize = useAppSelector(selectCartSize);
     const { children: categories } = useAppSelector(categorySelectors.selectDefault);
     const [indexCategory, setIndexCategory] = useState<number>(0);
+    const isExpired = useAuthenticated();
     const router = useRouter();
     const pathname = usePathname();
     const logout = useLogout();
@@ -128,7 +129,7 @@ function BottomNavigation() {
                             'text-cv-primary-100 hover:text-cv-primary-100': pathname === '/cart',
                         })}
                     />
-                    {Boolean(account) && (
+                    {!isExpired && (
                         <Badge variant='destructive' className='absolute -top-1 -right-2 px-1.5 rounded-full'>
                             {cartSize}
                         </Badge>
@@ -136,7 +137,13 @@ function BottomNavigation() {
                 </Link>
             </Button>
 
-            {account ? (
+            {isExpired ? (
+                <DialogLogin>
+                    <Button type='button' aria-label='btn-nav-acc' variant='ghost' size='icon' className='size-10'>
+                        <PersonIcon className='size-6' />
+                    </Button>
+                </DialogLogin>
+            ) : (
                 <Drawer>
                     <DrawerTrigger asChild>
                         <Button
@@ -183,12 +190,6 @@ function BottomNavigation() {
                         </div>
                     </DrawerContent>
                 </Drawer>
-            ) : (
-                <DialogLogin>
-                    <Button type='button' aria-label='btn-nav-acc' variant='ghost' size='icon' className='size-10'>
-                        <PersonIcon className='size-6' />
-                    </Button>
-                </DialogLogin>
             )}
 
             <Button

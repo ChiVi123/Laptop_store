@@ -18,6 +18,11 @@ export async function getCart() {
     const { payload } = await apiRequest
         .auth(accessToken)
         .get('private/cart', { next: { tags: [Key.CART] } })
+        .unauthorized(async (error, original) => {
+            logger.error('get cart::', error.status, error.json);
+            const resultRefresh = await handleRefetch(original);
+            return resultRefresh ?? getRawCartBodyResponse(error.json?.message ?? '');
+        })
         .fetchError((error) => {
             logger.error('get cart::', error.status, error.json);
             return getRawCartBodyResponse(error.json?.message ?? '');

@@ -1,12 +1,14 @@
 export enum Key {
-    ACCESS_TOKEN = 'access_token',
+    ACCESS_TOKEN = 'access-token',
     ACCOUNT = 'account',
+    ACCOUNT_TOKEN = 'account-token',
     CART = 'cart',
     IMAGE = 'image',
     LOGO = 'logo',
-    REFRESH_TOKEN = 'refresh_token',
+    REFRESH_TOKEN = 'refresh-token',
     ROOT_CATEGORY = 'root-category',
-    X_URL = 'x_url',
+    X_IS_AUTHENTICATED = 'x-is-authenticated',
+    X_URL = 'x-url',
 }
 export enum Invalid {
     FULL_NAME_REQUIRED = 'Hãy nhập họ tên',

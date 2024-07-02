@@ -1,10 +1,10 @@
-import accountSlice from './account';
+import accountTokenSlice from './account.token';
 import cartSlice from './cart';
 import categorySlice from './category';
 
-export const accountActions = accountSlice.actions;
-export const accountSelectors = accountSlice.selectors;
-export const cartActions = cartSlice.actions;
-export const cartSelectors = cartSlice.selectors;
+export const { resetAccountToken, setAccountToken } = accountTokenSlice.actions;
+export const { selectAccountToken } = accountTokenSlice.selectors;
+export const { selectCartSize } = cartSlice.selectors;
+export const { setCartSize, resetCartSize } = cartSlice.actions;
 export const categoryActions = categorySlice.actions;
 export const categorySelectors = categorySlice.selectors;

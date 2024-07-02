@@ -1,10 +1,13 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 import { useLogout } from '~/hooks/auth';
+import { decodeJwt } from '~/libs/helper';
+import { JwtPayload } from '~/libs/utilities';
 import { cn } from '~/libs/utils';
-import { IAccount } from '~/types/models';
+import { IAccountToken } from '~/types/models';
 
 import { Button } from '../ui/button';
 import {
@@ -16,18 +19,25 @@ import {
 } from '../ui/dropdown-menu';
 
 interface IProps {
-    account: IAccount;
+    accountToken: IAccountToken;
     className?: string;
 }
 
-function DropdownAccount({ account, className }: IProps) {
+function DropdownAccount({ accountToken, className }: IProps) {
+    const [decode, setDecode] = useState<JwtPayload>({ exp: 0, fullName: '', iat: 0, iss: '', sub: '' });
     const logout = useLogout();
+
+    useEffect(() => {
+        if (accountToken.accessToken) {
+            setDecode(decodeJwt<JwtPayload>(accountToken.accessToken));
+        }
+    }, [accountToken.accessToken]);
 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button variant='ghost' className={cn('gap-2', className)}>
-                    <span className='mb-0.5 text-center font-medium text-cv-gray-70'>{account.fullName}</span>
+                    <span className='mb-0.5 text-center font-medium text-cv-gray-70'>{decode.fullName}</span>
                 </Button>
             </DropdownMenuTrigger>
 

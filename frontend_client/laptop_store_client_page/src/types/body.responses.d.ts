@@ -1,4 +1,4 @@
-import { IAccount, ICart, ICategoryNode, IOrderItem, IProductDetail, IProductInfo } from './models';
+import { IAccount, IAccountToken, ICart, ICategoryNode, IOrderItem, IProductDetail, IProductInfo } from './models';
 
 export interface IBodyResponse {
     message: string;
@@ -11,11 +11,7 @@ export interface IErrorBodyResponse {
     timestamp: string;
 }
 export interface ILoginBodyResponse extends IBodyResponse {
-    payload: {
-        accessToken: string;
-        refreshToken: string;
-        expiration: number;
-    };
+    payload: IAccountToken;
 }
 export interface IAccountBodyResponse extends IBodyResponse {
     payload: IAccount;

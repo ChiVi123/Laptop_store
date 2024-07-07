@@ -35,8 +35,8 @@ public class ProductService {
         return productInfoRepository.findAllByOrderByCreatedDateDesc();
     }
 
-    public Page<ProductInfo> getAllLatest(Pageable pageable) {
-        return productInfoRepository.findAllByOrderByCreatedDateDesc(pageable);
+    public Page<ProductInfo> getAllByQuery(String query, Pageable pageable) {
+        return productInfoRepository.searchByQuery(query, pageable);
     }
 
     public List<ProductInfo> getAllByCategoryIds(List<Long> categoryIds) {

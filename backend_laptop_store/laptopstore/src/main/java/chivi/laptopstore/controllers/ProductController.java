@@ -17,6 +17,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,20 +64,17 @@ public class ProductController {
 
     @GetMapping(RequestMaps.PRODUCT_PATHNAME_PUBLIC + "search")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse searchProduct(@RequestParam(name = "category_code", defaultValue = "1-2") String code) {
-        List<Long> categoryIds = categoryService.getAllIdIsLeafByCode(code);
-        List<ProductInfo> products = productService.getAllByCategoryIds(categoryIds);
-        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, products);
-    }
-
-    @GetMapping(RequestMaps.PRODUCT_PATHNAME_PUBLIC + "sort-latest")
-    @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse findAllLatest(
+    public SuccessResponse findAllByName(
+            @RequestParam(name = "query", defaultValue = "") String query,
+            @RequestParam(name = "sort_by", defaultValue = "") String sortBy,
+            @RequestParam(name = "sort_dir", defaultValue = "") String sortDir,
             @RequestParam(name = "page_number", defaultValue = "1") int pageNumber,
             @RequestParam(name = "page_size", defaultValue = "6") int pageSize
     ) {
         int currentPage = pageNumber - 1;
-        Page<ProductInfo> productPage = productService.getAllLatest(PageRequest.of(currentPage, pageSize));
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(currentPage, pageSize, sort);
+        Page<ProductInfo> productPage = productService.getAllByQuery(query, pageable);
         PagePayload<ProductInfo> payload = new PagePayload<>(currentPage, productPage);
         return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, payload);
     }

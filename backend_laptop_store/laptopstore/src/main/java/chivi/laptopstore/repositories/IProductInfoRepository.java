@@ -5,13 +5,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
 public interface IProductInfoRepository extends JpaRepository<ProductInfo, Long> {
-    Page<ProductInfo> findAllByOrderByCreatedDateDesc(Pageable pageable);
+    @Query(value = "SELECT * FROM product_info_tb p " +
+            "WHERE p.name LIKE CONCAT('%', :query, '%') OR p.description LIKE CONCAT('%', :query, '%')", nativeQuery = true)
+    Page<ProductInfo> searchByQuery(@Param("query") String query, Pageable pageable);
 
     List<ProductInfo> findAllByOrderByCreatedDateDesc();
 

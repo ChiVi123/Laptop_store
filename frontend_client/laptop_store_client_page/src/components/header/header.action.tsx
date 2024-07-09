@@ -5,7 +5,6 @@ import { Fragment } from 'react';
 
 import { useAuthenticated } from '~/hooks/auth';
 import { useAppSelector } from '~/hooks/redux';
-import { logger } from '~/libs';
 import { selectAccountToken, selectCartSize } from '~/libs/redux/features';
 
 import DialogLogin from '../dialog.login';
@@ -20,8 +19,6 @@ function HeaderAction() {
     const accountToken = useAppSelector(selectAccountToken);
     const cartSize = useAppSelector(selectCartSize);
     const isExpired = useAuthenticated();
-
-    logger.info('isExpired::', isExpired);
 
     return (
         <Fragment>

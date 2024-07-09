@@ -1,7 +1,6 @@
+import Link from 'next/link';
 import { Fragment } from 'react';
-
 import { ICategoryNode } from '~/types/models';
-
 import {
     DropdownMenuItem,
     DropdownMenuPortal,
@@ -29,7 +28,9 @@ function CategoryMenuItem({ category }: IProps) {
                     </DropdownMenuPortal>
                 </DropdownMenuSub>
             ) : (
-                <DropdownMenuItem>{category.info.name}</DropdownMenuItem>
+                <DropdownMenuItem asChild className='cursor-pointer'>
+                    <Link href={`/category/${category.info.id}`}>{category.info.name}</Link>
+                </DropdownMenuItem>
             )}
         </Fragment>
     );

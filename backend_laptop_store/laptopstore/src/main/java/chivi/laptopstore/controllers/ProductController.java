@@ -17,6 +17,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,34 +50,76 @@ public class ProductController {
 
     @GetMapping(RequestMaps.PRODUCT_PATHNAME_PUBLIC + "list-data-home-page")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse getDataHomepage(@RequestParam(name = "category_ids") List<Long> categoryIds) {
+    public SuccessResponse getDataHomepage(
+            @RequestParam(name = "category_ids") List<Long> categoryIds,
+            @RequestParam(name = "sort_by", defaultValue = "created_at") String sortBy,
+            @RequestParam(name = "sort_dir", defaultValue = "desc") String sortDir,
+            @RequestParam(name = "page_number", defaultValue = "1") int pageNumber,
+            @RequestParam(name = "page_size", defaultValue = "10") int pageSize
+    ) {
+        int currentPage = pageNumber - 1;
+        String productInfoSortBy = "pro_in." + sortBy;
         List<SectionPayload> sectionPayloads = new ArrayList<>();
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(productInfoSortBy).ascending()
+                : Sort.by(productInfoSortBy).descending();
+        Pageable pageable = PageRequest.of(currentPage, pageSize, sort);
+
         categoryIds.forEach(id -> {
             CategoryInfo categoryInfo = categoryService.getInfoById(id);
             String code = categoryInfo.getCode() + "-" + categoryInfo.getId();
             List<Long> allIdIsLeafByCode = categoryService.getAllIdIsLeafByCode(code);
-            List<ProductInfo> products = productService.getAllByCategoryIds(allIdIsLeafByCode);
-            sectionPayloads.add(new SectionPayload(categoryInfo.getName(), products));
+            Page<ProductInfo> sectionPage = productService.getAllByCategoryIds(allIdIsLeafByCode, pageable);
+            PagePayload<ProductInfo> sectionPagePayload = new PagePayload<>(currentPage, sectionPage);
+            sectionPayloads.add(new SectionPayload(categoryInfo.getName(), sectionPagePayload.getList()));
         });
+
         return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, sectionPayloads);
     }
 
     @GetMapping(RequestMaps.PRODUCT_PATHNAME_PUBLIC + "search")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse searchProduct(@RequestParam(name = "category_code", defaultValue = "1-2") String code) {
-        List<Long> categoryIds = categoryService.getAllIdIsLeafByCode(code);
-        List<ProductInfo> products = productService.getAllByCategoryIds(categoryIds);
-        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, products);
-    }
-
-    @GetMapping(RequestMaps.PRODUCT_PATHNAME_PUBLIC + "sort-latest")
-    @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse findAllLatest(
+    public SuccessResponse searchAllByName(
+            @RequestParam(name = "query", defaultValue = "") String query,
+            @RequestParam(name = "sort_by", defaultValue = "created_at") String sortBy,
+            @RequestParam(name = "sort_dir", defaultValue = "desc") String sortDir,
             @RequestParam(name = "page_number", defaultValue = "1") int pageNumber,
-            @RequestParam(name = "page_size", defaultValue = "6") int pageSize
+            @RequestParam(name = "page_size", defaultValue = "20") int pageSize
     ) {
         int currentPage = pageNumber - 1;
-        Page<ProductInfo> productPage = productService.getAllLatest(PageRequest.of(currentPage, pageSize));
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(currentPage, pageSize, sort);
+        Page<ProductInfo> productPage = productService.getAllByQuery(query, pageable);
+        PagePayload<ProductInfo> payload = new PagePayload<>(currentPage, productPage);
+        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, payload);
+    }
+
+    @GetMapping(RequestMaps.PRODUCT_PATHNAME_PUBLIC + "by-category")
+    @ResponseStatus(HttpStatus.OK)
+    public SuccessResponse findAllByCategory(
+            @RequestParam(name = "category_id", defaultValue = "") Long categoryId,
+            @RequestParam(name = "sort_by", defaultValue = "created_at") String sortBy,
+            @RequestParam(name = "sort_dir", defaultValue = "desc") String sortDir,
+            @RequestParam(name = "page_number", defaultValue = "1") int pageNumber,
+            @RequestParam(name = "page_size", defaultValue = "20") int pageSize
+    ) {
+        int currentPage = pageNumber - 1;
+        String productInfoSortBy = "pro_in." + sortBy;
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(productInfoSortBy).ascending()
+                : Sort.by(productInfoSortBy).descending();
+        Pageable pageable = PageRequest.of(currentPage, pageSize, sort);
+        CategoryInfo categoryInfo = categoryService.getInfoById(categoryId);
+
+        if (categoryInfo.isLeaf()) {
+            Page<ProductInfo> productPage = productService.getAllByCategoryIds(List.of(categoryId), pageable);
+            PagePayload<ProductInfo> payload = new PagePayload<>(currentPage, productPage);
+            return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, payload);
+        }
+
+        String code = categoryInfo.getCode() + "-" + categoryInfo.getId();
+        List<Long> allIdIsLeafByCode = categoryService.getAllIdIsLeafByCode(code);
+        Page<ProductInfo> productPage = productService.getAllByCategoryIds(allIdIsLeafByCode, pageable);
         PagePayload<ProductInfo> payload = new PagePayload<>(currentPage, productPage);
         return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, payload);
     }

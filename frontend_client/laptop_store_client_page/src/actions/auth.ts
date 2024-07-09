@@ -17,7 +17,7 @@ export async function login(data: loginTypeSchema) {
     const cookieStore = cookies();
     const { payload } = await apiRequest
         .body(data)
-        .post('auth/login')
+        .post('api/v1/auth/login')
         .fetchError((error): ILoginBodyResponse => {
             logger.error('login::', error.status, error.json);
             return buildRawLoginRes(error.json?.message ?? '');

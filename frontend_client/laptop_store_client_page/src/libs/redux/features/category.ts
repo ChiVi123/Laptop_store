@@ -14,13 +14,13 @@ const categorySlice = createAppSlice({
     name: 'category',
     initialState,
     reducers: (creators) => ({
-        update: creators.reducer((state, { payload }: PayloadAction<ICategoryNode>) => {
+        setDefaultCategory: creators.reducer((state, { payload }: PayloadAction<ICategoryNode>) => {
             state.default = payload.children[0];
             state.status = 'fulfilled';
         }),
     }),
     selectors: {
-        selectDefault: (state) => state.default,
+        selectDefaultCategory: (state) => state.default,
     },
 });
 export default categorySlice;

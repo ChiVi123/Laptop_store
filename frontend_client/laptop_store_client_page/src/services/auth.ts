@@ -10,9 +10,9 @@ export async function createAccessTokenByRefreshToken(): Promise<IBodyResponse> 
     }
     return apiRequest
         .body({ refreshToken })
-        .post('auth/refresh-token')
+        .post('api/v1/auth/refresh-token')
         .fetchError((error): IBodyResponse => {
-            logger.error('add cart::', error.status, error.json);
+            logger.error('create access token by refresh token::', error.status, error.json);
             return { message: error.json?.message ?? '', payload: '' };
         })
         .json<IBodyResponse>();

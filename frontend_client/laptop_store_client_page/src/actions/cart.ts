@@ -17,7 +17,7 @@ export async function getCart() {
     const accessToken = cookies().get(Key.ACCESS_TOKEN)?.value;
     const { payload } = await apiRequest
         .auth(accessToken)
-        .get('private/cart', { next: { tags: [Key.CART] } })
+        .get('api/v1/private/cart', { next: { tags: [Key.CART] } })
         .unauthorized(async (error, original) => {
             logger.error('get cart::', error.status, error.json);
             const resultRefresh = await handleRefetch(original);
@@ -35,7 +35,7 @@ export async function add(data: { productId: number; quantity: number }) {
     const response = await apiRequest
         .auth(accessToken)
         .body(data)
-        .post('private/cart/add-item')
+        .post('api/v1/private/cart/add-item')
         .unauthorized(async (error, original) => {
             logger.error('add cart::', error.status, error.json);
             const resultRefresh = await handleRefetch(original);
@@ -53,7 +53,7 @@ export async function plus(orderItemId: number) {
     const accessToken = cookies().get(Key.ACCESS_TOKEN)?.value;
     const response = await apiRequest
         .auth(accessToken)
-        .patch(`private/cart/${orderItemId}/plus`)
+        .patch(`api/v1/private/cart/${orderItemId}/plus`)
         .unauthorized(async (error, original) => {
             logger.error('cart plus::', error.status, error.json);
             const resultRefresh = await handleRefetch(original);
@@ -71,7 +71,7 @@ export async function minus(orderItemId: number) {
     const accessToken = cookies().get(Key.ACCESS_TOKEN)?.value;
     const response = await apiRequest
         .auth(accessToken)
-        .patch(`private/cart/${orderItemId}/minus`)
+        .patch(`api/v1/private/cart/${orderItemId}/minus`)
         .unauthorized(async (error, original) => {
             logger.error('cart minus::', error.status, error.json);
             const resultRefresh = await handleRefetch(original);
@@ -89,7 +89,7 @@ export async function removeItem(orderItemId: number) {
     const accessToken = cookies().get(Key.ACCESS_TOKEN)?.value;
     const response = await apiRequest
         .auth(accessToken)
-        .delete(`private/cart/${orderItemId}/remove-item`)
+        .delete(`api/v1/private/cart/${orderItemId}/remove-item`)
         .unauthorized(async (error, original) => {
             logger.error('cart remove item::', error.status, error.json);
             const resultRefresh = await handleRefetch(original);
@@ -107,7 +107,7 @@ export async function removeAllItem() {
     const accessToken = cookies().get(Key.ACCESS_TOKEN)?.value;
     const response = await apiRequest
         .auth(accessToken)
-        .delete(`private/cart/remove-all`)
+        .delete(`api/v1/private/cart/remove-all`)
         .unauthorized(async (error, original) => {
             logger.error('cart remove all::', error.status, error.json);
             const resultRefresh = await handleRefetch(original);

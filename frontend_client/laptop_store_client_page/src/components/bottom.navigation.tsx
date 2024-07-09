@@ -1,15 +1,14 @@
 'use client';
 
 import { CaretLeftIcon, CaretRightIcon, HomeIcon, PersonIcon, TokensIcon } from '@radix-ui/react-icons';
-import clsx from 'clsx';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { Drawer as DrawerPrimitive } from 'vaul';
 
 import { useAuthenticated, useLogout } from '~/hooks/auth';
 import { useAppSelector } from '~/hooks/redux';
-import { categorySelectors, selectCartSize } from '~/libs/redux/features';
+import { selectCartSize, selectDefaultCategory } from '~/libs/redux/features';
+import { cn } from '~/libs/utils';
 
 import DialogLogin from './dialog.login';
 import { CartIcon } from './icons';
@@ -20,8 +19,10 @@ import { Separator } from './ui/separator';
 
 function BottomNavigation() {
     const cartSize = useAppSelector(selectCartSize);
-    const { children: categories } = useAppSelector(categorySelectors.selectDefault);
+    const { children: categories } = useAppSelector(selectDefaultCategory);
     const [indexCategory, setIndexCategory] = useState<number>(0);
+    const [openCategory, setOpenCategory] = useState<boolean>(false);
+    const [openAccount, setOpenAccount] = useState<boolean>(false);
     const isExpired = useAuthenticated();
     const router = useRouter();
     const pathname = usePathname();
@@ -54,7 +55,7 @@ function BottomNavigation() {
                 aria-label='btn-nav-home'
                 variant='ghost'
                 size='icon'
-                className={clsx('size-10', {
+                className={cn('size-10', {
                     'text-cv-primary-100 hover:text-cv-primary-100': pathname === '/',
                 })}
                 asChild
@@ -65,7 +66,7 @@ function BottomNavigation() {
             </Button>
 
             {/* Category button */}
-            <Drawer handleOnly>
+            <Drawer open={openCategory} onOpenChange={setOpenCategory}>
                 <DrawerTrigger asChild>
                     <Button type='button' aria-label='btn-nav-cate' variant='ghost' size='icon' className='size-10'>
                         <TokensIcon className='size-6' />
@@ -73,7 +74,6 @@ function BottomNavigation() {
                 </DrawerTrigger>
 
                 <DrawerContent className='border-0'>
-                    <DrawerPrimitive.Handle />
                     <DrawerHeader className='border border-r-2'>
                         <DrawerTitle>Danh mục sản phẩm</DrawerTitle>
                         <DrawerDescription></DrawerDescription>
@@ -84,7 +84,7 @@ function BottomNavigation() {
                                 <Button
                                     key={'bottom-nav-' + category.id}
                                     variant='outline'
-                                    className={clsx('w-full h-8 p-6 border-0 border-b-2 rounded-none font-normal', {
+                                    className={cn('w-full h-8 p-6 border-0 border-b-2 rounded-none font-normal', {
                                         'hover:text-cv-primary-100': indexCategory === index,
                                     })}
                                     onClick={() => setIndexCategory(index)}
@@ -96,15 +96,23 @@ function BottomNavigation() {
                         <div className='flex-1 h-[inherit] p-2 ml-2 space-y-4 bg-white overflow-y-auto'>
                             {categories[indexCategory].children.map((category) => (
                                 <div key={'bottom-nav-content-' + category.id} className='space-y-2'>
-                                    <div className='font-semibold text-cv-primary-100'>{category.info.name}</div>
+                                    <Link
+                                        href={`/category/${category.info.id}`}
+                                        className='font-semibold text-cv-primary-100'
+                                        onClick={() => setOpenCategory(false)}
+                                    >
+                                        {category.info.name}
+                                    </Link>
                                     <div className='grid grid-cols-2 gap-2'>
                                         {category.children.map((item) => (
                                             <Button
                                                 key={'bottom-nav-sub-' + item.id}
                                                 variant='outline'
+                                                asChild
                                                 className='w-full h-full font-normal text-wrap'
+                                                onClick={() => setOpenCategory(false)}
                                             >
-                                                {item.info.name}
+                                                <Link href={`/category/${item.info.id}`}>{item.info.name}</Link>
                                             </Button>
                                         ))}
                                     </div>
@@ -125,7 +133,7 @@ function BottomNavigation() {
             >
                 <Link href='/cart'>
                     <CartIcon
-                        className={clsx('size-6', {
+                        className={cn('size-6', {
                             'text-cv-primary-100 hover:text-cv-primary-100': pathname === '/cart',
                         })}
                     />
@@ -144,14 +152,14 @@ function BottomNavigation() {
                     </Button>
                 </DialogLogin>
             ) : (
-                <Drawer>
+                <Drawer open={openAccount} onOpenChange={setOpenAccount}>
                     <DrawerTrigger asChild>
                         <Button
                             type='button'
                             aria-label='btn-nav-acc'
                             variant='ghost'
                             size='icon'
-                            className={clsx('size-10', {
+                            className={cn('size-10', {
                                 'text-cv-primary-100 hover:text-cv-primary-100': pathname.includes('/account'),
                             })}
                         >
@@ -169,7 +177,10 @@ function BottomNavigation() {
                                 <Link
                                     key={item.path}
                                     href={item.path}
-                                    className='flex justify-between px-5 py-2 bg-white'
+                                    className={cn('flex justify-between px-5 py-2 bg-white', {
+                                        'text-cv-primary-100 hover:text-cv-primary-100': item.path === pathname,
+                                    })}
+                                    onClick={() => setOpenAccount(false)}
                                 >
                                     {item.content}
                                     <CaretRightIcon className='size-6' />

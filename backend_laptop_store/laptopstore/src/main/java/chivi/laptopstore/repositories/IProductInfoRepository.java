@@ -5,13 +5,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
 public interface IProductInfoRepository extends JpaRepository<ProductInfo, Long> {
-    Page<ProductInfo> findAllByOrderByCreatedDateDesc(Pageable pageable);
+    @Query(value = "SELECT * FROM product_info_tb p " +
+            "WHERE p.name LIKE CONCAT('%', :query, '%') OR p.description LIKE CONCAT('%', :query, '%')", nativeQuery = true)
+    Page<ProductInfo> searchByQuery(@Param("query") String query, Pageable pageable);
 
     List<ProductInfo> findAllByOrderByCreatedDateDesc();
 
@@ -22,11 +25,10 @@ public interface IProductInfoRepository extends JpaRepository<ProductInfo, Long>
             "FROM product_category_tb pro_cate " +
             "JOIN product_detail_tb pro_dt ON pro_cate.product_id=pro_dt.id " +
             "JOIN product_info_tb pro_in ON pro_dt.product_info_id=pro_in.id " +
-            "WHERE pro_cate.category_id IN (?1) " +
-            "ORDER BY pro_in.created_at desc",
+            "WHERE pro_cate.category_id IN (?1)",
             nativeQuery = true
     )
-    List<ProductInfo> findAllByCategories(List<Long> categoryIds);
+    Page<ProductInfo> findAllByCategories(List<Long> categoryIds, Pageable pageable);
 
     boolean existsByName(String name);
 }

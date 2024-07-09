@@ -1,5 +1,7 @@
 import { ChevronLeftIcon, ChevronRightIcon } from '@radix-ui/react-icons';
 import Link from 'next/link';
+
+import { SearchPagination, Sort, SortSelect } from '~/app/_components';
 import { Container, ProductCard } from '~/components';
 import {
     Breadcrumb,
@@ -11,20 +13,20 @@ import {
 } from '~/components/ui/breadcrumb';
 import { Button, buttonVariants } from '~/components/ui/button';
 import { cn } from '~/libs/utils';
-import { searchProduct } from '~/services';
-import { SearchPagination, Sort, SortSelect } from '../_components';
+import { findAllProductByCategoryId, findCategoryById } from '~/services';
 
 interface IProps {
+    params: { id: string };
     searchParams: {
-        query: string | undefined;
         sort_by: string | undefined;
         sort_dir: 'asc' | 'desc' | undefined;
         page_number: string | undefined;
     };
 }
 
-async function SearchPage({ searchParams }: IProps) {
-    const resultSearch = await searchProduct({ ...searchParams, page_size: '10' });
+async function CategoryPage({ params: { id }, searchParams }: IProps) {
+    const resultSearch = await findAllProductByCategoryId({ ...searchParams, category_id: id, page_size: '10' });
+    const resultCategory = await findCategoryById(Number(id));
     const page_number = searchParams.page_number;
 
     return (
@@ -40,13 +42,13 @@ async function SearchPage({ searchParams }: IProps) {
                     <BreadcrumbSeparator />
 
                     <BreadcrumbItem>
-                        <BreadcrumbPage>Kết quả tìm kiếm &quot;{searchParams.query}&quot;</BreadcrumbPage>
+                        <BreadcrumbPage>{resultCategory.name}</BreadcrumbPage>
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>
 
             <div className='hidden sm:flex justify-between p-3 mt-4 bg-white rounded-t-xl'>
-                <span className='text-lg font-semibold'>{searchParams.query}</span>
+                <span className='text-lg font-semibold'>{resultCategory.name}</span>
                 <div className='flex items-center gap-x-4'>
                     <div>
                         <span className='text-cv-primary-100'>{resultSearch.pageNumber ?? 1}</span>
@@ -116,4 +118,4 @@ async function SearchPage({ searchParams }: IProps) {
     );
 }
 
-export default SearchPage;
+export default CategoryPage;

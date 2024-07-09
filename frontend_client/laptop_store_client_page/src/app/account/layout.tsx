@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { PropsWithChildren } from 'react';
 
 import { Container } from '~/components';
-import { getProfile } from '~/services';
+import { getProfile } from '~/services/account';
 
 async function AccountLayout({ children }: PropsWithChildren) {
     const account = await getProfile();

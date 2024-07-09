@@ -1,4 +1,13 @@
-import { IAccount, IAccountToken, ICart, ICategoryNode, IOrderItem, IProductDetail, IProductInfo } from './models';
+import {
+    IAccount,
+    IAccountToken,
+    ICart,
+    ICategoryInfo,
+    ICategoryNode,
+    IOrderItem,
+    IProductDetail,
+    IProductInfo,
+} from './models';
 
 export interface IBodyResponse {
     message: string;
@@ -28,6 +37,9 @@ export interface IProductDetailBodyResponse extends IResponse {
 // Category
 export interface ICategoryNodeBodyResponse extends IBodyResponse {
     payload: ICategoryNode;
+}
+export interface ICategoryInfoBodyResponse extends IBodyResponse {
+    payload: ICategoryInfo;
 }
 
 // Cart

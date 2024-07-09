@@ -6,5 +6,5 @@ export const { resetAccountToken, setAccountToken } = accountTokenSlice.actions;
 export const { selectAccountToken } = accountTokenSlice.selectors;
 export const { selectCartSize } = cartSlice.selectors;
 export const { setCartSize, resetCartSize } = cartSlice.actions;
-export const categoryActions = categorySlice.actions;
-export const categorySelectors = categorySlice.selectors;
+export const { setDefaultCategory } = categorySlice.actions;
+export const { selectDefaultCategory } = categorySlice.selectors;

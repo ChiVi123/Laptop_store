@@ -25,11 +25,10 @@ public interface IProductInfoRepository extends JpaRepository<ProductInfo, Long>
             "FROM product_category_tb pro_cate " +
             "JOIN product_detail_tb pro_dt ON pro_cate.product_id=pro_dt.id " +
             "JOIN product_info_tb pro_in ON pro_dt.product_info_id=pro_in.id " +
-            "WHERE pro_cate.category_id IN (?1) " +
-            "ORDER BY pro_in.created_at desc",
+            "WHERE pro_cate.category_id IN (?1)",
             nativeQuery = true
     )
-    List<ProductInfo> findAllByCategories(List<Long> categoryIds);
+    Page<ProductInfo> findAllByCategories(List<Long> categoryIds, Pageable pageable);
 
     boolean existsByName(String name);
 }

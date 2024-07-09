@@ -8,7 +8,7 @@ export async function getProfile() {
     const accessToken = cookies().get(Key.ACCESS_TOKEN)?.value;
     const { payload } = await apiRequest
         .auth(accessToken)
-        .get('api/v1/private/accounts/profile')
+        .get('api/v1/private/accounts/profile', { cache: 'no-cache' })
         .fetchError((error) => {
             logger.error('profile::', error.status, error.json);
             return { message: error.json?.message, payload: RAW_ACCOUNT } as IAccountBodyResponse;

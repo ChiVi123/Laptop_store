@@ -39,8 +39,8 @@ public class ProductService {
         return productInfoRepository.searchByQuery(query, pageable);
     }
 
-    public List<ProductInfo> getAllByCategoryIds(List<Long> categoryIds) {
-        return productInfoRepository.findAllByCategories(categoryIds);
+    public Page<ProductInfo> getAllByCategoryIds(List<Long> categoryIds, Pageable pageable) {
+        return productInfoRepository.findAllByCategories(categoryIds, pageable);
     }
 
     public ProductDetail getBySlug(String slug) {

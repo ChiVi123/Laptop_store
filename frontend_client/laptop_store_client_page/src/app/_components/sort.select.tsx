@@ -1,7 +1,15 @@
 'use client';
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from '~/components/ui/select';
 
 function SortSelect() {
     const pathname = usePathname();
@@ -31,8 +39,17 @@ function SortSelect() {
             <SelectTrigger className='min-w-16'>
                 <SelectValue placeholder='Sắp xếp' />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent
+                ref={(ref) => {
+                    // https://github.com/shadcn-ui/ui/issues/486
+                    if (!ref) {
+                        return;
+                    }
+                    ref.ontouchstart = (e) => e.preventDefault();
+                }}
+            >
                 <SelectGroup>
+                    <SelectLabel>Fruits</SelectLabel>
                     {sorts.map((item) => (
                         <SelectItem key={item.value + ' ' + item.direct} value={item.value + ' ' + item.direct}>
                             {item.label}

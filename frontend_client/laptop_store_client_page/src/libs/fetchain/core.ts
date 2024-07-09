@@ -44,10 +44,6 @@ const core: IFetchain = {
         urlObject.search = this.requestParams;
         base.finalURL = urlObject.href;
 
-        console.log('request base::', options.baseURL ?? this.baseURL);
-        console.log('request url::', url);
-        console.log('request href::', urlObject.href);
-
         return resolver(base);
     },
     recall() {

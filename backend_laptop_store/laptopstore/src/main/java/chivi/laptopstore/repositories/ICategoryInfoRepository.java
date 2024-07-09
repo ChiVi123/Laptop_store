@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Repository
@@ -15,9 +14,6 @@ public interface ICategoryInfoRepository extends JpaRepository<CategoryInfo, Lon
 //    id, name, path, code, is_leaf, status, created_at, updated_at
 
     Set<CategoryInfo> findAllByIdIn(Collection<Long> id);
-
-    @Query(value = "SELECT name FROM category_info WHERE code=?1", nativeQuery = true)
-    Optional<String> findNameByCode(String code);
 
     @Query(value = "SELECT id FROM category_info_tb WHERE code LIKE CONCAT('%', ?1, '%') AND is_leaf=?2", nativeQuery = true)
     List<Long> findAllIdByCodeLikeAndLeaf(String code, boolean leaf);

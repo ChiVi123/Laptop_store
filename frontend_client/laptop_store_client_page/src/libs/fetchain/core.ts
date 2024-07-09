@@ -5,42 +5,48 @@ import { IFetchain } from './types';
 const core: IFetchain = {
     baseURL: '',
     finalURL: '',
+    requestParams: '',
     options: {},
     catchers: new Map(),
     body(data) {
         if (data instanceof FormData) {
-            this.options.body = data;
             return { ...this, options: { ...this.options, body: data } };
         } else {
-            return {
-                ...this,
-                options: {
-                    ...this.options,
-                    headers: { ...this.options.headers, 'content-type': CONTENT_TYPE_JSON },
-                    body: JSON.stringify(data),
-                },
-            };
+            const headers = new Headers(this.options.headers);
+            headers.set('content-type', CONTENT_TYPE_JSON);
+            return { ...this, options: { ...this.options, headers, body: JSON.stringify(data) } };
         }
     },
-    headers(header) {
-        this.options.headers ??= {};
-        return { ...this, options: { ...this.options, headers: { ...this.options.headers, ...header } } };
+    headers(headers) {
+        const headersObject = new Headers(this.options.headers);
+        const headersArray = Object.entries(headers);
+        headersArray.forEach(([key, value]) => {
+            headersObject.append(key, value);
+        });
+        return { ...this, options: { ...this.options, headers: headersObject } };
     },
     auth(value) {
-        return value ? this.headers({ Authorization: `Bearer ${value}` }) : { ...this };
+        if (!value) {
+            return this;
+        }
+        const headers = new Headers(this.options.headers);
+        headers.set('Authorization', `Bearer ${value}`);
+        return { ...this, options: { ...this.options, headers } };
     },
     params(query) {
-        const requestParams = Object.entries(query)
-            .map((item) => item.join('='))
-            .join('&');
-        return { ...this, finalURL: `?${requestParams}` };
+        const searchParams = new URLSearchParams(query);
+        return { ...this, requestParams: searchParams.toString() };
     },
     request(method, url, options = {}) {
-        const baseURL = options.baseURL ?? this.baseURL;
+        const urlObject = new URL(url, options.baseURL ?? this.baseURL);
         const base = { ...this, options: { ...this.options, ...options, method } };
 
-        url = base.finalURL.startsWith('?') ? `${url}${base.finalURL}` : url;
-        base.finalURL = url.startsWith('/') ? baseURL.concat(url) : baseURL.concat('/', url);
+        urlObject.search = this.requestParams;
+        base.finalURL = urlObject.href;
+
+        console.log('request base::', options.baseURL ?? this.baseURL);
+        console.log('request url::', url);
+        console.log('request href::', urlObject.href);
 
         return resolver(base);
     },

@@ -6,7 +6,7 @@ import { ICategoryNodeBodyResponse } from '~/types/body.responses';
 
 export async function getRoot() {
     const { payload } = await apiRequest
-        .get('public/categories/root')
+        .get('api/v1/public/categories/root')
         .fetchError((error) => {
             logger.anger('get root category::', error.status, error.json);
             return { message: error.json?.message, payload: RAW_CATEGORY_NODE } as ICategoryNodeBodyResponse;

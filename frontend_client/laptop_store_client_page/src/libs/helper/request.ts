@@ -14,7 +14,7 @@ export const handleRefetch = async (request: IFetchain) => {
     if (!refreshToken) {
         redirect('/logout');
     }
-    const { payload } = await apiRequest.body({ refreshToken }).post('auth/refresh-token').json<IBodyResponse>();
+    const { payload } = await apiRequest.body({ refreshToken }).post('api/v1/auth/refresh-token').json<IBodyResponse>();
     return request.auth(payload).recall().json();
 };
 export const handleReturnError = (reason: unknown) => {

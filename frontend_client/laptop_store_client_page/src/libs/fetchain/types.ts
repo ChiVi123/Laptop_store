@@ -122,11 +122,9 @@ export interface IFetchainResponse {
 export interface IFetchain {
     baseURL: string;
     finalURL: string;
+    requestParams: string;
     options: FetchainOptions;
-    catchers: Map<
-        string | number | Symbol,
-        (error: FetchainError, originalRequest: IFetchain) => any
-    >;
+    catchers: Map<string | number | Symbol, (error: FetchainError, originalRequest: IFetchain) => any>;
     /**
      * Sets the request body with any data.
      *
@@ -150,7 +148,7 @@ export interface IFetchain {
      * @param value - Header value
      */
     auth(value: string | undefined): this;
-    params(query: Record<string, unknown>): this;
+    params(query: Record<string, string> | URLSearchParams): this;
     /**
      * Sends the request using the accumulated fetch options.
      *

@@ -3,7 +3,6 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { PropsWithChildren } from 'react';
 
-import { BottomNavigation, Header } from '~/components';
 import { Toaster } from '~/components/ui/sonner';
 import ReduxProvider from '~/provider/redux.provider';
 import { getRootCategory } from '~/services';
@@ -14,12 +13,7 @@ async function RootLayout({ children }: PropsWithChildren) {
         <html lang='vi'>
             <body className='bg-cv-primary-background'>
                 <Toaster />
-                <ReduxProvider rootCategory={rootCategory}>
-                    <Header />
-                    {children}
-                    <BottomNavigation />
-                </ReduxProvider>
-                <footer className='hidden lg:block'>Footer</footer>
+                <ReduxProvider rootCategory={rootCategory}>{children}</ReduxProvider>
             </body>
         </html>
     );

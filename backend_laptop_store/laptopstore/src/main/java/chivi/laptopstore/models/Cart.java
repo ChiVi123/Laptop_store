@@ -36,6 +36,7 @@ public class Cart extends EntityStandard {
 
     private EntityStatus status;
 
+    //    subTotal property for response
     public BigDecimal getSubTotal() {
         return this.items.stream().map(OrderItem::getSubTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
     }

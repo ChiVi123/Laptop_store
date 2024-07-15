@@ -1,3 +1,4 @@
+import { isClient } from '../utils';
 import { CONTENT_TYPE_JSON } from './constants';
 import resolver from './resolver';
 import { IFetchain } from './types';
@@ -18,12 +19,7 @@ const core: IFetchain = {
         }
     },
     headers(headers) {
-        const headersObject = new Headers(this.options.headers);
-        const headersArray = Object.entries(headers);
-        headersArray.forEach(([key, value]) => {
-            headersObject.append(key, value);
-        });
-        return { ...this, options: { ...this.options, headers: headersObject } };
+        return { ...this, options: { ...this.options, headers: { ...this.options.headers, ...headers } } };
     },
     auth(value) {
         if (!value) {
@@ -38,12 +34,19 @@ const core: IFetchain = {
         return { ...this, requestParams: searchParams.toString() };
     },
     request(method, url, options = {}) {
-        const urlObject = new URL(url, options.baseURL ?? this.baseURL);
-        const base = { ...this, options: { ...this.options, ...options, method } };
+        let urlObject: URL;
+        const baseUrl = options?.baseURL ?? this.baseURL;
 
+        if (URL.canParse(url, baseUrl)) {
+            urlObject = new URL(url, baseUrl);
+        } else if (isClient()) {
+            urlObject = new URL(url, window.location.origin);
+        } else {
+            urlObject = new URL(url, globalThis.nextOrigin);
+        }
         urlObject.search = this.requestParams;
-        base.finalURL = urlObject.href;
 
+        const base = { ...this, finalURL: urlObject.href, options: { ...this.options, ...options, method } };
         return resolver(base);
     },
     recall() {

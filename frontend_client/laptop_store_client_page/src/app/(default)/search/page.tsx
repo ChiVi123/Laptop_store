@@ -1,5 +1,7 @@
 import { ChevronLeftIcon, ChevronRightIcon } from '@radix-ui/react-icons';
 import Link from 'next/link';
+
+import { SearchPagination, Sort, SortSelect } from '~/app/_components';
 import { Container, ProductCard } from '~/components';
 import {
     Breadcrumb,
@@ -12,7 +14,6 @@ import {
 import { Button, buttonVariants } from '~/components/ui/button';
 import { cn } from '~/libs/utils';
 import { searchProduct } from '~/services';
-import { SearchPagination, Sort, SortSelect } from '../_components';
 
 interface IProps {
     searchParams: {

@@ -9,6 +9,9 @@ export enum Key {
     ROOT_CATEGORY = 'root-category',
     X_IS_AUTHENTICATED = 'x-is-authenticated',
     X_URL = 'x-url',
+    X_ORIGIN = 'x-origin',
+    X_FORWARDED_HOST = 'x-forwarded-host',
+    X_FORWARDED_PROTO = 'x-forwarded-proto',
 }
 export enum Invalid {
     FULL_NAME_REQUIRED = 'Hãy nhập họ tên',

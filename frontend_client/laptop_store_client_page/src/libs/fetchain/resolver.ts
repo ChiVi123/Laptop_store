@@ -6,23 +6,21 @@ function resolver(fetchain: IFetchain): IFetchainResponse {
     const catchers = new Map(fetchain.catchers);
     const responsePromise = fetch(finalURL, options);
     const resultPromise = responsePromise
-        .then((response) => {
-            if (!response.ok) {
-                const fetchainError = new FetchainError();
-                fetchainError.status = response.status;
-                fetchainError.response = response;
-                fetchainError.url = finalURL;
+        .then((res) => {
+            if (res.ok) return res;
 
-                return response.text().then((value) => {
-                    const headerValue = response.headers.get('content-type');
-                    if (headerValue && headerValue.includes(CONTENT_TYPE_JSON)) {
-                        fetchainError.json = JSON.parse(value);
-                    }
-                    throw fetchainError;
-                });
-            } else {
-                return response;
-            }
+            const fetchainError = new FetchainError();
+            fetchainError.status = res.status;
+            fetchainError.response = res;
+            fetchainError.url = finalURL;
+
+            return res.text().then((value) => {
+                const headerValue = res.headers.get('content-type');
+                if (headerValue && headerValue.includes(CONTENT_TYPE_JSON)) {
+                    fetchainError.json = JSON.parse(value);
+                }
+                throw fetchainError;
+            });
         })
         .catch((error) => {
             throw { [FETCH_ERROR]: error };
@@ -44,19 +42,15 @@ function resolver(fetchain: IFetchain): IFetchainResponse {
     };
 
     type BodyParserHandler = <Type>(
-        typeName: 'json' | null,
+        method: 'json' | null,
     ) => <Result = void>(cb?: (value: Type) => Result) => Promise<Awaited<Result>>;
 
-    const bodyParser: BodyParserHandler = (typeName) => {
-        return (cb) => {
-            return typeName
-                ? catchWrapper(
-                      resultPromise.then((res) => res[typeName]()).then((result) => (cb ? cb(result) : result)),
-                  )
-                : catchWrapper(resultPromise.then((response) => (cb ? cb(response as any) : response)));
-        };
-    };
-    const responseChain: IFetchainResponse = {
+    const bodyParser: BodyParserHandler = (method) => (cb) =>
+        method
+            ? catchWrapper(resultPromise.then((res) => res[method]()).then((result) => (cb ? cb(result) : result)))
+            : catchWrapper(resultPromise.then((res) => (cb ? cb(res as any) : res)));
+
+    return {
         error(code, callback) {
             catchers.set(code, callback);
             return this;
@@ -85,7 +79,6 @@ function resolver(fetchain: IFetchain): IFetchainResponse {
         json: bodyParser<any>('json'),
         res: bodyParser<Response>(null),
     };
-    return responseChain;
 }
 
 export default resolver;

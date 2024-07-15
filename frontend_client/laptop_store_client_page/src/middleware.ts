@@ -8,7 +8,6 @@ import { createAccessTokenByRefreshToken } from './services/auth';
 
 export async function middleware(request: NextRequest) {
     const { headers, nextUrl } = request;
-    const { pathname } = nextUrl;
     const nextResponse = NextResponse.next({ request: { headers: new Headers(headers) } });
     const cookieStore = cookies();
     const refreshToken = cookieStore.get(Key.REFRESH_TOKEN)?.value;
@@ -23,9 +22,9 @@ export async function middleware(request: NextRequest) {
         }
     }
 
-    nextResponse.headers.set(Key.X_URL, pathname);
+    nextResponse.headers.set(Key.X_ORIGIN, nextUrl.origin);
     return nextResponse;
 }
 export const config = {
-    matcher: ['/:path?', '/cart', '/account/:path*'],
+    matcher: ['/:path?', '/cart', '/account/:path*', '/make-payment', '/shipping'],
 };

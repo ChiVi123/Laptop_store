@@ -1,12 +1,15 @@
-import './globals.css';
-
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { PropsWithChildren } from 'react';
 
-import { BottomNavigation, Header } from '~/components';
+import './globals.css';
+
+import { Key } from '~/common/enums';
 import { Toaster } from '~/components/ui/sonner';
 import ReduxProvider from '~/provider/redux.provider';
 import { getRootCategory } from '~/services';
+
+globalThis.nextOrigin = `${headers().get(Key.X_FORWARDED_PROTO)}://${headers().get(Key.X_FORWARDED_HOST)}`;
 
 async function RootLayout({ children }: PropsWithChildren) {
     const rootCategory = await getRootCategory();
@@ -14,12 +17,7 @@ async function RootLayout({ children }: PropsWithChildren) {
         <html lang='vi'>
             <body className='bg-cv-primary-background'>
                 <Toaster />
-                <ReduxProvider rootCategory={rootCategory}>
-                    <Header />
-                    {children}
-                    <BottomNavigation />
-                </ReduxProvider>
-                <footer className='hidden lg:block'>Footer</footer>
+                <ReduxProvider rootCategory={rootCategory}>{children}</ReduxProvider>
             </body>
         </html>
     );

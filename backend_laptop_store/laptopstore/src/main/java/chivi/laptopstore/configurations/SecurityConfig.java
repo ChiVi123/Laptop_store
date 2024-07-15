@@ -3,7 +3,7 @@ package chivi.laptopstore.configurations;
 import chivi.laptopstore.common.AccountRole;
 import chivi.laptopstore.security.jwt.JwtAuthenticationEntryPoint;
 import chivi.laptopstore.security.jwt.JwtFilter;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -32,7 +32,7 @@ import java.util.List;
 @Slf4j
 @Configuration
 @EnableWebSecurity
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtFilter jwtFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;

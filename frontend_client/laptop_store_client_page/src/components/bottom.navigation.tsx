@@ -94,30 +94,31 @@ function BottomNavigation() {
                             ))}
                         </div>
                         <div className='flex-1 h-[inherit] p-2 ml-2 space-y-4 bg-white overflow-y-auto'>
-                            {categories[indexCategory].children.map((category) => (
-                                <div key={'bottom-nav-content-' + category.id} className='space-y-2'>
-                                    <Link
-                                        href={`/category/${category.info.id}`}
-                                        className='font-semibold text-cv-primary-100'
-                                        onClick={() => setOpenCategory(false)}
-                                    >
-                                        {category.info.name}
-                                    </Link>
-                                    <div className='grid grid-cols-2 gap-2'>
-                                        {category.children.map((item) => (
-                                            <Button
-                                                key={'bottom-nav-sub-' + item.id}
-                                                variant='outline'
-                                                asChild
-                                                className='w-full h-full font-normal text-wrap'
-                                                onClick={() => setOpenCategory(false)}
-                                            >
-                                                <Link href={`/category/${item.info.id}`}>{item.info.name}</Link>
-                                            </Button>
-                                        ))}
+                            {categories[indexCategory] &&
+                                categories[indexCategory].children.map((category) => (
+                                    <div key={'bottom-nav-content-' + category.id} className='space-y-2'>
+                                        <Link
+                                            href={`/category/${category.info.id}`}
+                                            className='font-semibold text-cv-primary-100'
+                                            onClick={() => setOpenCategory(false)}
+                                        >
+                                            {category.info.name}
+                                        </Link>
+                                        <div className='grid grid-cols-2 gap-2'>
+                                            {category.children.map((item) => (
+                                                <Button
+                                                    key={'bottom-nav-sub-' + item.id}
+                                                    variant='outline'
+                                                    asChild
+                                                    className='w-full h-full font-normal text-wrap'
+                                                    onClick={() => setOpenCategory(false)}
+                                                >
+                                                    <Link href={`/category/${item.info.id}`}>{item.info.name}</Link>
+                                                </Button>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
                         </div>
                     </div>
                 </DrawerContent>

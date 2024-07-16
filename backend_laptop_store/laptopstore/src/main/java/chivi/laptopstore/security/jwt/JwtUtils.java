@@ -52,6 +52,7 @@ public class JwtUtils {
     public String createTokenFromAccount(Account account) {
         return Jwts.builder()
                 .subject(account.getEmail())
+                .claim("accountId", account.getId())
                 .claim("username", account.getUsername())
                 .claim("fullName", account.getFullName())
                 .claim("phone", account.getPhone())

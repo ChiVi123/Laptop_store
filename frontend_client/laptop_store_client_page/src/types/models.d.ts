@@ -83,3 +83,18 @@ export interface ICart extends IEntityStatus {
 export interface IOrder {
     items: IOrderItem[];
 }
+export interface IAddress extends IEntity, IEntityDateTime {
+    fullName: string;
+    phone: string;
+    province: string;
+    provinceId: number;
+    district: string;
+    districtId: number;
+    ward: string;
+    wardId: number;
+    street: string;
+    location: string;
+    deliveryAddressType: 'HOME' | 'COMPANY';
+    selectDefault: boolean;
+    isChoose: boolean;
+}

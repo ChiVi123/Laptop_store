@@ -1,15 +1,11 @@
 import type { Metadata } from 'next';
-import { headers } from 'next/headers';
 import { PropsWithChildren } from 'react';
 
 import './globals.css';
 
-import { Key } from '~/common/enums';
 import { Toaster } from '~/components/ui/sonner';
 import ReduxProvider from '~/provider/redux.provider';
 import { getRootCategory } from '~/services';
-
-globalThis.nextOrigin = `${headers().get(Key.X_FORWARDED_PROTO)}://${headers().get(Key.X_FORWARDED_HOST)}`;
 
 async function RootLayout({ children }: PropsWithChildren) {
     const rootCategory = await getRootCategory();

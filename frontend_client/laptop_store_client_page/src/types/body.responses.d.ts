@@ -65,3 +65,9 @@ export interface IPaginationBodyResponse<Type> extends IBodyResponse {
 export interface ISectionBodyResponse<Type> extends IBodyResponse {
     payload: { title: string; list: Type[] }[];
 }
+export interface IPayloadBodyResponse<T> extends IBodyResponse {
+    payload: T;
+}
+export interface IListBodyResponse<T> extends IBodyResponse {
+    payload: T[];
+}

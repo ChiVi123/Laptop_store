@@ -1,5 +1,6 @@
 import {
     IAccount,
+    IAddress,
     ICart,
     ICategoryInfo,
     ICategoryNode,
@@ -51,7 +52,7 @@ export const RAW_CATEGORY_NODE: ICategoryNode = {
             createdDate: '',
             lastModifiedDate: '',
             info: RAW_CATEGORY_INFO,
-            children: new Array(),
+            children: [],
         },
     ],
 };
@@ -88,4 +89,22 @@ export const RAW_CART: ICart = {
     items: new Array(),
     subTotal: 0,
     status: EntityStatus.ENABLED,
+};
+export const RAW_ADDRESS: IAddress = {
+    id: 0,
+    fullName: '',
+    phone: '',
+    province: '',
+    provinceId: 0,
+    district: '',
+    districtId: 0,
+    ward: '',
+    wardId: 0,
+    street: '',
+    location: '',
+    deliveryAddressType: 'HOME',
+    selectDefault: false,
+    choose: false,
+    createdDate: '',
+    lastModifiedDate: '',
 };

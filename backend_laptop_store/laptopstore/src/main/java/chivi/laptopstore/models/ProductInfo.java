@@ -5,17 +5,21 @@ import chivi.laptopstore.common.EntityStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 
-@Entity
-@Table(name = EntityNames.TABLE_PRODUCT_INFO)
+@AllArgsConstructor
 @NoArgsConstructor
+@SuperBuilder
 @Getter
 @Setter
+@Entity
+@Table(name = EntityNames.TABLE_PRODUCT_INFO)
 public class ProductInfo extends EntityStandard {
     @Column(unique = true, nullable = false)
     private String name;

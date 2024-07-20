@@ -1,66 +1,87 @@
 package chivi.laptopstore.controllers;
 
+import chivi.laptopstore.common.OrderStatus;
 import chivi.laptopstore.common.RequestMaps;
-import chivi.laptopstore.communication.requests.OrderRequest;
+import chivi.laptopstore.communication.requests.ExecutePaymentRequest;
+import chivi.laptopstore.communication.requests.MakePaymentRequest;
 import chivi.laptopstore.communication.responses.SuccessResponse;
 import chivi.laptopstore.exception.BaseException;
 import chivi.laptopstore.helpers.AuthContext;
-import chivi.laptopstore.services.CartService;
+import chivi.laptopstore.mappers.OrderItemMapper;
+import chivi.laptopstore.services.CartItemService;
 import chivi.laptopstore.services.OrderService;
-import chivi.laptopstore.services.payment.PaypalService;
-import com.paypal.api.payments.Links;
-import com.paypal.api.payments.Payment;
+import chivi.laptopstore.services.ProductService;
+import chivi.laptopstore.services.payment.PaymentServiceGetter;
 import com.paypal.base.rest.PayPalRESTException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
+import java.util.List;
 
 @Slf4j
+@RequiredArgsConstructor
 @RestController
 @RequestMapping(RequestMaps.API_V1 + "/private/orders")
-@RequiredArgsConstructor
 public class OrderController {
-    private final CartService cartService;
+    private final CartItemService cartItemService;
     private final OrderService orderService;
-    private final PaypalService paypalService;
+    private final ProductService productService;
+    private final PaymentServiceGetter paymentServiceGetter;
+    private final OrderItemMapper orderItemMapper;
 
     @PostMapping("make-payment")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse addOrder(@RequestBody OrderRequest request) {
+    public SuccessResponse makePayment(@RequestBody MakePaymentRequest request) throws Exception {
         var account = AuthContext.getFromSecurityContext();
-        var cart = cartService.getByAccountEmail(account.getEmail());
+        var cartItems = cartItemService.getAllCartItemByAccountId(account.getId());
+        var paymentService = paymentServiceGetter.getService(request.paymentMethod());
+        String href = paymentService.createPayment(cartItems, request);
 
-        try {
-            var payment = paypalService.createPayment(cart, request);
-            for (Links links : payment.getLinks()) {
-                if (links.getRel().equals("approval_url")) {
-                    return new SuccessResponse("Payment init complete", links.getHref());
-                }
-            }
-        } catch (PayPalRESTException | IOException e) {
-            throw new BaseException(HttpStatus.UNPROCESSABLE_ENTITY.value(), e.getMessage());
+        if (href == null) {
+            throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Can't init payment");
         }
 
-        throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Can't init payment");
+        var orderItem = cartItems.stream().map(orderItemMapper::toOrderItemFromCartItem).toList();
+        orderService.create(orderItem, request);
+        return new SuccessResponse("Payment init complete", href);
     }
 
-    @GetMapping("execute-payment")
+    @PatchMapping("execute-payment")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse paymentSuccess(
-            @RequestParam("paymentId") String paymentId,
-            @RequestParam("PayerID") String payerId
-    ) {
-        try {
-            Payment payment = paypalService.executePayment(paymentId, payerId);
-            if (payment.getState().equals("approved")) {
-                return new SuccessResponse("Payment successful", payment.getId());
-            }
-        } catch (PayPalRESTException e) {
-            log.error("Error occurred:: ", e);
+    public SuccessResponse executePayment(@RequestBody ExecutePaymentRequest request) throws PayPalRESTException {
+        var paymentService = paymentServiceGetter.getService(request.paymentMethod());
+        boolean isSuccess = paymentService.executePayment(request);
+
+        if (isSuccess) {
+            var account = AuthContext.getFromSecurityContext();
+            var order = orderService.findByIdAndStatus(request.orderId(), OrderStatus.PREPARING);
+            orderService.setStatus(order, OrderStatus.PROCESSING);
+            cartItemService.deleteAllByAccountId(account.getId());
+
+            String payload = request.paymentId() != null ? request.paymentId() : "";
+            return new SuccessResponse("Execute payment successful", payload);
+        } else {
+            throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Execute payment fail");
         }
-        throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Execute payment fail");
+    }
+
+    @PatchMapping("/{orderId}/complete")
+    @ResponseStatus(HttpStatus.OK)
+    public SuccessResponse completeOrder(@PathVariable("orderId") Long orderId) {
+        var order = orderService.findByIdAndStatus(orderId, OrderStatus.PROCESSING);
+        orderService.setStatus(order, OrderStatus.COMPLETED);
+        productService.updateAllQuantitySold(order.getItems());
+        return new SuccessResponse("Order completed", orderId);
+    }
+
+    @PatchMapping("/{orderId}/cancel")
+    @ResponseStatus(HttpStatus.OK)
+    public SuccessResponse cancelOrder(@PathVariable("orderId") Long orderId) {
+        var order = orderService.findByIdAndInOrderStatus(orderId, List.of(OrderStatus.PREPARING, OrderStatus.PROCESSING));
+        orderService.setStatus(order, OrderStatus.CANCELED);
+        productService.restoreFromOrderItem(order.getItems());
+        return new SuccessResponse("Order cancelled", orderId);
     }
 }

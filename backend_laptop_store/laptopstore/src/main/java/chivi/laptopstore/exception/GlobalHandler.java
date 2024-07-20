@@ -5,6 +5,7 @@ import chivi.laptopstore.communication.error.ErrorBodyResponse;
 import chivi.laptopstore.communication.error.FamilyErrorBodyResponse;
 import chivi.laptopstore.communication.error.FieldErrorBodyResponse;
 import chivi.laptopstore.communication.error.NameErrorBodyResponse;
+import com.paypal.base.rest.PayPalRESTException;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.ServletWebRequest;
 
+import java.io.IOException;
 import java.util.Map;
 
 @Slf4j
@@ -99,5 +101,13 @@ public class GlobalHandler {
         String message = exception.getMessage();
         String requestUri = request.getRequest().getRequestURI();
         return new FamilyErrorBodyResponse(CodeError.USERNAME_OR_PASSWORD_INCORRECT_ERROR, message, requestUri);
+    }
+
+    @ExceptionHandler({ PayPalRESTException.class, IOException.class })
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    public ErrorBodyResponse handle(Exception exception, ServletWebRequest request) {
+        String message = exception.getMessage();
+        String requestUri = request.getRequest().getRequestURI();
+        return new ErrorBodyResponse(message, requestUri);
     }
 }

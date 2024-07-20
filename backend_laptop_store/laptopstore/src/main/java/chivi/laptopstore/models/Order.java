@@ -2,30 +2,33 @@ package chivi.laptopstore.models;
 
 
 import chivi.laptopstore.common.EntityNames;
+import chivi.laptopstore.common.OrderStatus;
+import chivi.laptopstore.common.PaymentType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Table(name = EntityNames.TABLE_ORDER)
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Getter
 @Setter
+@Entity
+@Table(name = EntityNames.TABLE_ORDER)
 public class Order extends EntityStandard {
-    @ManyToOne
-    private Account account;
+    private BigDecimal amount;
+    @Enumerated(EnumType.STRING)
+    private PaymentType paymentType;
 
-    @OneToMany(cascade = CascadeType.PERSIST)
-    @JoinTable(
-            name = EntityNames.TABLE_ORDER_ORDER_ITEM,
-            joinColumns = @JoinColumn(name = EntityNames.JOIN_COLUMN_ORDER_ID),
-            inverseJoinColumns = @JoinColumn(name = EntityNames.JOIN_COLUMN_ITEM_ID)
-    )
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Address address;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST)
     private List<OrderItem> items = new ArrayList<>();
+
+    private OrderStatus orderStatus;
 }
+

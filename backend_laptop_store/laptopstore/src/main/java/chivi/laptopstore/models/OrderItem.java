@@ -8,19 +8,21 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 
-@Entity
-@Table(name = EntityNames.TABLE_ORDER_ITEM)
 @NoArgsConstructor
 @Getter
 @Setter
+@Entity
+@Table(name = EntityNames.TABLE_ORDER_ITEM)
 public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = EntityNames.JOIN_COLUMN_PRODUCT_ID, referencedColumnName = "id" )
     private ProductInfo product;
+
+    @ManyToOne
+    private Order order;
 
     private int quantity;
 

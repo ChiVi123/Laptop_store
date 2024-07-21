@@ -16,7 +16,7 @@ function ButtonAddCart({ productId }: { productId: number }) {
     const handleClick = async () => {
         if (!isExpired) {
             const cart = await cartServerAction.add({ productId, quantity: 1 });
-            dispatch(setCartSize(cart.items.length));
+            dispatch(setCartSize(cart.length));
             toast.success('Đã thêm vào giỏ hàng');
         } else {
             toast.info('Đăng nhập để thêm giỏ hàng!!!');

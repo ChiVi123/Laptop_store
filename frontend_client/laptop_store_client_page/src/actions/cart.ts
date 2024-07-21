@@ -3,31 +3,27 @@
 import { revalidateTag } from 'next/cache';
 import { cookies } from 'next/headers';
 
-import { EntityStatus, Key } from '~/common/enums';
-import { RAW_CART, RAW_ORDER_ITEM } from '~/common/values';
+import { Key } from '~/common/enums';
 import { apiRequest, logger } from '~/libs';
 import { handleRefetch } from '~/libs/helper';
-import { ICartBodyResponse, IOrderItemBodyResponse } from '~/types/body.responses';
-import { ICart, IOrderItem } from '~/types/models';
-
-const getRawCartBodyResponse = (message: string): ICartBodyResponse => ({ message, payload: RAW_CART });
-const getRawOrderItemBodyResponse = (message: string): IOrderItemBodyResponse => ({ message, payload: RAW_ORDER_ITEM });
+import { IListBodyResponse } from '~/types/body.responses';
+import { ICartItem } from '~/types/models';
 
 export async function getCart() {
     const accessToken = cookies().get(Key.ACCESS_TOKEN)?.value;
     const { payload } = await apiRequest
         .auth(accessToken)
-        .get('api/v1/private/cart', { next: { tags: [Key.CART] } })
+        .get('api/v1/private/cart-item', { next: { tags: [Key.CART] } })
         .unauthorized(async (error, original) => {
             logger.error('get cart::', error.status, error.json);
             const resultRefresh = await handleRefetch(original);
-            return resultRefresh ?? getRawCartBodyResponse(error.json?.message ?? '');
+            return resultRefresh ?? { message: error.json?.message ?? '', payload: [] };
         })
-        .fetchError((error) => {
+        .fetchError((error): IListBodyResponse<ICartItem> => {
             logger.error('get cart::', error.status, error.json);
-            return getRawCartBodyResponse(error.json?.message ?? '');
+            return { message: error.json?.message ?? '', payload: [] };
         })
-        .json<ICartBodyResponse>();
+        .json<IListBodyResponse<ICartItem>>();
     return payload;
 }
 export async function add(data: { productId: number; quantity: number }) {
@@ -35,89 +31,80 @@ export async function add(data: { productId: number; quantity: number }) {
     const response = await apiRequest
         .auth(accessToken)
         .body(data)
-        .post('api/v1/private/cart/add-item')
+        .post('api/v1/private/cart-item')
         .unauthorized(async (error, original) => {
             logger.error('add cart::', error.status, error.json);
             const resultRefresh = await handleRefetch(original);
-            return resultRefresh ?? getRawCartBodyResponse(error.json?.message ?? '');
+            return resultRefresh ?? { message: error.json?.message ?? '', payload: [] };
         })
-        .fetchError((error) => {
+        .fetchError((error): IListBodyResponse<ICartItem> => {
             logger.error('add cart::', error.status, error.json);
-            return getRawCartBodyResponse(error.json?.message ?? '');
+            return { message: error.json?.message ?? '', payload: [] };
         })
-        .json<ICartBodyResponse>();
+        .json<IListBodyResponse<ICartItem>>();
     revalidateTag(Key.CART);
     return response.payload;
 }
 export async function plus(orderItemId: number) {
     const accessToken = cookies().get(Key.ACCESS_TOKEN)?.value;
-    const response = await apiRequest
+    await apiRequest
         .auth(accessToken)
-        .patch(`api/v1/private/cart/${orderItemId}/plus`)
+        .patch(`api/v1/private/cart-item/${orderItemId}/plus`)
         .unauthorized(async (error, original) => {
             logger.error('cart plus::', error.status, error.json);
-            const resultRefresh = await handleRefetch(original);
-            return resultRefresh ?? getRawCartBodyResponse(error.json?.message ?? '');
+            await handleRefetch(original);
         })
         .fetchError((error) => {
             logger.error('cart plus::', error.status, error.json);
-            return { id: 0, quantity: 0, subTotal: 0 } as Omit<IOrderItem, 'product'>;
         })
-        .json<IOrderItemBodyResponse>();
+        .json();
     revalidateTag(Key.CART);
-    return response.payload;
 }
 export async function minus(orderItemId: number) {
     const accessToken = cookies().get(Key.ACCESS_TOKEN)?.value;
-    const response = await apiRequest
+    await apiRequest
         .auth(accessToken)
-        .patch(`api/v1/private/cart/${orderItemId}/minus`)
+        .patch(`api/v1/private/cart-item/${orderItemId}/minus`)
         .unauthorized(async (error, original) => {
             logger.error('cart minus::', error.status, error.json);
-            const resultRefresh = await handleRefetch(original);
-            return resultRefresh ?? getRawOrderItemBodyResponse(error.json?.message ?? '');
+            await handleRefetch(original);
         })
         .fetchError((error) => {
             logger.error('cart minus::', error.status, error.json);
-            return getRawOrderItemBodyResponse(error.json?.message ?? '');
         })
-        .json<IOrderItemBodyResponse>();
+        .json();
     revalidateTag(Key.CART);
-    return response.payload;
 }
 export async function removeItem(orderItemId: number) {
     const accessToken = cookies().get(Key.ACCESS_TOKEN)?.value;
     const response = await apiRequest
         .auth(accessToken)
-        .delete(`api/v1/private/cart/${orderItemId}/remove-item`)
-        .unauthorized(async (error, original) => {
+        .delete(`api/v1/private/cart-item/${orderItemId}`)
+        .unauthorized(async (error, original): Promise<IListBodyResponse<ICartItem>> => {
             logger.error('cart remove item::', error.status, error.json);
-            const resultRefresh = await handleRefetch(original);
-            return resultRefresh ?? getRawCartBodyResponse(error.json?.message ?? '');
+            const resultRefresh = (await handleRefetch(original)) as IListBodyResponse<ICartItem>;
+            return resultRefresh ?? { message: error.json?.message ?? '', payload: [] };
         })
-        .fetchError((error) => {
+        .fetchError((error): IListBodyResponse<ICartItem> => {
             logger.error('cart remove item::', error.status, error.json);
-            return { items: new Array(), status: EntityStatus.ENABLED } as ICart;
+            return { message: error.json?.message ?? '', payload: [] };
         })
-        .json<ICartBodyResponse>();
+        .json<IListBodyResponse<ICartItem>>();
     revalidateTag(Key.CART);
     return response.payload;
 }
 export async function removeAllItem() {
     const accessToken = cookies().get(Key.ACCESS_TOKEN)?.value;
-    const response = await apiRequest
+    await apiRequest
         .auth(accessToken)
-        .delete(`api/v1/private/cart/remove-all`)
+        .delete('api/v1/private/cart-item')
         .unauthorized(async (error, original) => {
             logger.error('cart remove all::', error.status, error.json);
-            const resultRefresh = await handleRefetch(original);
-            return resultRefresh ?? getRawCartBodyResponse(error.json?.message ?? '');
+            await handleRefetch(original);
         })
         .fetchError((error) => {
             logger.error('cart remove all::', error.status, error.json);
-            return { items: new Array(), status: EntityStatus.ENABLED } as ICart;
         })
-        .json<ICartBodyResponse>();
+        .json();
     revalidateTag(Key.CART);
-    return response.payload;
 }

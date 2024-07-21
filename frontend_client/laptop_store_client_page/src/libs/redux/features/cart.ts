@@ -12,6 +12,12 @@ const cartSlice = createAppSlice({
         setCartSize: creators.reducer((state, { payload }: PayloadAction<number>) => {
             state.value = payload;
         }),
+        increaseCartSize: creators.reducer((state) => {
+            state.value += 1;
+        }),
+        decreaseCartSize: creators.reducer((state) => {
+            state.value -= 1;
+        }),
         resetCartSize: creators.reducer((state) => {
             state.value = 0;
         }),

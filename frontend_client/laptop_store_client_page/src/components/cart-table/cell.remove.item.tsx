@@ -25,8 +25,8 @@ function CellRemoveItem({ id, className }: { id: number; className?: string }) {
     const dispatch = useAppDispatch();
 
     const handleClick = async () => {
-        const { items } = await cartServerAction.removeItem(id);
-        dispatch(setCartSize(items.length));
+        const cart = await cartServerAction.removeItem(id);
+        dispatch(setCartSize(cart.length));
         setOpenDialog(false);
     };
     return (

@@ -8,7 +8,7 @@ import { useCallback, useMemo } from 'react';
 import '~/libs/extension.number';
 
 import { cartServerAction } from '~/actions';
-import { IOrderItem, IProductInfo } from '~/types/models';
+import { ICartItem } from '~/types/models';
 
 import InputQuantity from '../input-quantity';
 import { Button } from '../ui/button';
@@ -17,46 +17,44 @@ import CellRemoveAllItem from './cell.remove.all.item';
 import CellRemoveItem from './cell.remove.item';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './table';
 
-function CartTable({ data }: { data: IOrderItem[] }) {
-    const columns = useMemo<ColumnDef<IOrderItem>[]>(
+function CartTable({ data }: { data: ICartItem[] }) {
+    const columns = useMemo<ColumnDef<ICartItem>[]>(
         () => [
             {
                 id: 'thumbnail-name',
                 accessorFn: (orderItem) => orderItem,
                 header: ({ table }) => `Tất cả (${table.getRowModel().rows.length} sản phẩm)`,
                 cell: ({ getValue }) => {
-                    const {
-                        id,
-                        quantity,
-                        subTotal,
-                        product: { thumbnailUrl, name, price, quantityStock },
-                    } = getValue<IOrderItem>();
+                    const item = getValue<ICartItem>();
                     return (
                         <div className='flex items-start gap-2'>
                             <Image
-                                src={thumbnailUrl}
-                                alt={name}
+                                src={item.productThumbnail}
+                                alt={item.productName}
                                 width={84}
                                 height={84}
                                 className='size-20 lg:size-16'
                             />
                             <div className='flex-1 space-y-2'>
                                 <div className='flex items-center'>
-                                    <span className='w-full text-base text-cv-gray-100 font-normal break-words line-clamp-2'>
-                                        {name}
-                                    </span>
-                                    <CellRemoveItem id={id} className='flex lg:hidden w-fit lg:w-full' />
+                                    <Link
+                                        href={'/' + item.productSlug}
+                                        className='w-full text-base text-cv-gray-100 font-normal break-words line-clamp-2'
+                                    >
+                                        {item.productName}
+                                    </Link>
+                                    <CellRemoveItem id={item.id} className='flex lg:hidden w-fit lg:w-full' />
                                 </div>
-                                <div className='block lg:hidden font-semibold'>{price.toCurrency()}</div>
+                                <div className='block lg:hidden font-semibold'>{item.productPrice.toCurrency()}</div>
                                 <div className='flex lg:hidden items-center justify-between'>
                                     <InputQuantity
-                                        id={id}
-                                        quantity={quantity}
-                                        stock={quantityStock}
-                                        onMinus={async () => void (await cartServerAction.minus(id))}
-                                        onPlus={async () => void (await cartServerAction.plus(id))}
+                                        id={item.id}
+                                        quantity={item.quantity}
+                                        stock={item.productQuantityStock}
+                                        onMinus={async () => void (await cartServerAction.minus(item.id))}
+                                        onPlus={async () => void (await cartServerAction.plus(item.id))}
                                     />
-                                    <div className='font-semibold text-red-600'>{subTotal.toCurrency()}</div>
+                                    <div className='font-semibold text-red-600'>{item.total.toCurrency()}</div>
                                 </div>
                             </div>
                         </div>
@@ -64,11 +62,10 @@ function CartTable({ data }: { data: IOrderItem[] }) {
                 },
             },
             {
-                accessorKey: 'product',
+                accessorKey: 'productPrice',
                 header: 'Đơn giá',
                 cell: ({ getValue }) => {
-                    const { price } = getValue<IProductInfo>();
-                    return <div className='font-semibold'>{price.toCurrency()}</div>;
+                    return <div className='font-semibold'>{getValue<number>().toCurrency()}</div>;
                 },
             },
             {
@@ -76,24 +73,20 @@ function CartTable({ data }: { data: IOrderItem[] }) {
                 accessorFn: (orderItem) => orderItem,
                 header: 'Số lượng',
                 cell: ({ getValue }) => {
-                    const {
-                        id,
-                        quantity,
-                        product: { quantityStock },
-                    } = getValue<IOrderItem>();
+                    const item = getValue<ICartItem>();
                     return (
                         <InputQuantity
-                            id={id}
-                            quantity={quantity}
-                            stock={quantityStock}
-                            onMinus={async () => void (await cartServerAction.minus(id))}
-                            onPlus={async () => void (await cartServerAction.plus(id))}
+                            id={item.id}
+                            quantity={item.quantity}
+                            stock={item.productQuantityStock}
+                            onMinus={async () => void (await cartServerAction.minus(item.id))}
+                            onPlus={async () => void (await cartServerAction.plus(item.id))}
                         />
                     );
                 },
             },
             {
-                accessorKey: 'subTotal',
+                accessorKey: 'total',
                 header: 'Thành tiền',
                 cell: ({ getValue }) => (
                     <div className='font-semibold text-red-600'>{getValue<number>().toCurrency()}</div>
@@ -116,7 +109,7 @@ function CartTable({ data }: { data: IOrderItem[] }) {
     const table = useReactTable({ data, columns, getCoreRowModel: getCoreRowModel() });
     const headerGroups = useMemo(() => table.getHeaderGroups(), [table]);
     const renderHeaderCell = useCallback(
-        (header: Header<IOrderItem, unknown>) =>
+        (header: Header<ICartItem, unknown>) =>
             header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext()),
         [],
     );

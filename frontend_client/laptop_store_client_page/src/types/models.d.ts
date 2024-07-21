@@ -80,6 +80,18 @@ export interface ICart extends IEntityStatus {
     items: IOrderItem[];
     subTotal: number;
 }
+export interface ICartItem extends IEntity {
+    productId: number;
+    accountId: number;
+    productName: string;
+    productSlug: string;
+    productThumbnail: string;
+    productPrice: number;
+    productDiscount: number | null;
+    productQuantityStock: number;
+    quantity: number;
+    total: number;
+}
 export interface IOrder {
     items: IOrderItem[];
 }

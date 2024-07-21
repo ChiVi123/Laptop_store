@@ -5,7 +5,10 @@ import chivi.laptopstore.common.AccountStatus;
 import chivi.laptopstore.common.EntityNames;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -45,7 +48,7 @@ public class Account extends EntityStandard {
     @Column(name = EntityNames.COLUMN_LIKE_COUNT, columnDefinition = "int default 0")
     private int likeCount;
 
-    @OneToMany(mappedBy = "account", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "account")
     @JsonManagedReference
     private List<Address> addresses = new ArrayList<>();
 

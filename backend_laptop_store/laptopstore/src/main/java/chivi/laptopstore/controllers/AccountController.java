@@ -5,6 +5,7 @@ import chivi.laptopstore.common.ResponseMessage;
 import chivi.laptopstore.communication.requests.AccountRequest;
 import chivi.laptopstore.communication.responses.SuccessResponse;
 import chivi.laptopstore.helpers.AuthContext;
+import chivi.laptopstore.mappers.AccountMapper;
 import chivi.laptopstore.models.Account;
 import chivi.laptopstore.services.AccountService;
 import jakarta.validation.Valid;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class AccountController {
     private final AccountService accountService;
+    private final AccountMapper mapper;
 
     @GetMapping(RequestMaps.ACCOUNT_PATHNAME_ADMIN + "all")
     @ResponseStatus(HttpStatus.OK)
@@ -30,7 +32,8 @@ public class AccountController {
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse getProfile() {
         Account account = AuthContext.getFromSecurityContext();
-        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, account);
+        var accountPayload = mapper.toPayloadFromAccount(account);
+        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, accountPayload);
     }
 
     @PutMapping(RequestMaps.ACCOUNT_PATHNAME_PRIVATE + "edit")

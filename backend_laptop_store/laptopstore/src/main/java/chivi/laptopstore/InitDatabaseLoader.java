@@ -21,13 +21,11 @@ import java.util.List;
 public class InitDatabaseLoader implements CommandLineRunner {
     private final ICategoryInfoRepository categoryInfoRepository;
     private final ICategoryNodeRepository categoryNodeRepository;
-    //    private final ICartRepository cartRepository;
     private final IRefreshTokenRepository refreshTokenRepository;
 
     @Override
     public void run(String... args) throws Exception {
         this.initialCategory();
-        this.setStateExpired();
         this.handleRefreshTokenExpired();
     }
 
@@ -53,16 +51,6 @@ public class InitDatabaseLoader implements CommandLineRunner {
         categoryNodeRepository.saveAll(List.of(rootCategoryNode, defaultCategoryNode));
 
         log.info("Init root and default category!!!");
-    }
-
-    private void setStateExpired() {
-//        List<Cart> carts = cartRepository.findAllByStatus(EntityStatus.ENABLED);
-//        carts.forEach(cart -> {
-//            if (cart.getExpiration().compareTo(Instant.now()) < 0) {
-//                cart.setStatus(EntityStatus.DISABLED);
-//            }
-//        });
-//        cartRepository.saveAll(carts);
     }
 
     private void handleRefreshTokenExpired() {

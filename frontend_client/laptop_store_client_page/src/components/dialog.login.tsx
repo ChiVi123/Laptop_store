@@ -73,7 +73,7 @@ function DialogLogin({ children }: PropsWithChildren) {
         const result = await authServerAction.login(data);
 
         if (result.accessToken) {
-            const { items } = await cartServerAction.getCart();
+            const items = await cartServerAction.getCart();
 
             dispatch(setAccountToken(result));
             dispatch(setCartSize(items.length));

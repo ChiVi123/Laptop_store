@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { cartServerAction } from '~/actions';
 import { useAppDispatch } from '~/hooks/redux';
 
-import { setCartSize } from '~/libs/redux/features';
+import { resetCartSize } from '~/libs/redux/features';
 import { Button } from '../ui/button';
 import {
     Dialog,
@@ -24,8 +24,8 @@ function CellRemoveAllItem() {
     const dispatch = useAppDispatch();
 
     const handleClick = async () => {
-        const { items } = await cartServerAction.removeAllItem();
-        dispatch(setCartSize(items.length));
+        await cartServerAction.removeAllItem();
+        dispatch(resetCartSize());
         setOpenDialog(false);
     };
 

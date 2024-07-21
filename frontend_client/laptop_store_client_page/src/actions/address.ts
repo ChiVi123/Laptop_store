@@ -26,6 +26,23 @@ export async function getAll() {
         .json<IListBodyResponse<IAddress>>();
     return payload;
 }
+export async function getDefault() {
+    const accessToken = cookies().get(Key.ACCESS_TOKEN)?.value;
+    const { payload } = await apiRequest
+        .auth(accessToken)
+        .get('/api/v1/private/address/default')
+        .unauthorized(async (error, original) => {
+            console.log('get address by id::', error.status, error.json);
+            const resultRefresh = await handleRefetch(original);
+            return resultRefresh ?? { message: error.json?.message ?? '', payload: RAW_ADDRESS };
+        })
+        .fetchError((error): IPayloadBodyResponse<IAddress> => {
+            console.log('get address by id::', error.status, error.json);
+            return { message: error.json?.message ?? '', payload: RAW_ADDRESS };
+        })
+        .json<IPayloadBodyResponse<IAddress>>();
+    return payload;
+}
 export async function getById(id: number) {
     const accessToken = cookies().get(Key.ACCESS_TOKEN)?.value;
     const { payload } = await apiRequest
@@ -50,7 +67,7 @@ export type AddressRequest = {
 
 export async function create(data: AddressRequest) {
     const accessToken = cookies().get(Key.ACCESS_TOKEN)?.value;
-    const response = await apiRequest
+    const result = await apiRequest
         .auth(accessToken)
         .body(data)
         .post('/api/v1/private/address')
@@ -65,11 +82,10 @@ export async function create(data: AddressRequest) {
             console.log('create address::', error.status, error.json);
             return { message: error.json?.message ?? '', payload: false };
         })
-        .json<IPayloadBodyResponse<IAddress>>();
+        .json((data): IPayloadBodyResponse<boolean> => ({ message: data.message, payload: true }));
 
     revalidateTag('all-address-tag');
-
-    return { message: response.message, payload: true };
+    return result;
 }
 export async function update(data: AddressRequest) {
     const accessToken = cookies().get(Key.ACCESS_TOKEN)?.value;

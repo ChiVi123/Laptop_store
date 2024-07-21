@@ -15,7 +15,11 @@ export const handleRefetch = async (request: IFetchain) => {
         redirect('/logout');
     }
     const { payload } = await apiRequest.body({ refreshToken }).post('api/v1/auth/refresh-token').json<IBodyResponse>();
-    return request.auth(payload).recall().json();
+    return request
+        .auth(payload)
+        .recall()
+        .unauthorized(() => null)
+        .json();
 };
 export const handleReturnError = (reason: unknown) => {
     return reason instanceof FetchainError

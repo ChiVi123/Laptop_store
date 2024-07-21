@@ -4,8 +4,9 @@ import { orderServerAction } from '~/actions';
 import { Button } from '~/components/ui/button';
 
 interface IProps {
-    params: { status: string };
+    params: { paymentMethod: string; status: string };
     searchParams: {
+        token: string | undefined;
         paymentId: string | undefined;
         PayerID: string | undefined;
     };
@@ -13,7 +14,7 @@ interface IProps {
 
 async function NotifyOrderPage({ params, searchParams }: IProps) {
     if (params.status === 'success') {
-        const result = await orderServerAction.executePayment(searchParams);
+        const result = await orderServerAction.executePayment(params.paymentMethod, searchParams);
         return (
             <main>
                 {result.isSuccess ? (

@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @Slf4j
@@ -120,16 +119,6 @@ public class ProductService {
         productInfoRepository.save(productInfo);
     }
 
-    public void restoreAllStock(List<Map<String, Object>> mapList) {
-        List<ProductInfo> infoList = mapList.stream().map(item -> {
-            ProductInfo info = (ProductInfo) item.get("info");
-            int stock = info.getQuantityStock() + (int) item.get("quantity");
-            info.setQuantityStock(stock);
-            return info;
-        }).toList();
-        productInfoRepository.saveAll(infoList);
-    }
-
     public void removeAttribute(ProductDetail productDetail, Attribute attribute) {
         productDetail.removeAttribute(attribute);
         productDetailRepository.save(productDetail);
@@ -142,11 +131,47 @@ public class ProductService {
         return result.getImages();
     }
 
+    public void updateAllQuantitySold(List<OrderLine> items) {
+        List<ProductInfo> products = items.stream().map(item -> {
+            var product = item.getProduct();
+            int sold = product.getQuantitySold();
+            int quantity = item.getQuantity();
+
+            product.setQuantitySold(sold + quantity);
+            return product;
+        }).toList();
+        productInfoRepository.saveAll(products);
+    }
+
+    public void restoreFromCartItem(List<CartItem> items) {
+        List<ProductInfo> products = items.stream().map(item -> {
+            var product = item.getProduct();
+            int stock = product.getQuantityStock();
+            int quantity = item.getQuantity();
+
+            product.setQuantityStock(stock + quantity);
+            return product;
+        }).toList();
+        productInfoRepository.saveAll(products);
+    }
+
+    public void restoreFromOrderItem(List<OrderLine> items) {
+        List<ProductInfo> products = items.stream().map(item -> {
+            var product = item.getProduct();
+            int stock = product.getQuantityStock();
+            int quantity = item.getQuantity();
+
+            product.setQuantityStock(stock + quantity);
+            return product;
+        }).toList();
+        productInfoRepository.saveAll(products);
+    }
+
     public void delete(ProductDetail productDetail) {
         List<String> publicIds = productDetail.getImages().stream().map(Image::getPublicId).toList();
         productDetail.clearAllCategory();
 
-        if (publicIds.size() > 0) {
+        if (!publicIds.isEmpty()) {
             cloudinaryConfig.deleteImage(publicIds);
         }
         productDetailRepository.delete(productDetail);

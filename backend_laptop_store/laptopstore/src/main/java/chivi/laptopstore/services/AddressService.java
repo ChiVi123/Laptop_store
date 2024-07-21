@@ -21,6 +21,11 @@ public class AddressService {
         return repository.findById(id).orElseThrow(() -> new NotFoundDataException("address", id));
     }
 
+    public Address getDefaultByAccountId(Long accountId) {
+        return repository.findAddressByAccount_IdAndSelectDefault(accountId, true)
+                .orElseThrow(() -> new NotFoundDataException("default address", accountId));
+    }
+
     public List<Address> getAllByAccountId(Long accountId) {
         return repository.findAllByAccount_Id(accountId);
     }

@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.List;
 
 public interface IPaymentMethodService {
-    String createPayment(List<CartItem> cartItems, MakePaymentRequest request) throws PayPalRESTException, IOException;
+    CreatePaymentPayload createPayment(List<CartItem> cartItems, MakePaymentRequest request) throws PayPalRESTException, IOException;
 
     Boolean executePayment(ExecutePaymentRequest request) throws PayPalRESTException;
 }

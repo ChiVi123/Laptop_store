@@ -131,7 +131,7 @@ public class ProductService {
         return result.getImages();
     }
 
-    public void updateAllQuantitySold(List<OrderItem> items) {
+    public void updateAllQuantitySold(List<OrderLine> items) {
         List<ProductInfo> products = items.stream().map(item -> {
             var product = item.getProduct();
             int sold = product.getQuantitySold();
@@ -155,7 +155,7 @@ public class ProductService {
         productInfoRepository.saveAll(products);
     }
 
-    public void restoreFromOrderItem(List<OrderItem> items) {
+    public void restoreFromOrderItem(List<OrderLine> items) {
         List<ProductInfo> products = items.stream().map(item -> {
             var product = item.getProduct();
             int stock = product.getQuantityStock();

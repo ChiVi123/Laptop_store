@@ -12,9 +12,11 @@ import chivi.laptopstore.services.CartItemService;
 import chivi.laptopstore.services.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(RequestMaps.API_V1 + "/private/cart-item")
@@ -41,8 +43,11 @@ public class CartItemController {
         var product = productService.getInfoById(request.productId());
 
         productService.updateStock(product, product.getQuantityStock() - request.quantity());
-        cartItemService.create(mapper.toCartItem(account.getId(), request));
-        return new SuccessResponse(ResponseMessage.CREATE_SUCCESS);
+        var cart = cartItemService.createOrUpdate(mapper.toCartItem(account.getId(), product, request))
+                .stream()
+                .map(mapper::toCartItemPayload)
+                .toList();
+        return new SuccessResponse(ResponseMessage.CREATE_SUCCESS, cart);
     }
 
     @PatchMapping("{cartItemId}/plus")
@@ -74,13 +79,19 @@ public class CartItemController {
     @DeleteMapping("{cartItemId}")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse deleteCartItem(@PathVariable long cartItemId) {
+        Account account = AuthContext.getFromSecurityContext();
         var cartItem = cartItemService.getById(cartItemId);
         var product = cartItem.getProduct();
         int stock = cartItem.getQuantity() + product.getQuantityStock();
 
         productService.updateStock(product, stock);
         cartItemService.deleteById(cartItemId);
-        return new SuccessResponse(ResponseMessage.DELETE_SUCCESS);
+
+        var cart = cartItemService.getAllCartItemByAccountId(account.getId())
+                .stream()
+                .map(mapper::toCartItemPayload)
+                .toList();
+        return new SuccessResponse(ResponseMessage.DELETE_SUCCESS, cart);
     }
 
     @DeleteMapping()

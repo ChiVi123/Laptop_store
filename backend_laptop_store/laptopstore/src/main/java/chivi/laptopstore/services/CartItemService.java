@@ -22,7 +22,7 @@ public class CartItemService {
                 .orElseThrow(() -> new NotFoundDataException("cart item", cartItemId));
     }
 
-    public CartItem create(CartItem cartItem) {
+    public List<CartItem> createOrUpdate(CartItem cartItem) {
         long productId = cartItem.getProduct().getId();
         var allCartItems = repository.findAllCartItemByAccountId(cartItem.getAccount().getId());
         var itemOptional = allCartItems.stream().filter(item -> item.getProduct().getId().equals(productId)).findFirst();
@@ -30,9 +30,12 @@ public class CartItemService {
         if (itemOptional.isPresent()) {
             var item = itemOptional.get();
             item.setQuantity(item.getQuantity() + cartItem.getQuantity());
-            return repository.save(item);
+            repository.save(item);
+            return allCartItems;
         } else {
-            return repository.save(cartItem);
+            var newCartItem = repository.save(cartItem);
+            allCartItems.add(newCartItem);
+            return allCartItems;
         }
     }
 

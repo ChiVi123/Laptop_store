@@ -8,6 +8,7 @@ import com.paypal.api.payments.*;
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -16,13 +17,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class PaypalService implements IPaymentMethodService {
     private final APIContext apiContext;
 
     @Override
-    public String createPayment(List<CartItem> cartItems, MakePaymentRequest request) throws PayPalRESTException, IOException {
+    public CreatePaymentPayload createPayment(List<CartItem> cartItems, MakePaymentRequest request) throws PayPalRESTException, IOException {
         BigDecimal subTotal = cartItems.stream().map(CartItem::getTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
         double total = PriceHandler.exchange(subTotal);
         Amount amount = new Amount();
@@ -47,19 +49,19 @@ public class PaypalService implements IPaymentMethodService {
         RedirectUrls redirectUrls = new RedirectUrls();
         redirectUrls.setReturnUrl(request.successUrl());
         redirectUrls.setCancelUrl(request.cancelUrl());
-
         payment.setRedirectUrls(redirectUrls);
 
         var paymentCreated = payment.create(apiContext);
-        String href = null;
-
         for (Links links : paymentCreated.getLinks()) {
             if (links.getRel().equals("approval_url")) {
-                href = links.getHref();
+                return new CreatePaymentPayload(
+                        links.getHref().split("&token=")[1],
+                        links.getHref(),
+                        request.paymentMethod()
+                );
             }
         }
-
-        return href;
+        return null;
     }
 
     @Override

@@ -24,6 +24,14 @@ public class AddressController {
         return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, addressService.getAllByAccountId(account.getId()));
     }
 
+    @GetMapping("default")
+    @ResponseStatus(HttpStatus.OK)
+    public SuccessResponse getDefaultAddressByAccountId() {
+        var accountId = AuthContext.getFromSecurityContext().getId();
+        var address = addressService.getDefaultByAccountId(accountId);
+        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, address);
+    }
+
     @GetMapping("{address-id}")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse getAddressById(@PathVariable("address-id") Long addressId) {

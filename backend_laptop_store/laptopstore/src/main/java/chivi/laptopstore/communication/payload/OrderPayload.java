@@ -1,7 +1,7 @@
 package chivi.laptopstore.communication.payload;
 
 import chivi.laptopstore.common.DeliveryAddressType;
-import chivi.laptopstore.models.OrderItem;
+import chivi.laptopstore.models.OrderLine;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -16,6 +16,6 @@ public record OrderPayload(
         String shippingFullName,
         String shippingAddress,
         DeliveryAddressType shippingDeliveryAddressType,
-        List<OrderItem> items
+        List<OrderLine> items
 ) {
 }

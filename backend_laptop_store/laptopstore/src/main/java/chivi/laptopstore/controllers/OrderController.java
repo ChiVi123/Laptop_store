@@ -7,7 +7,7 @@ import chivi.laptopstore.communication.requests.MakePaymentRequest;
 import chivi.laptopstore.communication.responses.SuccessResponse;
 import chivi.laptopstore.exception.BaseException;
 import chivi.laptopstore.helpers.AuthContext;
-import chivi.laptopstore.mappers.OrderItemMapper;
+import chivi.laptopstore.mappers.OrderLineMapper;
 import chivi.laptopstore.services.CartItemService;
 import chivi.laptopstore.services.OrderService;
 import chivi.laptopstore.services.ProductService;
@@ -29,7 +29,8 @@ public class OrderController {
     private final OrderService orderService;
     private final ProductService productService;
     private final PaymentServiceGetter paymentServiceGetter;
-    private final OrderItemMapper orderItemMapper;
+    private final OrderLineMapper orderLineMapper;
+//  sb-mn470631681810@personal.example.com
 
     @PostMapping("make-payment")
     @ResponseStatus(HttpStatus.OK)
@@ -37,15 +38,15 @@ public class OrderController {
         var account = AuthContext.getFromSecurityContext();
         var cartItems = cartItemService.getAllCartItemByAccountId(account.getId());
         var paymentService = paymentServiceGetter.getService(request.paymentMethod());
-        String href = paymentService.createPayment(cartItems, request);
+        var createPaymentPayload = paymentService.createPayment(cartItems, request);
 
-        if (href == null) {
+        if (createPaymentPayload == null) {
             throw new BaseException(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Can't init payment");
         }
 
-        var orderItem = cartItems.stream().map(orderItemMapper::toOrderItemFromCartItem).toList();
-        orderService.create(orderItem, request);
-        return new SuccessResponse("Payment init complete", href);
+        var orderItems = cartItems.stream().map(orderLineMapper::toOrderItemFromCartItem).toList();
+        orderService.create(createPaymentPayload.token(), orderItems, request);
+        return new SuccessResponse("Payment init complete", createPaymentPayload.href());
     }
 
     @PatchMapping("execute-payment")
@@ -56,7 +57,7 @@ public class OrderController {
 
         if (isSuccess) {
             var account = AuthContext.getFromSecurityContext();
-            var order = orderService.findByIdAndStatus(request.orderId(), OrderStatus.PREPARING);
+            var order = orderService.findByPaymentTokenAndStatus(request.token(), OrderStatus.PREPARING);
             orderService.setStatus(order, OrderStatus.PROCESSING);
             cartItemService.deleteAllByAccountId(account.getId());
 

@@ -26,10 +26,10 @@ public class CartItemMapper {
         );
     }
 
-    public CartItem toCartItem(Long accountId, CartItemRequest request) {
+    public CartItem toCartItem(Long accountId, ProductInfo product, CartItemRequest request) {
         return CartItem.builder()
                 .quantity(request.quantity())
-                .product(ProductInfo.builder().id(request.productId()).build())
+                .product(product)
                 .account(Account.builder().id(accountId).build())
                 .build();
     }

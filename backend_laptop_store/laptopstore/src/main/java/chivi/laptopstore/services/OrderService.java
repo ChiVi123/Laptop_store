@@ -5,7 +5,7 @@ import chivi.laptopstore.communication.requests.MakePaymentRequest;
 import chivi.laptopstore.exception.NotFoundDataException;
 import chivi.laptopstore.mappers.OrderMapper;
 import chivi.laptopstore.models.Order;
-import chivi.laptopstore.models.OrderItem;
+import chivi.laptopstore.models.OrderLine;
 import chivi.laptopstore.repositories.IOrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,26 +24,36 @@ public class OrderService {
     }
 
     public Order findByIdAndInOrderStatus(Long orderId, List<OrderStatus> statuses) {
-        return repository.findByIdAndOrderStatusIn(orderId, statuses)
-                .orElseThrow(() -> new NotFoundDataException("order not canceled or completed", orderId));
-    }
-
-    public Order findByIdAndStatus(Long orderId, OrderStatus orderStatus) {
-        return repository.findByIdAndOrderStatus(orderId, orderStatus)
+        return repository.findByIdAndStatusIn(orderId, statuses)
                 .orElseThrow(() -> new NotFoundDataException("order", orderId));
     }
 
-    public void create(List<OrderItem> orderItems, MakePaymentRequest request) {
-        BigDecimal amount = orderItems.stream().map(OrderItem::getSubTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
+    public Order findByIdAndStatus(Long orderId, OrderStatus orderStatus) {
+        return repository.findByIdAndStatus(orderId, orderStatus)
+                .orElseThrow(() -> new NotFoundDataException("order", orderId));
+    }
+
+    public Order findByPaymentTokenAndStatus(String token, OrderStatus orderStatus) {
+        return repository.findOrderByPaymentTokenAndStatus(token, orderStatus)
+                .orElseThrow(() -> new NotFoundDataException("order", token));
+    }
+
+    public Order create(String token, List<OrderLine> orderLines, MakePaymentRequest request) {
+        BigDecimal amount = orderLines.stream().map(OrderLine::getSubTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
         var order = orderMapper.toOrderFromMakePaymentRequest(request);
+        order.setPaymentToken(token);
         order.setAmount(amount);
-        order.setItems(orderItems);
-        order.setOrderStatus(OrderStatus.PREPARING);
-        repository.save(order);
+        order.setItems(orderLines);
+        order.setStatus(OrderStatus.PREPARING);
+
+        orderLines.forEach(line -> {
+            line.setOrder(order);
+        });
+        return repository.save(order);
     }
 
     public void setStatus(Order order, OrderStatus orderStatus) {
-        order.setOrderStatus(orderStatus);
+        order.setStatus(orderStatus);
         repository.save(order);
     }
 }

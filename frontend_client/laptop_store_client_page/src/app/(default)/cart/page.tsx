@@ -19,7 +19,7 @@ async function CartPage() {
         <Container component='main' className='px-0 md:px-4 pt-[3.875rem] pb-16 md:py-[4.625rem]'>
             <h2 className='hidden lg:block mb-2 text-xl'>Giỏ hàng</h2>
             {/* width 1200px => 29% width 360px + 12px (gap-3) */}
-            <div className='grid grid-cols-1 lg:grid-cols-[auto_29%_0] gap-3'>
+            <div className='grid grid-cols-1 lg:grid-cols-[auto_29%_0] grid-rows-[8rem_auto] gap-3'>
                 <div className='row-start-1 row-span-2'>
                     <CartTable data={cart} />
                 </div>
@@ -41,7 +41,7 @@ async function CartPage() {
                 </div>
 
                 <div className='lg:col-start-2 lg:col-span-2'>
-                    <div className='bg-white p-4 rounded-sm'>
+                    <div className='sticky top-16 right-0 left-0 bg-white p-4 rounded-sm'>
                         <SectionTotal cart={cart} />
                         <Link
                             href='/make-payment'

@@ -10,7 +10,11 @@ import { setDefaultCategory } from '~/libs/redux/features';
 import { AppStore, RootState, makeStore } from '~/libs/redux/store';
 import { ICategoryNode } from '~/types/models';
 
-function ReduxProvider({ children, rootCategory }: PropsWithChildren<{ rootCategory: ICategoryNode }>) {
+interface IReduxProviderProps {
+    rootCategory: ICategoryNode;
+}
+
+function ReduxProvider({ rootCategory, children }: PropsWithChildren<IReduxProviderProps>) {
     const storeRef = useRef<AppStore | null>(null);
 
     if (storeRef.current === null) {

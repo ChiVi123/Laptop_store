@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Fragment } from 'react';
 import { orderServerAction } from '~/actions';
 import { Button } from '~/components/ui/button';
+import { CartHandler } from '../_components';
 
 interface IProps {
     params: { paymentMethod: string; status: string };
@@ -17,16 +18,18 @@ async function NotifyOrderPage({ params, searchParams }: IProps) {
         const result = await orderServerAction.executePayment(params.paymentMethod, searchParams);
         return (
             <main>
-                {result.isSuccess ? (
-                    <h1 className='mt-5 text-xl text-center'>Thanh toán thành công</h1>
-                ) : (
-                    <Fragment>
-                        <h1 className='mt-5 text-xl text-destructive text-center'>Thanh toán thất bại</h1>
-                        <p className='mt-2 text-center'>
-                            Đã có lỗi xảy ra trong quá trình thanh toán. Vui lòng thử lại.
-                        </p>
-                    </Fragment>
-                )}
+                <CartHandler success={result.isSuccess}>
+                    {result.isSuccess ? (
+                        <h1 className='mt-5 text-xl text-center'>Thanh toán thành công</h1>
+                    ) : (
+                        <Fragment>
+                            <h1 className='mt-5 text-xl text-destructive text-center'>Thanh toán thất bại</h1>
+                            <p className='mt-2 text-center'>
+                                Đã có lỗi xảy ra trong quá trình thanh toán. Vui lòng thử lại.
+                            </p>
+                        </Fragment>
+                    )}
+                </CartHandler>
                 <div className='flex justify-center mt-5'>
                     <Button asChild>
                         <Link href='/'>Về trang chủ</Link>

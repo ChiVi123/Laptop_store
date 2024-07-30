@@ -1,0 +1,12 @@
+# https://docs.docker.com/build/building/multi-stage/
+# as build -> is name stage
+FROM maven:3.8.7-openjdk-18-slim as build
+WORKDIR /app
+COPY laptopstore /app/laptopstore
+RUN mvn package -Dmaven.test.skip -f /app/laptopstore/pom.xml
+
+FROM openjdk:22-ea-18-slim-bookworm
+WORKDIR /app
+COPY --from=build /app/laptopstore/target/laptopstore-0.0.1-SNAPSHOT.jar app.jar
+EXPOSE 8080
+CMD [ "java", "-jar", "app.jar" ]

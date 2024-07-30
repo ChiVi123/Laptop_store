@@ -4,10 +4,9 @@ import { Google as Google_icon } from '@mui/icons-material';
 import { Box, TextField, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { loginAction } from '~/actions/authActions';
+import { authServerAction } from '~/actions';
 import { EPath } from '~/common/enums';
 import { loginDefaultValues } from '~/common/values';
 import PasswordField from '~/components/auth/password.field';
@@ -22,24 +21,10 @@ function LoginPage() {
         handleSubmit,
     } = useForm<loginFormData>({ resolver: loginResolver, defaultValues: loginDefaultValues });
     const [disabled, setDisabled] = useState<boolean>(false);
-    const router = useRouter();
 
     const handleOnSubmit: SubmitHandler<loginFormData> = async (data) => {
         setDisabled(true);
-        const result = await loginAction(data);
-
-        if (result?.success) {
-            router.push(EPath.MANAGE_PRODUCT_LIST);
-            return;
-        }
-
-        if (result?.error?.message) {
-            const { message } = result.error;
-            if (message.includes('is not verified')) {
-                router.push(EPath.AUTH_SEND_MAIL_VERIFY);
-            }
-        }
-
+        await authServerAction.login(data);
         setDisabled(false);
     };
 

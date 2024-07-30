@@ -1,7 +1,7 @@
+import { PropsWithChildren } from 'react';
 import { StyleWrap } from '~/components/auth/styles';
-import { IOnlyChildren } from '~/types/props';
 
-function AuthLayout({ children }: IOnlyChildren) {
+function AuthLayout({ children }: PropsWithChildren) {
     return <StyleWrap>{children}</StyleWrap>;
 }
 

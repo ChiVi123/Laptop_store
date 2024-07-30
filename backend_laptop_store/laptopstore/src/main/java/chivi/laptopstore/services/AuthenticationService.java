@@ -1,16 +1,15 @@
 package chivi.laptopstore.services;
 
-import chivi.laptopstore.common.EAccountRole;
-import chivi.laptopstore.common.EAccountStatus;
-import chivi.laptopstore.models.entities.AccountEntity;
-import chivi.laptopstore.models.entities.VerificationTokenEntity;
-import chivi.laptopstore.models.exceptions.ConflictException;
-import chivi.laptopstore.models.exceptions.CustomNotFoundException;
-import chivi.laptopstore.models.requests.RegisterRequest;
-import chivi.laptopstore.repositories.entities.IAccountRepository;
-import chivi.laptopstore.repositories.entities.IVerificationTokenRepository;
+import chivi.laptopstore.common.AccountRole;
+import chivi.laptopstore.common.AccountStatus;
+import chivi.laptopstore.exception.ConflictException;
+import chivi.laptopstore.exception.NotFoundDataException;
+import chivi.laptopstore.models.Account;
+import chivi.laptopstore.models.VerificationToken;
+import chivi.laptopstore.communication.requests.RegisterRequest;
+import chivi.laptopstore.repositories.IAccountRepository;
+import chivi.laptopstore.repositories.IVerificationTokenRepository;
 import chivi.laptopstore.security.account.AccountDetails;
-import chivi.laptopstore.security.jwt.JwtUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,25 +30,17 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final IAccountRepository accountRepository;
     private final IVerificationTokenRepository verificationTokenRepository;
-    private final JwtUtils jwtUtils;
 
-    public VerificationTokenEntity getVerificationToken(String token) {
-        return verificationTokenRepository.findByToken(token).orElseThrow(() -> new CustomNotFoundException("token", token));
+    public VerificationToken getVerificationToken(String token) {
+        return verificationTokenRepository.findByToken(token).orElseThrow(() -> new NotFoundDataException("token", token));
     }
 
-    public String getJwtToken(String email, String password) {
-        try {
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
-            Authentication authentication = authenticationManager.authenticate(authenticationToken);
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            AccountDetails accountDetails = (AccountDetails) authentication.getPrincipal();
-
-            return jwtUtils.createTokenFromAccount(accountDetails.getAccount());
-        } catch (BadCredentialsException badCredentialsException) {
-            throw new BadCredentialsException(badCredentialsException.getMessage());
-        }
+    public Account getByEmailAndPassword(String email, String password) throws BadCredentialsException {
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
+        Authentication authentication = authenticationManager.authenticate(authenticationToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        AccountDetails accountDetails = (AccountDetails) authentication.getPrincipal();
+        return accountDetails.getAccount();
     }
 
     public void checkConflictAccountByEmail(String email) {
@@ -58,38 +49,33 @@ public class AuthenticationService {
         }
     }
 
-    public AccountEntity createAccount(RegisterRequest registerRequest, EAccountRole role) {
-        String encode = passwordEncoder.encode(registerRequest.getPassword());
-        AccountEntity account = AccountEntity
-                .builder()
-                .fullName(registerRequest.getFullName())
-                .email(registerRequest.getEmail())
-                .password(encode)
-                .role(role)
-                .status(EAccountStatus.NOT_VERIFIED)
-                .build();
-
+    public Account createAccount(RegisterRequest request, AccountRole role) {
+        String encoded = passwordEncoder.encode(request.getPassword());
+        Account account = new Account();
+        account.setFullName(request.getFullName());
+        account.setEmail(request.getEmail());
+        account.setPassword(encoded);
+        account.setRole(role);
+        account.setStatus(AccountStatus.NOT_VERIFIED);
         return accountRepository.save(account);
     }
 
-    public AccountEntity activeAccount(AccountEntity account) {
-        account.setStatus(EAccountStatus.ACTIVE);
+    public Account activeAccount(Account account) {
+        account.setStatus(AccountStatus.ACTIVE);
         return accountRepository.save(account);
     }
 
-    public void saveVerificationToken(AccountEntity account, String token) {
-        Long accountId = account.getId();
-        Optional<VerificationTokenEntity> optional = verificationTokenRepository.findByAccountId(accountId);
+    public void saveVerificationToken(Account account, String token) {
+        Optional<VerificationToken> optional = verificationTokenRepository.findByAccountId(account.getId());
 
         if (optional.isEmpty()) {
-            verificationTokenRepository.save(new VerificationTokenEntity(account, token));
+            verificationTokenRepository.save(new VerificationToken(account, token));
             return;
         }
 
-        VerificationTokenEntity verificationToken = optional.get();
+        VerificationToken verificationToken = optional.get();
         verificationToken.setToken(token);
         verificationToken.setNewExpired();
         verificationTokenRepository.save(verificationToken);
     }
-
 }

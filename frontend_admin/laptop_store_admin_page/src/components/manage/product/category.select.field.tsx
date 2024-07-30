@@ -1,117 +1,115 @@
 'use client';
 
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { Box, Button, Divider, Menu, MenuItem } from '@mui/material';
-import { useState } from 'react';
-import { ICategory } from '~/types/models';
+import { AutocompleteChangeReason, FormHelperText, TextField } from '@mui/material';
+import TreeSelect from 'mui-tree-select';
+import { useCallback, useMemo } from 'react';
+import { ICategoryInfo, ICategoryNode } from '~/types/models';
 
-interface IProps {
-    tree: ICategory[];
-    onChange(value: number): void;
-}
-interface ISelect {
+class Node implements ICategoryNode {
     id: number;
-    name: string;
+    info: ICategoryInfo;
+    children: ICategoryNode[];
+    createdDate: string;
+    lastModifiedDate: string;
+
+    constructor(node: ICategoryNode | ICategoryInfo) {
+        if ('info' in node) {
+            this.id = node.id;
+            this.info = node.info;
+            this.children = node.children;
+            this.createdDate = node.createdDate;
+            this.lastModifiedDate = node.lastModifiedDate;
+        } else {
+            this.id = 0;
+            this.info = node;
+            this.children = [];
+            this.createdDate = '';
+            this.lastModifiedDate = '';
+        }
+    }
+
+    get childrenNode() {
+        return Boolean(this.children.length) ? this.children.map((item) => new Node(item)) : null;
+    }
+
+    isBranch(): boolean {
+        return Boolean(this.children.length);
+    }
+
+    isEqual(node: Node): boolean {
+        return this.id === node.id;
+    }
+
+    toString(): string {
+        return this.info.name;
+    }
+}
+interface IProps {
+    id: string;
+    value?: ICategoryInfo[];
+    tree: ICategoryNode[];
+    error: boolean;
+    helperText: string;
+    onChange(value: ICategoryInfo[]): void;
 }
 
-function CategorySelectField({ tree, onChange }: IProps) {
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const [parent, setParent] = useState<ICategory | null>(null);
-    const [children, setChildren] = useState<ICategory[]>(tree);
-    const [selected, setSelected] = useState<ISelect | null>(null);
+function CategorySelectField({ id, value, tree, error, helperText, onChange }: IProps) {
+    const data = useMemo(() => tree.map((item) => new Node(item)), [tree]);
+    const nodeValue = useMemo(() => value?.map((item) => new Node(item)) ?? [], [value]);
 
-    function handleOpenMenu(event: React.MouseEvent<HTMLElement>) {
-        setAnchorEl(event.currentTarget);
-    }
-    function handleCloseMenu() {
-        setAnchorEl(null);
-    }
-    function handleClick(director: string, nodeId?: number) {
-        let parentElement: ICategory | null = null;
-        let childrenElement = tree;
+    const handleGetParent = useCallback(
+        (node: Node): Node | null => {
+            let parentElement: ICategoryNode | undefined;
+            let childrenElement = tree;
 
-        director.split(',').forEach((pathId) => {
-            if (!pathId) {
-                return;
-            }
+            node.info.code.split('-').forEach((pathId) => {
+                if (!pathId) {
+                    return;
+                }
 
-            parentElement = childrenElement.find((element) => element.id === Number(pathId)) || null;
+                parentElement = childrenElement.find((element) => element.info.id === Number(pathId));
 
-            if (parentElement) {
-                childrenElement = parentElement.children;
-            }
-        });
+                if (parentElement) {
+                    childrenElement = parentElement.children;
+                }
+            });
 
-        if (nodeId) {
-            parentElement = childrenElement.find((element) => element.id === nodeId) || null;
-            onChange(nodeId);
-        }
+            return parentElement ? new Node(parentElement) : null;
+        },
+        [tree],
+    );
 
-        if (parentElement && parentElement.children.length) {
-            setParent(parentElement);
-            setChildren(parentElement.children);
+    function handleOnChange(_: any, nodes: Node[] | null, reason: AutocompleteChangeReason, __: any) {
+        if (nodes === null) {
             return;
         }
+        switch (reason) {
+            case 'selectOption':
+            case 'removeOption':
+                onChange(nodes.map((item) => item.info));
+                break;
 
-        if (!director && !parentElement) {
-            setParent(null);
-            setChildren(tree);
-            return;
+            default:
+                break;
         }
-
-        setSelected(parentElement ? { id: parentElement.id, name: parentElement.name } : null);
-        setAnchorEl(null);
     }
 
     return (
-        <Box>
-            <Button
-                id='dropdown-tree-select-button'
-                variant='outlined'
-                fullWidth
-                disableRipple
-                endIcon={<ArrowDropDownIcon />}
-                onClick={handleOpenMenu}
-            >
-                {selected ? selected.name : 'Danh muc'}
-            </Button>
-
-            <Menu
-                id='dropdown-tree-select'
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleCloseMenu}
-                anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'left',
-                }}
-                transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'left',
-                }}
-                sx={{ mt: 1.5, '& .MuiPaper-root': { minWidth: 180 } }}
-            >
-                {parent ? (
-                    <MenuItem onClick={() => handleClick(parent.director)}>
-                        <ChevronLeftIcon />
-                        {parent.name}
-                    </MenuItem>
-                ) : null}
-                {parent ? <Divider /> : null}
-                {children.map((item) => (
-                    <MenuItem
-                        key={item.id}
-                        selected={item.id === selected?.id}
-                        onClick={() => handleClick(item.director, item.id)}
-                    >
-                        {item.name}
-                        {item.children.length ? <ChevronRightIcon /> : null}
-                    </MenuItem>
-                ))}
-            </Menu>
-        </Box>
+        <div>
+            <TreeSelect
+                id={'select-' + id}
+                size='small'
+                value={nodeValue}
+                getChildren={(node) => (node ? node.childrenNode : data)}
+                getParent={handleGetParent}
+                multiple
+                renderInput={(params) => <TextField {...params} label='' />}
+                onChange={handleOnChange}
+            />
+            <div>
+                <FormHelperText error={error}>{helperText}</FormHelperText>
+            </div>
+        </div>
     );
 }
 

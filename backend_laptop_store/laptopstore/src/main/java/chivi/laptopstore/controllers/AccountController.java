@@ -2,48 +2,52 @@ package chivi.laptopstore.controllers;
 
 import chivi.laptopstore.common.RequestMaps;
 import chivi.laptopstore.common.ResponseMessage;
-import chivi.laptopstore.models.entities.AccountEntity;
-import chivi.laptopstore.models.requests.AccountRequest;
-import chivi.laptopstore.models.responses.SuccessResponse;
-import chivi.laptopstore.security.jwt.JwtUtils;
+import chivi.laptopstore.communication.requests.AccountRequest;
+import chivi.laptopstore.communication.responses.SuccessResponse;
+import chivi.laptopstore.helpers.AuthContext;
+import chivi.laptopstore.mappers.AccountMapper;
+import chivi.laptopstore.models.Account;
 import chivi.laptopstore.services.AccountService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping(RequestMaps.API_V1)
 @AllArgsConstructor
 public class AccountController {
     private final AccountService accountService;
-    private final JwtUtils jwtUtils;
+    private final AccountMapper mapper;
 
-    @GetMapping(RequestMaps.ACCOUNT_PATHNAME_ADMIN + "find-all")
+    @GetMapping(RequestMaps.ACCOUNT_PATHNAME_ADMIN + "all")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse findAllAccount() {
-        return accountService.getAllAccount();
+    public SuccessResponse getAllAccount() {
+        return accountService.getAll();
+    }
+
+    @GetMapping(RequestMaps.ACCOUNT_PATHNAME_PRIVATE + "profile")
+    @ResponseStatus(HttpStatus.OK)
+    public SuccessResponse getProfile() {
+        Account account = AuthContext.getFromSecurityContext();
+        var accountPayload = mapper.toPayloadFromAccount(account);
+        return new SuccessResponse(ResponseMessage.FOUND_SUCCESS, accountPayload);
     }
 
     @PutMapping(RequestMaps.ACCOUNT_PATHNAME_PRIVATE + "edit")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse editAccount(@Valid @RequestBody AccountRequest accountRequest, HttpServletRequest httpServletRequest) {
-        String email = this.getEmailFromRequest(httpServletRequest);
-        AccountEntity account = accountService.editAccount(email, accountRequest);
-        return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, account);
-
+    public SuccessResponse editAccount(@Valid @RequestBody AccountRequest accountRequest) {
+        Account account = AuthContext.getFromSecurityContext();
+        Account result = accountService.editInfo(account, accountRequest);
+        return new SuccessResponse(ResponseMessage.UPDATE_SUCCESS, result);
     }
 
-    @DeleteMapping(RequestMaps.ACCOUNT_PATHNAME_ADMIN + "delete/{accountId}")
+    @DeleteMapping(RequestMaps.ACCOUNT_PATHNAME_ADMIN + "{id}/delete")
     @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse deleteAccount(@PathVariable Long accountId) {
-        accountService.deleteAccount(accountId);
+    public SuccessResponse deleteAccount(@PathVariable Long id) {
+        accountService.delete(id);
         return new SuccessResponse(ResponseMessage.DELETE_SUCCESS);
-    }
-
-    private String getEmailFromRequest(HttpServletRequest request) {
-        String token = jwtUtils.getTokenFromAuthorizationHeader(request);
-        return jwtUtils.getSubjectFromToken(token);
     }
 }

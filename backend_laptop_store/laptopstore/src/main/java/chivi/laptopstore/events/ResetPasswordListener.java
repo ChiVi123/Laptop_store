@@ -1,6 +1,6 @@
 package chivi.laptopstore.events;
 
-import chivi.laptopstore.models.entities.AccountEntity;
+import chivi.laptopstore.models.Account;
 import chivi.laptopstore.services.AccountService;
 import chivi.laptopstore.utils.CustomMail;
 import freemarker.template.Configuration;
@@ -36,7 +36,7 @@ public class ResetPasswordListener implements ApplicationListener<OnResetPasswor
         String toMail = event.getEmail();
         String newPassword = this.generatePassword(lengthPassword);
         Map<String, Object> model = this.createModel(toMail, newPassword);
-        AccountEntity account = accountService.getByEmail(toMail);
+        Account account = accountService.getByEmail(toMail);
 
         accountService.resetPassword(account, newPassword);
 

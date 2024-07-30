@@ -1,6 +1,8 @@
 'use client';
 
 import { createTheme } from '@mui/material';
+import { createContext } from 'react';
+import { IAccount } from './types/models';
 
 declare module '@mui/material/styles' {
     interface Palette {
@@ -11,6 +13,8 @@ declare module '@mui/material/styles' {
         border?: { main?: string };
     }
 }
+
+export const AccountContext = createContext<IAccount | null>(null);
 
 export const themeMUI = createTheme({
     palette: {

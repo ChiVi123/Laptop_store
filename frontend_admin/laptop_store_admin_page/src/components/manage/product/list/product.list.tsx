@@ -11,43 +11,52 @@ import {
     GridRowSelectionModel,
 } from '@mui/x-data-grid';
 import Image from 'next/image';
-import { useMemo, useState } from 'react';
-import { deleteProductAction } from '~/actions/productActions';
-import { EStatus } from '~/common/enums';
+import { useRouter } from 'next/navigation';
+import { Fragment, useMemo, useState } from 'react';
+import { productServerAction } from '~/actions';
+import { EPath, EStatus, EText } from '~/common/enums';
 import { mapStatus } from '~/common/maps';
-import { IImage, IProduct } from '~/types/models';
-import { logger } from '~/utils';
-import '~/utils/extends';
+import { IProductInfo } from '~/types/models';
+import DeleteActionCell from './delete.action.cell';
+
+import '~/libs/string.extensions';
 
 interface IProps {
-    rows: IProduct[];
+    rows: IProductInfo[];
 }
 
 function ProductList({ rows }: IProps) {
     const [rowSelectionModel, setRowSelectionModel] = useState<GridRowSelectionModel>([]);
+    const router = useRouter();
 
-    async function handleDeleteItem(id: number) {
-        const result = await deleteProductAction(id);
-        logger({ result });
-    }
+    const handleDeleteItem = async (id: number) => {
+        await productServerAction.destroy(id);
+    };
 
-    const columns = useMemo<GridColDef[]>(
+    const columns = useMemo<GridColDef<(typeof rows)[number]>[]>(
         () => [
             { field: 'id', headerName: 'ID', type: 'number', width: 40 },
             {
-                field: 'images',
+                field: 'thumbnailUrl',
                 headerName: '',
                 width: 120,
                 sortable: false,
                 filterable: false,
-                renderCell: (params: GridRenderCellParams<any, IImage[]>) => (
-                    <Image
-                        src={params.value ? params.value[0].secure_url : ''}
-                        alt={params.value ? params.value[0].folder : ''}
-                        width={100}
-                        height={100}
-                        style={{ objectFit: 'contain' }}
-                    />
+                renderCell: (params: GridRenderCellParams<any, string>) => (
+                    <Fragment>
+                        {Boolean(params.value) ? (
+                            <Image
+                                src={params.value ?? ''}
+                                alt=''
+                                width={100}
+                                height={100}
+                                priority
+                                style={{ objectFit: 'contain' }}
+                            />
+                        ) : (
+                            <Box width={100} height={100}></Box>
+                        )}
+                    </Fragment>
                 ),
             },
             { field: 'name', headerName: 'Tên sản phẩm', minWidth: 420 },
@@ -79,21 +88,22 @@ function ProductList({ rows }: IProps) {
                     <GridActionsCellItem
                         key={1}
                         icon={<EditIcon />}
-                        label='Chinh sua'
+                        label={EText.EDIT}
                         showInMenu
-                        onClick={() => console.log(params.id)}
+                        onClick={() => router.push(EPath.MANAGE_PRODUCT_EDIT.concat(params.row.slug))}
                     />,
-                    <GridActionsCellItem
+                    <DeleteActionCell
                         key={2}
                         icon={<DeleteIcon />}
-                        label='Xoa'
+                        label={EText.DELETE}
                         showInMenu
-                        onClick={() => handleDeleteItem(Number(params.id))}
+                        closeMenuOnClick={false}
+                        onDelete={() => handleDeleteItem(Number(params.id))}
                     />,
                 ],
             },
         ],
-        [],
+        [router],
     );
 
     return (
@@ -105,11 +115,7 @@ function ProductList({ rows }: IProps) {
                 rows={rows}
                 columns={columns}
                 getRowHeight={() => 'auto'}
-                initialState={{
-                    pagination: {
-                        paginationModel: { page: 0, pageSize: 5 },
-                    },
-                }}
+                initialState={{ pagination: { paginationModel: { page: 0, pageSize: 5 } } }}
                 pageSizeOptions={[5, 10]}
                 checkboxSelection
                 rowSelectionModel={rowSelectionModel}

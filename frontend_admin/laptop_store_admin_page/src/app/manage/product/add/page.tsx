@@ -5,12 +5,12 @@ import Typography from '@mui/material/Typography';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Fragment } from 'react';
+import { categoryServerAction } from '~/actions';
 import { EPath } from '~/common/enums';
-import ProductForm from '~/components/manage/product/add/product.form';
-import { findAllBrand, findAllCategoryRoot } from '~/services/find.all';
+import ProductForm from '~/components/manage/product/product.form';
 
 async function AddProductPage() {
-    const [brandResponse, categoryResponse] = await Promise.all([findAllBrand(), findAllCategoryRoot()]);
+    const result = await categoryServerAction.root();
 
     return (
         <Fragment>
@@ -29,10 +29,7 @@ async function AddProductPage() {
                 </Typography>
             </Box>
 
-            <ProductForm
-                brands={brandResponse && 'data' in brandResponse ? brandResponse.data : []}
-                categories={categoryResponse && 'data' in categoryResponse ? categoryResponse.data : []}
-            />
+            <ProductForm categories={result.children} />
         </Fragment>
     );
 }

@@ -5,6 +5,7 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { Box, IconButton, Typography, styled } from '@mui/material';
 import Image from 'next/image';
 import { ChangeEvent, Fragment, useEffect, useState } from 'react';
+import { IImage } from '~/types/models';
 
 const StyleVisuallyHiddenInput = styled('input')({
     position: 'absolute',
@@ -22,17 +23,22 @@ declare global {
         src: string;
     }
 }
+export type imageType = File | IImage | undefined;
 interface IProps {
-    onChange?: (value: File) => void;
+    value?: imageType;
+    onRemoveImage?: (value: imageType) => void;
+    onChange?: (value: File | undefined) => void;
 }
 
-function SingleImageField({ onChange }: IProps) {
-    const [image, setImage] = useState<File | null>(null);
+function SingleImageField({ value, onRemoveImage, onChange }: IProps) {
+    const [image, setImage] = useState<imageType>(value);
     const sizeImage = 240;
+    const imageSrc = image instanceof File ? image.src : image?.secureUrl;
+    const imageName = image instanceof File ? image.name : image?.publicId;
 
     useEffect(() => {
         return () => {
-            if (image) {
+            if (image && image instanceof File) {
                 URL.revokeObjectURL(image.src);
             }
         };
@@ -49,10 +55,13 @@ function SingleImageField({ onChange }: IProps) {
         }
     }
     function handleDeleteImage() {
-        if (image) {
+        if (image && image instanceof File) {
             URL.revokeObjectURL(image.src);
         }
-        setImage(null);
+        if (onRemoveImage) {
+            onRemoveImage(image);
+        }
+        setImage(undefined);
     }
 
     return (
@@ -81,7 +90,7 @@ function SingleImageField({ onChange }: IProps) {
                     >
                         <ClearIcon fontSize='inherit' />
                     </IconButton>
-                    <StyleImage src={image.src} alt={image.name} fill />
+                    <StyleImage src={imageSrc || ''} alt={imageName || ''} sizes='auto' fill priority />
                 </Box>
             ) : (
                 <Box

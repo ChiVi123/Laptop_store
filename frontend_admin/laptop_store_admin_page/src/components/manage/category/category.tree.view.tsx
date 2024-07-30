@@ -2,18 +2,19 @@
 
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Box, Button, FormControlLabel, Paper, Switch, TextField } from '@mui/material';
+import { Box, Button, FormControlLabel, Switch, TextField } from '@mui/material';
 import { TreeView } from '@mui/x-tree-view';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { DragEvent, Fragment, SyntheticEvent, useCallback, useMemo, useRef, useState } from 'react';
+import { DragEvent, SyntheticEvent, useCallback, useMemo, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { createSubCategoryAction, deleteCategoryAction, moveCategoryAction } from '~/actions/categoryActions';
-import { EPath, EStatus } from '~/common/enums';
-import { addCategoryResolver } from '~/resolvers';
-import { addCategoryFormData } from '~/types/form.data';
-import { ICategory } from '~/types/models';
-import { logger } from '~/utils';
+import { categoryServerAction } from '~/actions';
+import { ELabel, EPath, EStatus, EText } from '~/common/enums';
+import { useEntityStatus } from '~/hooks';
+import { categoryResolver } from '~/resolvers';
+import { categoryFormData } from '~/types/form.data';
+import { ICategoryNode } from '~/types/models';
+import FormLabel from '../form.label';
 import CustomTreeItem from './custom.tree.item';
 
 declare global {
@@ -28,9 +29,9 @@ interface IDragAndDropStatus {
     dropTo: number | null;
 }
 interface IProps {
-    categoryTree: ICategory[];
-    category?: ICategory;
-    categoryParent?: ICategory;
+    categoryTree: ICategoryNode[];
+    categoryNode?: ICategoryNode;
+    parentCategoryNode?: ICategoryNode;
 }
 
 const styleBefore = {
@@ -51,121 +52,114 @@ const styleBefore = {
     zIndex: 2,
 };
 
-function CategoryTreeView({ categoryTree, category, categoryParent }: IProps) {
+function CategoryTreeView({ categoryTree, categoryNode, parentCategoryNode }: IProps) {
     const initDragAndDrop = useCallback(() => ({ type: '', dragFrom: null, dropTo: null } as IDragAndDropStatus), []);
     const {
         control,
         formState: { errors },
+        setValue,
         handleSubmit,
     } = useForm({
-        resolver: addCategoryResolver,
-        defaultValues: { name: category?.name || '', path: category?.path || '' },
+        resolver: categoryResolver,
+        defaultValues: { name: categoryNode?.info.name ?? '', path: categoryNode?.info.path ?? '' },
     });
     const [dragAndDrop, setDragAndDrop] = useState(initDragAndDrop);
-    const [status, setStatus] = useState<boolean>(true);
+    const [status, setStatus] = useEntityStatus(categoryNode?.info);
     const [disabled, setDisabled] = useState<boolean>(false);
-    const inputNameRef = useRef<HTMLInputElement>();
-    const router = useRouter();
     const defaultExpanded = useMemo(() => {
-        const expanded = category?.director.split(',') || categoryParent?.director.split(',') || [];
-        if (category) {
-            expanded.push(category.id.toString());
-        }
-        if (categoryParent) {
-            expanded.push(categoryParent.id.toString());
-        }
-        return expanded;
-    }, [category, categoryParent]);
+        const expanded = categoryNode?.info.code.split('-') ?? parentCategoryNode?.info.code.split('-') ?? ['2'];
+        return [...expanded, categoryNode?.info.id.toString() ?? parentCategoryNode?.info.id.toString() ?? '2'];
+    }, [categoryNode?.info.code, categoryNode?.info.id, parentCategoryNode?.info.code, parentCategoryNode?.info.id]);
+    const router = useRouter();
 
-    function handleSetSelected(_: SyntheticEvent, nodeId: string) {
-        router.push(EPath.MANAGE_CATEGORY.concat('/edit/', nodeId));
-    }
-    function handleDragStart(event: DragEvent<HTMLElement>) {
+    const pathDefault = '1';
+
+    const handleSetSelected = (_: SyntheticEvent, nodeId: string) => {
+        router.push(EPath.MANAGE_CATEGORY_EDIT.concat(nodeId));
+    };
+    const handleDragStart = (event: DragEvent<HTMLElement>) => {
         event.stopPropagation();
         const dragFrom = Number(event.currentTarget.dataset.id);
         setDragAndDrop({ ...dragAndDrop, type: 'handleDragStart', dragFrom });
-    }
-    function handleDragOver(event: DragEvent<HTMLElement>) {
+    };
+    const handleDragOver = (event: DragEvent<HTMLElement>) => {
         event.preventDefault();
-    }
-    function handleDragEnter(event: DragEvent<HTMLElement>) {
+    };
+    const handleDragEnter = (event: DragEvent<HTMLElement>) => {
         event.stopPropagation();
         const dropTo = Number(event.currentTarget.dataset.id);
         setDragAndDrop({ ...dragAndDrop, type: 'handleDragEnter', dropTo });
-    }
-    async function handleDragEnd() {
+    };
+    const handleDragEnd = async () => {
         const { dragFrom, dropTo } = dragAndDrop;
         if (dragFrom !== null && dropTo !== null && dragFrom !== dropTo) {
-            const result = await moveCategoryAction(dragFrom, dropTo);
-            logger({ result });
+            await categoryServerAction.move(dragFrom, dropTo);
         }
         setDragAndDrop(initDragAndDrop());
-    }
-    async function handleDeleteItem(id: number) {
-        const result = await deleteCategoryAction(id);
-        logger({ result });
-    }
-
-    const handleOnSubmit: SubmitHandler<addCategoryFormData> = async (data) => {
-        setDisabled(true);
-        data.parentId = categoryParent?.id;
-        data.status = status ? EStatus.ENABLED : EStatus.DISABLED;
-        const result = await createSubCategoryAction(data);
-        setDisabled(false);
-        logger({ result });
     };
 
-    function renderTreeItem(node: ICategory, parentId?: number) {
-        return (
-            <CustomTreeItem
-                key={node.id}
-                id={`parent-${parentId}-${node.id}`}
-                nodeId={node.id.toString()}
-                label={node.name.concat(` (ID: ${node.id})`)}
-                data-id={node.id}
-                draggable
-                onDragStart={handleDragStart}
-                onDragOver={handleDragOver}
-                onDragEnter={handleDragEnter}
-                onDragEnd={handleDragEnd}
-                sx={{
-                    position: 'relative',
-                    '& > .MuiTreeItem-content::before': dragAndDrop.dropTo === node.id ? styleBefore : {},
-                }}
-            >
-                {node.children.map((child) => renderTreeItem(child, node.id))}
-            </CustomTreeItem>
-        );
-    }
+    const handleOnSubmit: SubmitHandler<categoryFormData> = async (data) => {
+        setDisabled(true);
+
+        data.parentId = parentCategoryNode?.id;
+        data.status = status ? EStatus.ENABLED : EStatus.DISABLED;
+
+        const result = categoryNode
+            ? await categoryServerAction.edit(categoryNode.id, data)
+            : await categoryServerAction.create(data);
+
+        if (result) {
+            setValue('name', result.info.name);
+            setValue('path', result.info.path);
+            setValue('status', result.info.status);
+            setStatus(result.info.status === EStatus.ENABLED);
+        }
+
+        setDisabled(false);
+    };
+
+    const renderTreeItem = (node: ICategoryNode) => (
+        <CustomTreeItem
+            key={node.id}
+            label={node.info.name.concat(` (ID: ${node.info.id})`)}
+            nodeId={node.info.id.toString()}
+            data-id={node.id}
+            draggable
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragEnter={handleDragEnter}
+            onDragEnd={handleDragEnd}
+            sx={{
+                position: 'relative',
+                '& > .MuiTreeItem-content::before': dragAndDrop.dropTo === node.id ? styleBefore : {},
+            }}
+        >
+            {node.children.map((child) => renderTreeItem(child))}
+        </CustomTreeItem>
+    );
 
     return (
-        <Fragment>
-            {category && (
-                <Paper elevation={0} sx={{ display: 'flex', justifyContent: 'space-between', p: 1 }}>
+        <Box display='flex' gap={2} mt={2}>
+            <Box flex='1'>
+                <Box display='flex' alignItems='flex-start' gap={1} mb={2}>
                     <Button
                         variant='outlined'
-                        size='small'
                         LinkComponent={Link}
-                        href={EPath.MANAGE_CATEGORY.concat(`/add/${category.id}`)}
+                        href={`${EPath.MANAGE_CATEGORY_ADD}${parentCategoryNode?.info.id ?? pathDefault}`}
                     >
-                        Them moi
+                        {EText.ADD_ROOT_CATEGORY}
                     </Button>
                     <Button
-                        variant='contained'
-                        size='small'
-                        color='warning'
-                        disabled={disabled}
-                        onClick={() => handleDeleteItem(category.id)}
+                        variant='outlined'
+                        LinkComponent={Link}
+                        href={`${EPath.MANAGE_CATEGORY_ADD}${categoryNode?.info.id ?? pathDefault}`}
                     >
-                        Xoa
+                        {EText.ADD_SUBCATEGORY}
                     </Button>
-                </Paper>
-            )}
-
-            <Box display='flex' gap={4} mt={2}>
+                </Box>
                 <TreeView
                     aria-label='category tree'
-                    defaultSelected={category?.id.toString() || categoryParent?.id.toString()}
+                    defaultSelected={categoryNode?.info.id.toString() || parentCategoryNode?.info.id.toString()}
                     defaultExpanded={defaultExpanded}
                     defaultCollapseIcon={<ExpandMoreIcon />}
                     defaultExpandIcon={<ChevronRightIcon />}
@@ -174,19 +168,27 @@ function CategoryTreeView({ categoryTree, category, categoryParent }: IProps) {
                 >
                     {categoryTree.map((item) => renderTreeItem(item))}
                 </TreeView>
+            </Box>
 
-                <Box
-                    width='40%'
-                    component='form'
-                    onSubmit={handleSubmit(handleOnSubmit)}
-                    sx={{ '& .MuiFormControl-root': { mb: 2 } }}
-                >
+            <Box
+                width='60%'
+                component='form'
+                onSubmit={handleSubmit(handleOnSubmit)}
+                sx={{ '& .MuiFormControl-root': { mb: 2 } }}
+            >
+                <Box display='flex' justifyContent='space-between' gap={3}>
+                    <FormLabel
+                        id='input-name'
+                        required
+                        sx={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'flex-end', minWidth: 148 }}
+                    >
+                        {ELabel.CATEGORY_NAME}
+                    </FormLabel>
                     <Controller
                         control={control}
                         name='name'
                         render={({ field: { value, onChange } }) => (
                             <TextField
-                                inputRef={inputNameRef}
                                 id='input-name'
                                 type='text'
                                 label=''
@@ -201,12 +203,19 @@ function CategoryTreeView({ categoryTree, category, categoryParent }: IProps) {
                             />
                         )}
                     />
+                </Box>
+                <Box display='flex' justifyContent='space-between' gap={3}>
+                    <FormLabel
+                        id='input-name'
+                        sx={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'flex-end', minWidth: 148 }}
+                    >
+                        URL
+                    </FormLabel>
                     <Controller
                         control={control}
                         name='path'
                         render={({ field: { value, onChange } }) => (
                             <TextField
-                                inputRef={inputNameRef}
                                 id='input-path'
                                 type='text'
                                 label=''
@@ -221,25 +230,26 @@ function CategoryTreeView({ categoryTree, category, categoryParent }: IProps) {
                             />
                         )}
                     />
-                    <FormControlLabel
-                        label='Bật'
-                        control={
-                            <Switch
-                                inputProps={{ 'aria-label': 'category-status' }}
-                                checked={status}
-                                onChange={(event) => setStatus(event.target.checked)}
-                            />
-                        }
-                    />
+                </Box>
+                <FormControlLabel
+                    label={ELabel.TURN_ON}
+                    control={
+                        <Switch
+                            inputProps={{ 'aria-label': 'category-status' }}
+                            checked={status}
+                            onChange={(event) => setStatus(event.target.checked)}
+                        />
+                    }
+                    sx={{ marginLeft: 18.5 }}
+                />
 
-                    <Box mt={2}>
-                        <Button type='submit' variant='contained' disabled={disabled}>
-                            Luu
-                        </Button>
-                    </Box>
+                <Box mt={2} ml={18.5}>
+                    <Button type='submit' variant='contained' disabled={disabled}>
+                        {EText.SAVE}
+                    </Button>
                 </Box>
             </Box>
-        </Fragment>
+        </Box>
     );
 }
 

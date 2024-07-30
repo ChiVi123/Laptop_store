@@ -1,0 +1,68 @@
+{
+    "Client component": {
+        "scope": "typescriptreact, typescript",
+        "prefix": "ucl",
+        "body": ["'use client';"],
+        "description": "Client component"
+    },
+    "Servcer action": {
+        "scope": "typescriptreact, typescript",
+        "prefix": "usv",
+        "body": ["'use server';"],
+        "description": "server action"
+    },
+    "Create component": {
+        "scope": "typescriptreact, typescript",
+        "prefix": "ffc",
+        "body": ["function $1() {", "    return <div></div>", "};", "", "export default $1;"],
+        "description": "Create component"
+    },
+    "Create component layout": {
+        "scope": "typescriptreact, typescript",
+        "prefix": "ffcl",
+        "body": [
+            "function $1Layout({ children }: PropsWithChildren$2) {",
+            "    return (<div>{children}</div>)",
+            "};",
+            "",
+            "export default $1Layout;"
+        ],
+        "description": "Create component layout"
+    },
+    "Logger": {
+        "scope": "typescriptreact, typescript",
+        "prefix": "lif",
+        "body": ["logger$1.info('$2::', $3);"],
+        "description": "Use state"
+    },
+    "Use state": {
+        "scope": "typescriptreact, typescript",
+        "prefix": "ust",
+        "body": "const [$1, set${1/(.*)/${1:/capitalize}/}] = useState$2($3);",
+        "description": "Use state"
+    },
+    "Use effect": {
+        "scope": "typescriptreact, typescript",
+        "prefix": "uef",
+        "body": ["useEffect$1(() => {", "    $2", "}, []);"],
+        "description": "Use effect"
+    },
+    "Export default": {
+        "scope": "typescriptreact, typescript",
+        "prefix": "edf",
+        "body": ["export { default as $2 } from '$1';"],
+        "description": "Export default"
+    },
+    "Export all": {
+        "scope": "typescriptreact, typescript",
+        "prefix": "eal",
+        "body": ["export * as $2 from '$1';"],
+        "description": "Export all"
+    },
+    "Export const": {
+        "scope": "typescriptreact, typescript",
+        "prefix": "ecst",
+        "body": ["export const $1 = $2;"],
+        "description": "Export const"
+    }
+}

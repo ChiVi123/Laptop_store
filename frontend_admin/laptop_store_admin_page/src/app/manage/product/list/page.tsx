@@ -9,23 +9,18 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
 import { Fragment } from 'react';
+import { productServerAction } from '~/actions';
 import { EPath } from '~/common/enums';
 import { ProductList, TabsWrap } from '~/components/manage/product/list';
-import { findAllProduct } from '~/services/find.all';
 
 export const metadata: Metadata = {
     title: 'List product | Laptop store',
-    description: 'Management page',
+    description: 'List product page',
 };
 
 async function ProductListPage() {
-    const result = (await findAllProduct()) || { data: [] };
-
-    if ('code' in result && result.code === 401) {
-        redirect(EPath.AUTH_LOGIN);
-    }
+    const result = await productServerAction.all();
 
     return (
         <Fragment>
@@ -74,7 +69,7 @@ async function ProductListPage() {
                 </Button>
             </Box>
 
-            <ProductList rows={'data' in result ? result.data : []} />
+            <ProductList rows={Array.isArray(result) ? result : []} />
         </Fragment>
     );
 }

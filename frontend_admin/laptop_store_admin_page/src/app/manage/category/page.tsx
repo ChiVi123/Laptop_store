@@ -4,12 +4,12 @@ import LinkMUI from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import Link from 'next/link';
 import { Fragment } from 'react';
+import { categoryServerAction } from '~/actions';
 import { EPath } from '~/common/enums';
 import CategoryTreeView from '~/components/manage/category/category.tree.view';
-import { findAllCategoryRoot } from '~/services/find.all';
 
 async function CategoryPage() {
-    const result = await findAllCategoryRoot();
+    const result = await categoryServerAction.root();
 
     return (
         <Fragment>
@@ -19,17 +19,13 @@ async function CategoryPage() {
                         Trang chủ
                     </LinkMUI>
                     <Typography color='text.primary' component='span'>
-                        Danh muc
+                        Danh mục
                     </Typography>
                 </Breadcrumbs>
-
-                <Typography variant='h2' mt={2}>
-                    Danh muc
-                </Typography>
             </Box>
 
             <Box px={3} py={2}>
-                <CategoryTreeView categoryTree={result.data} category={result.data[0]} />
+                <CategoryTreeView categoryTree={result.children} parentCategoryNode={result} />
             </Box>
         </Fragment>
     );

@@ -2,20 +2,23 @@ import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import LinkMUI from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
+import { Metadata } from 'next';
 import Link from 'next/link';
 import { Fragment } from 'react';
-import { EPath } from '~/common/enums';
+import { categoryServerAction } from '~/actions';
+import { EPath, EText } from '~/common/enums';
+import CategoryBar from '~/components/manage/category/category.bar';
 import CategoryTreeView from '~/components/manage/category/category.tree.view';
-import { findAllCategoryRoot } from '~/services/find.all';
-import { findCategoryById } from '~/services/find.one';
 
 interface IProps {
     params: { id: string };
 }
 
 async function EditCategoryPage({ params: { id } }: IProps) {
-    const resultTreeView = await findAllCategoryRoot();
-    const resultCategory = await findCategoryById(Number(id));
+    const [rootCategoryResult, categoryResult] = await Promise.all([
+        categoryServerAction.root(),
+        categoryServerAction.getNodeByInfoId(Number(id)),
+    ]);
 
     return (
         <Fragment>
@@ -25,20 +28,24 @@ async function EditCategoryPage({ params: { id } }: IProps) {
                         Trang chủ
                     </LinkMUI>
                     <Typography color='text.primary' component='span'>
-                        Danh muc
+                        Danh mục
                     </Typography>
                 </Breadcrumbs>
-
-                <Typography variant='h2' mt={2}>
-                    Danh muc
+                <Typography variant='h1' mt={1}>
+                    {EText.EDIT}
                 </Typography>
             </Box>
+            {categoryResult.info.name && <CategoryBar category={categoryResult} />}
 
             <Box px={3} py={2}>
-                <CategoryTreeView categoryTree={resultTreeView.data} category={resultCategory.data} />
+                <CategoryTreeView categoryTree={rootCategoryResult.children} categoryNode={categoryResult} />
             </Box>
         </Fragment>
     );
 }
 
+export async function generateMetadata({ params: { id } }: IProps): Promise<Metadata> {
+    const result = await categoryServerAction.getInfoById(Number(id));
+    return { title: `${result.name} (ID: ${result.id}) | Laptop Store` };
+}
 export default EditCategoryPage;

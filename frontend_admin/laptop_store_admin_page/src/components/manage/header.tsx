@@ -1,21 +1,17 @@
 'use client';
 
 import { KeyboardArrowDown as KeyboardArrowDownIcon, Notifications as NotificationsIcon } from '@mui/icons-material';
-import {
-    AppBar,
-    Avatar,
-    Badge,
-    Button,
-    Divider,
-    IconButton,
-    Link as LinkMUI,
-    Menu,
-    MenuItem,
-    Toolbar,
-} from '@mui/material';
-import Link from 'next/link';
-import { useState } from 'react';
+import { AppBar, Avatar, Badge, Button, Divider, IconButton, Menu, MenuItem, Toolbar } from '@mui/material';
+import { useRouter } from 'next/navigation';
+import { useContext, useState } from 'react';
 import { EPath } from '~/common/enums';
+import { AccountContext } from '~/config';
+import { apiRequest } from '~/libs';
+
+type responseType = {
+    message: string;
+    path: EPath;
+};
 
 function stringToColor(string: string) {
     let hash = 0;
@@ -36,7 +32,6 @@ function stringToColor(string: string) {
 
     return color;
 }
-
 function stringAvatar(name: string) {
     return {
         sx: {
@@ -45,19 +40,28 @@ function stringAvatar(name: string) {
             bgcolor: stringToColor(name),
             fontSize: '0.625rem !important',
         },
-        children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
+        children: name[0],
     };
 }
 
 function Header({ width }: { width: number }) {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const account = useContext(AccountContext);
+    const router = useRouter();
 
-    function handleOpenMenu(event: React.MouseEvent<HTMLElement>) {
+    const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
-    }
-    function handleCloseMenu() {
+    };
+    const handleCloseMenu = () => {
         setAnchorEl(null);
-    }
+    };
+    const handleProfile = () => {
+        router.push(EPath.MANAGE_PROFILE);
+    };
+    const handleLogout = async () => {
+        const result = await apiRequest.get('api/auth/logout', { baseURL: '' }).json<responseType>();
+        router.push(result.path);
+    };
 
     return (
         <AppBar sx={{ left: width, width: 'auto', backgroundColor: 'white' }}>
@@ -71,12 +75,12 @@ function Header({ width }: { width: number }) {
                     id='profile-menu-button'
                     variant='outlined'
                     disableRipple
-                    startIcon={<Avatar {...stringAvatar('I Love You')} />}
+                    startIcon={<Avatar {...stringAvatar(account?.fullName ?? '')} />}
                     endIcon={<KeyboardArrowDownIcon />}
                     sx={{ color: ({ palette }) => palette.grey[600], borderRadius: '999px' }}
                     onClick={handleOpenMenu}
                 >
-                    I love you
+                    {account?.fullName ?? ''}
                 </Button>
                 <Menu
                     id='profile-menu-content'
@@ -93,14 +97,9 @@ function Header({ width }: { width: number }) {
                     }}
                     sx={{ mt: 1.5, '& .MuiPaper-root': { minWidth: 180 } }}
                 >
-                    <MenuItem onClick={handleCloseMenu}>Profile</MenuItem>
-                    <MenuItem onClick={handleCloseMenu}>Profile</MenuItem>
+                    <MenuItem onClick={handleProfile}>Tài khoản</MenuItem>
                     <Divider />
-                    <MenuItem>
-                        <LinkMUI underline='none' color='inherit' component={Link} href={EPath.AUTH_LOGIN}>
-                            Dang xuat
-                        </LinkMUI>
-                    </MenuItem>
+                    <MenuItem onClick={handleLogout}>Đăng xuất</MenuItem>
                 </Menu>
             </Toolbar>
         </AppBar>

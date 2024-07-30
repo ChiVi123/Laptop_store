@@ -1,12 +1,12 @@
 {
     "Create component": {
-        "scope": "typescriptreact",
+        "scope": "typescriptreact, typescript",
         "prefix": "ffc",
         "body": ["function $1() {", "    return <div></div>", "};", "", "export default $1;"],
         "description": "Create component"
     },
     "Create component layout": {
-        "scope": "typescriptreact",
+        "scope": "typescriptreact, typescript",
         "prefix": "ffcl",
         "body": [
             "function $1Layout({ children }: $2Type) {",
@@ -18,25 +18,31 @@
         "description": "Create component layout"
     },
     "Logger": {
-        "scope": "typescriptreact",
+        "scope": "typescriptreact, typescript",
         "prefix": "logger",
-        "body": ["logger$1({ $2 });"],
+        "body": ["logger$1.info('$2::', $3);"],
         "description": "Use state"
     },
     "Use state": {
-        "scope": "typescriptreact",
+        "scope": "typescriptreact, typescript",
         "prefix": "ust",
         "body": "const [$1, set${1/(.*)/${1:/capitalize}/}] = useState$2($3);",
         "description": "Use state"
     },
     "Export default": {
-        "scope": "typescriptreact",
+        "scope": "typescriptreact, typescript",
         "prefix": "edf",
         "body": ["export { default as $2 } from '$1';"],
         "description": "Export default"
     },
+    "Export all": {
+        "scope": "typescriptreact, typescript",
+        "prefix": "eal",
+        "body": ["export * as $2 from '$1';"],
+        "description": "Export all"
+    },
     "Export const": {
-        "scope": "typescriptreact",
+        "scope": "typescriptreact, typescript",
         "prefix": "ecst",
         "body": ["export const $1 = $2;"],
         "description": "Export const"

@@ -4,11 +4,11 @@ import Link from 'next/link';
 
 import { addressServerAction, cartServerAction } from '~/actions';
 import { Key } from '~/common/enums';
-import { CartTable, Container } from '~/components';
+import { Container } from '~/components';
 import { buttonVariants } from '~/components/ui/button';
 import { Separator } from '~/components/ui/separator';
 import { cn } from '~/libs/utils';
-import { SectionTotal } from './_components';
+import { CartTable, SectionTotal } from './_components';
 
 async function CartPage() {
     const accessToken = cookies().get(Key.ACCESS_TOKEN)?.value;

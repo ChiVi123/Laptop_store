@@ -7,7 +7,7 @@ function DefaultLayout({ children }: PropsWithChildren) {
             <Header />
             {children}
             <BottomNavigation />
-            <footer className='hidden lg:block'>Footer</footer>
+            {/* <footer className='hidden lg:block'>Footer</footer> */}
         </Fragment>
     );
 }

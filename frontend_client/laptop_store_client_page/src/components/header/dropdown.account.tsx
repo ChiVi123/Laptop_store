@@ -24,7 +24,7 @@ interface IProps {
 }
 
 function DropdownAccount({ accountToken, className }: IProps) {
-    const [decode, setDecode] = useState<JwtPayload>({ exp: 0, fullName: '', iat: 0, iss: '', sub: '' });
+    const [decode, setDecode] = useState<JwtPayload>({ exp: 0, accountId: 0, fullName: '', iat: 0, iss: '', sub: '' });
     const logout = useLogout();
 
     useEffect(() => {

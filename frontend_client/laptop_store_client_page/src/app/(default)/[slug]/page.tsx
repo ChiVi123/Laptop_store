@@ -1,11 +1,10 @@
 import { HomeIcon } from '@radix-ui/react-icons';
 import { Metadata } from 'next';
-import Link from 'next/link';
 
 import '~/libs/extension.number';
 
 import { Container } from '~/components';
-import { ButtonAddCart, CarouselImage } from '~/components/product-detail';
+import { ButtonAddCart, ButtonBuyNow, CarouselImage } from '~/components/product-detail';
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -14,8 +13,6 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '~/components/ui/breadcrumb';
-import { Button } from '~/components/ui/button';
-import { Separator } from '~/components/ui/separator';
 import { getProductBySlug } from '~/services';
 
 import style from './style.module.css';
@@ -65,7 +62,7 @@ async function ProductDetailPage({ params: { slug } }: IProps) {
                         <div className='flex-1 p-4 rounded-md bg-white space-y-2.5'>
                             <h2 className='font-medium text-xl text-cv-gray-200'>{productInfo.name}</h2>
 
-                            <div className='flex items-center h-5 space-x-4 text-sm'>
+                            {/* <div className='flex items-center h-5 space-x-4 text-sm'>
                                 <div className='space-x-1'>
                                     <span className='text-cv-gray-90'>Thương hiệu:</span>
                                     <Link href='' className='text-sm text-cv-primary-100'>
@@ -74,7 +71,7 @@ async function ProductDetailPage({ params: { slug } }: IProps) {
                                 </div>
                                 <Separator orientation='vertical' />
                                 <div className='text-cv-gray-90'>Đã bán {productInfo.quantitySold}</div>
-                            </div>
+                            </div> */}
 
                             <div className='font-medium text-lg text-cv-primary-100'>
                                 {productInfo.price.toCurrency()}
@@ -105,11 +102,9 @@ async function ProductDetailPage({ params: { slug } }: IProps) {
                     </div>
                 </div>
 
-                <div className='fixed right-0 bottom-[3.625rem] left-0 flex-1 md:relative'>
+                <div className='fixed right-0 left-0 flex-1 md:relative'>
                     <div className='md:sticky top-[4.625rem] right-0 grid grid-cols-2 items-center gap-4 md:block p-2 lg:p-4 rounded-md bg-white md:space-y-3'>
-                        <Button type='button' size='lg' className='w-full'>
-                            Mua ngay
-                        </Button>
+                        <ButtonBuyNow productId={productInfo.id} />
                         <ButtonAddCart productId={productInfo.id} />
                     </div>
                 </div>

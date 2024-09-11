@@ -5,6 +5,7 @@ import { LOGO_TEXT_URL, LOGO_URL } from '~/common/values';
 
 import Container from '../container';
 
+import { Suspense } from 'react';
 import HeaderAction from './header.action';
 import HeaderCategoryMenu from './header.category.menu';
 import HeaderSearchBar from './header.search.bar';
@@ -34,7 +35,9 @@ function Header() {
 
                 {/* Search bar */}
                 <div className='flex-1 sm:flex-none flex gap-2 items-center px-2.5 py-2 sm:w-72 lg:w-96 h-[2.125rem] rounded-full border border-input bg-white shadow-sm'>
-                    <HeaderSearchBar />
+                    <Suspense>
+                        <HeaderSearchBar />
+                    </Suspense>
                 </div>
 
                 <div className='hidden sm:flex justify-end'>

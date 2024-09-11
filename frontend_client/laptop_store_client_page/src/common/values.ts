@@ -104,7 +104,7 @@ export const RAW_ADDRESS: IAddress = {
     location: '',
     deliveryAddressType: 'HOME',
     selectDefault: false,
-    choose: false,
+    isChoose: false,
     createdDate: '',
     lastModifiedDate: '',
 };

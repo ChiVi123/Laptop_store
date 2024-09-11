@@ -1,18 +1,13 @@
-import AddIcon from '@mui/icons-material/Add';
-import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
-import Button from '@mui/material/Button';
-import InputAdornment from '@mui/material/InputAdornment';
 import LinkMUI from '@mui/material/Link';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Fragment } from 'react';
 import { productServerAction } from '~/actions';
 import { EPath } from '~/common/enums';
-import { ProductList, TabsWrap } from '~/components/manage/product/list';
+import { ProductList } from '~/components/manage/product/list';
 
 export const metadata: Metadata = {
     title: 'List product | Laptop store',
@@ -24,7 +19,7 @@ async function ProductListPage() {
 
     return (
         <Fragment>
-            <Box p='18px 24px 12px' bgcolor='white'>
+            <Box p='18px 24px 12px' mb={3} bgcolor='white'>
                 <Breadcrumbs separator='/'>
                     <LinkMUI href={EPath.MANAGE_HOME} underline='hover' color='grey.400' component={Link}>
                         Trang chủ
@@ -39,11 +34,11 @@ async function ProductListPage() {
                 </Typography>
             </Box>
 
-            <Box bgcolor='white'>
+            {/* <Box bgcolor='white'>
                 <TabsWrap />
-            </Box>
+            </Box> */}
 
-            <Box
+            {/* <Box
                 display='flex'
                 alignItems='center'
                 justifyContent='space-between'
@@ -67,7 +62,7 @@ async function ProductListPage() {
                 <Button variant='outlined' endIcon={<AddIcon />}>
                     Bộ lọc
                 </Button>
-            </Box>
+            </Box> */}
 
             <ProductList rows={Array.isArray(result) ? result : []} />
         </Fragment>

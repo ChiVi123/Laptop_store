@@ -18,4 +18,5 @@ export const productDefaultValues: productFormData = {
     description: '',
     price: 10000,
     quantityStock: 10,
+    images: [],
 };

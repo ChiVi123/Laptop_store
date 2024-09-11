@@ -1,7 +1,7 @@
 'use client';
 
-import { KeyboardArrowDown as KeyboardArrowDownIcon, Notifications as NotificationsIcon } from '@mui/icons-material';
-import { AppBar, Avatar, Badge, Button, Divider, IconButton, Menu, MenuItem, Toolbar } from '@mui/material';
+import { KeyboardArrowDown as KeyboardArrowDownIcon } from '@mui/icons-material';
+import { AppBar, Avatar, Button, Divider, Menu, MenuItem, Toolbar } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useContext, useState } from 'react';
 import { EPath } from '~/common/enums';
@@ -66,11 +66,11 @@ function Header({ width }: { width: number }) {
     return (
         <AppBar sx={{ left: width, width: 'auto', backgroundColor: 'white' }}>
             <Toolbar sx={{ justifyContent: 'flex-end', gap: 2 }}>
-                <IconButton>
+                {/* <IconButton>
                     <Badge badgeContent={2} color='warning'>
                         <NotificationsIcon />
                     </Badge>
-                </IconButton>
+                </IconButton> */}
                 <Button
                     id='profile-menu-button'
                     variant='outlined'

@@ -1,5 +1,6 @@
 import { ChevronLeftIcon, ChevronRightIcon } from '@radix-ui/react-icons';
 import Link from 'next/link';
+import { Suspense } from 'react';
 
 import { SearchPagination, Sort, SortSelect } from '~/app/_components';
 import { Container, ProductCard } from '~/components';
@@ -84,10 +85,14 @@ async function SearchPage({ searchParams }: IProps) {
             </div>
 
             <div className='flex items-center justify-between p-3 mt-1 bg-white'>
-                <Sort />
+                <Suspense>
+                    <Sort />
+                </Suspense>
 
                 <div className='sm:hidden'>
-                    <SortSelect />
+                    <Suspense>
+                        <SortSelect />
+                    </Suspense>
                 </div>
             </div>
 
@@ -110,7 +115,9 @@ async function SearchPage({ searchParams }: IProps) {
 
             {Boolean(resultSearch.list.length) && (
                 <div className='flex justify-center mt-6 mb-48'>
-                    <SearchPagination totalPage={resultSearch.totalPage} />
+                    <Suspense>
+                        <SearchPagination totalPage={resultSearch.totalPage} />
+                    </Suspense>
                 </div>
             )}
         </Container>
